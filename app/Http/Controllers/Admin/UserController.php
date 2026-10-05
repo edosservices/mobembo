@@ -1,0 +1,116 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Enums\KycStatus;
+use App\Enums\UserRole;
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\AccountService;
+use App\Services\PortfolioService;
+use App\Support\Money;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class UserController extends Controller
+{
+    public function index(Request $request)
+    {
+        $q = trim((string) $request->input('q'));
+
+        $users = User::query()
+            ->where('role', UserRole::User)
+            ->with(['wallet', 'referrer'])
+            ->withSum(['ledgerEntries as returns_total' => fn ($query) => $query->where('type', 'investment_return')->where('status', 'completed')], 'amount')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($inner) use ($q) {
+                    $inner->where('name', 'like', "%{$q}%")->orWhere('phone', 'like', "%{$q}%");
+                });
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.users.index', compact('users', 'q'));
+    }
+
+    public function show(User $user, PortfolioService $portfolio)
+    {
+        abort_if($user->isAdmin(), 404);
+        $user->load(['wallet', 'referrer', 'kycDocuments']);
+
+        return view('admin.users.show', [
+            'user' => $user,
+            'summary' => $portfolio->summary($user),
+            'transactions' => $user->ledgerEntries()->latest()->limit(12)->get(),
+            'deposits' => $user->deposits()->latest()->limit(8)->get(),
+            'withdrawals' => $user->withdrawals()->latest()->limit(8)->get(),
+            'investments' => $user->investments()->with('project')->latest('invested_at')->limit(8)->get(),
+            'audits' => $user->hasMany(\App\Models\AuditLog::class)->latest('created_at')->limit(12)->get(),
+        ]);
+    }
+
+    public function block(Request $request, User $user, AccountService $accounts)
+    {
+        $data = $request->validate(['reason' => ['required', 'string', 'min:5', 'max:500']]);
+        $accounts->block($user, $request->user(), $data['reason']);
+
+        return back()->with('success', 'Compte bloqué.');
+    }
+
+    public function unblock(Request $request, User $user, AccountService $accounts)
+    {
+        $data = $request->validate(['reason' => ['required', 'string', 'min:5', 'max:500']]);
+        $accounts->unblock($user, $request->user(), $data['reason']);
+
+        return back()->with('success', 'Compte débloqué.');
+    }
+
+    public function bonus(Request $request, User $user, AccountService $accounts)
+    {
+        $request->merge(['amount' => Money::normalizeInput($request->input('amount'))]);
+        $data = $request->validate([
+            'amount' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'reason' => ['required', 'string', 'min:5', 'max:500'],
+            'idempotency_key' => ['required', 'uuid'],
+        ]);
+        $accounts->bonus($user, $request->user(), $data['amount'], $data['reason'], $data['idempotency_key']);
+
+        return back()->with('success', 'Bonus enregistré dans le ledger et le journal d’audit.');
+    }
+
+    public function adjust(Request $request, User $user, AccountService $accounts)
+    {
+        $request->merge(['amount' => Money::normalizeInput($request->input('amount'))]);
+        $data = $request->validate([
+            'amount' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'direction' => ['required', Rule::in(['credit', 'debit'])],
+            'reason' => ['required', 'string', 'min:5', 'max:500'],
+            'idempotency_key' => ['required', 'uuid'],
+        ]);
+
+        $signed = $data['direction'] === 'debit' ? Money::sub('0', $data['amount']) : $data['amount'];
+        $accounts->adjust($user, $request->user(), $signed, $data['reason'], $data['idempotency_key']);
+
+        return back()->with('success', 'Ajustement enregistré. Le solde n’a pas été modifié en silence.');
+    }
+
+    public function password(Request $request, User $user, AccountService $accounts)
+    {
+        $password = $accounts->resetPassword($user, $request->user());
+
+        return back()->with('temporary_password', $password)->with('success', 'Mot de passe temporaire créé. Il ne sera plus affiché ensuite.');
+    }
+
+    public function kyc(Request $request, User $user, AccountService $accounts)
+    {
+        $data = $request->validate([
+            'kyc_status' => ['required', Rule::enum(KycStatus::class)],
+            'kyc_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $accounts->reviewKyc($user, $request->user(), KycStatus::from($data['kyc_status']), $data['kyc_note'] ?? null);
+
+        return back()->with('success', 'Statut KYC mis à jour.');
+    }
+}
