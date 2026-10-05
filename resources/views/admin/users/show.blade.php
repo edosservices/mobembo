@@ -1,7 +1,13 @@
 @extends('layouts.admin')
 @section('content')
 <p><a href="{{ route('admin.users.index') }}">Utilisateurs</a></p>
-<h1 class="serif">{{ $user->name }}</h1>
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;">
+    <h1 class="serif">{{ $user->name }}</h1>
+    <form method="POST" action="{{ route('admin.users.impersonate', $user) }}">
+        @csrf
+        <button class="btn-z" type="submit">Ouvrir le compte</button>
+    </form>
+</div>
 <p>{{ $user->phone }} · @include('partials.status', ['status' => $user->status]) · KYC {{ $user->kyc_status->label() }} · Parrain {{ $user->referrer->name ?? 'aucun' }} · Inscrit le {{ $user->created_at->format('d/m/Y H:i') }}</p>
 <div class="grid-4">
     <div class="stat"><span>Disponible</span><strong>{{ money($summary['available']) }}</strong></div>

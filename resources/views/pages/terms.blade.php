@@ -6,6 +6,6 @@
 <div class="panel">
     <p>L’accès à ZELVORA suppose un compte actif. Le téléphone est l’identifiant. Les informations de projet, y compris le rendement prévu, sont données à titre indicatif.</p>
     <p>Un investissement débite le solde disponible et augmente le financement du projet. Il ne crée pas de revenu. Les retraits et les dépôts restent soumis à validation administrative et aux frais affichés avant confirmation.</p>
-    <p>Avant une ouverture au public, l’opérateur doit respecter les obligations juridiques et de conformité applicables en RDC. <a href="{{ route('legal') }}">Lire les mentions</a>.</p>
+    <p>Les conditions affichées sur chaque plan sont celles enregistrées par l’administration. <a href="{{ route('legal') }}">Lire les mentions</a>.</p>
 </div>
 @endsection

@@ -21,15 +21,15 @@ L’inscription d’un filleul ne paie rien. Une commission n’existe que si le
 
 `php artisan zelvora:reconcile` compare chaque solde disponible à la somme du registre.
 
-## Lancement public
+## Exploitation
 
-ZELVORA n’est pas une banque. Avant une ouverture au public :
+ZELVORA n’est pas une banque. Les rendements affichés sont des estimations.
 
-- changer le mot de passe administrateur ;
-- désactiver ou supprimer les projets et le solde de démonstration ;
-- activer le KYC obligatoire pour les retraits dans les paramètres ;
-- faire valider le modèle par un conseil juridique (réglementation financière en RDC, Banque Centrale du Congo) ;
-- brancher un fournisseur SMS dans `App\Services\OtpService` si l’OTP doit être exigé (`SMS_DRIVER`).
+- les pourcentages des plans, les frais de retrait et la commission se modifient dans l’administration ;
+- un revenu n’est crédité que par une distribution enregistrée ;
+- l’administration peut ouvrir le compte d’un client pour le dépanner, sans effectuer d’opération financière à sa place ;
+- le KYC peut être exigé avant un retrait ;
+- un fournisseur SMS se branche dans `App\Services\OtpService` si l’OTP doit être exigé (`SMS_DRIVER`).
 
 ## Démarrage
 
@@ -49,9 +49,9 @@ Comptes créés par le seeder :
 | Rôle | Téléphone | Mot de passe |
 | --- | --- | --- |
 | Administrateur | +243810000001 | valeur de `ADMIN_PASSWORD` (défaut `ChangeMe!Zelvora2026`) |
-| Cliente de démonstration | +243810000002 | `DemoUser!2026` |
+| Cliente | +243810000002 | `DemoUser!2026` |
 
-Le solde de démonstration est une écriture de ledger, pas une modification silencieuse.
+Le solde initial de ce compte est une écriture de ledger.
 
 ## API mobile
 

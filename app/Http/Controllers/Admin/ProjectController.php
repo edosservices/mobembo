@@ -76,6 +76,36 @@ class ProjectController extends Controller
         return redirect()->route('admin.projects.show', $project)->with('success', 'Projet mis à jour.');
     }
 
+    public function updateReturn(Request $request, Project $project, AuditService $audit)
+    {
+        $request->merge([
+            'expected_return_percent' => str_replace(',', '.', (string) $request->input('expected_return_percent')),
+        ]);
+
+        $data = $request->validate([
+            'expected_return_percent' => ['required', 'numeric', 'min:0', 'max:100'],
+        ]);
+
+        $previous = (string) $project->expected_return_percent;
+        $project->forceFill([
+            'expected_return_percent' => $data['expected_return_percent'],
+            'is_demo' => false,
+        ])->save();
+
+        $audit->record(
+            $request->user(),
+            null,
+            'project_return_updated',
+            $previous,
+            $project->expected_return_percent,
+            null,
+            'Modification du rendement prévu de '.$project->name.'. Les investissements déjà ouverts conservent leur taux.',
+            ['project_id' => $project->id],
+        );
+
+        return back()->with('success', 'Rendement prévu mis à jour. Aucun solde n’a été modifié.');
+    }
+
     public function distribute(Request $request, Project $project, DistributionService $distributions)
     {
         $request->merge(['total_amount' => Money::normalizeInput($request->input('total_amount'))]);
@@ -174,7 +204,7 @@ class ProjectController extends Controller
             'starts_at' => $data['starts_at'] ?? null,
             'ends_at' => $data['ends_at'] ?? null,
             'next_distribution_on' => $data['next_distribution_on'] ?? null,
-            'is_demo' => $request->boolean('is_demo'),
+            'is_demo' => false,
         ]);
     }
 

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/zelvora.css') }}">
 </head>
 <body class="site-app">
+    @include('partials.support-banner')
     <header class="topbar">
         <a class="brand" href="{{ route('dashboard') }}">
             <span class="mark">Z</span>

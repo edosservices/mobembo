@@ -10,7 +10,7 @@
     </details>
     <details>
         <summary>Comment effectuer un dépôt ?</summary>
-        <p>Choisissez M-Pesa, Airtel Money ou Orange Money, envoyez les fonds au numéro configuré par l’administration, puis envoyez la preuve. Le solde disponible change après validation.</p>
+        <p>Choisissez M-Pesa, Airtel Money ou Orange Money, envoyez les fonds au numéro indiqué sur la page de dépôt, puis envoyez la preuve. Le solde disponible est mis à jour après validation.</p>
     </details>
     <details>
         <summary>Quel est le montant minimum ?</summary>

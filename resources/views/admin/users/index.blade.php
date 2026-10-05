@@ -20,7 +20,10 @@
                 <td>@include('partials.status', ['status' => $user->status])</td>
                 <td>{{ $user->referrer->referral_code ?? '—' }}</td>
                 <td>{{ $user->created_at->format('d/m/Y') }}</td>
-                <td><a href="{{ route('admin.users.show', $user) }}">Voir</a></td>
+                <td>
+                    <a href="{{ route('admin.users.show', $user) }}">Voir</a>
+                    <form method="POST" action="{{ route('admin.users.impersonate', $user) }}">@csrf<button class="btn-z-ghost small" type="submit">Dépanner</button></form>
+                </td>
             </tr>
         @endforeach
         </tbody>

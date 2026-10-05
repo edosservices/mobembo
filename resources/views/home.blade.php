@@ -97,10 +97,10 @@
 <section class="section reveal" id="comment-ca-marche">
     <div class="wrap">
         <p class="kicker">Comment ça marche</p>
-        <h2>Cinq étapes, sans rendement inventé.</h2>
+        <h2>Cinq étapes pour investir.</h2>
         <ol class="timeline">
             <li><span>01</span><div><h3>Créer un compte</h3><p>Nom, téléphone et mot de passe.</p></div></li>
-            <li><span>02</span><div><h3>Déposer des fonds</h3><p>Choisir son moyen de paiement et envoyer les fonds au numéro ZELVORA indiqué, lorsqu’il est configuré. La preuve reste en attente jusqu’à validation.</p></div></li>
+            <li><span>02</span><div><h3>Déposer des fonds</h3><p>Choisir M-Pesa, Airtel Money ou Orange Money, envoyer les fonds au numéro indiqué, puis joindre la preuve. Le dépôt est ajouté au solde après validation.</p></div></li>
             <li><span>03</span><div><h3>Choisir un projet</h3><p>Explorer les différentes opportunités.</p></div></li>
             <li><span>04</span><div><h3>Investir</h3><p>Choisir le montant et confirmer. Le solde disponible est débité dans une opération unique.</p></div></li>
             <li><span>05</span><div><h3>Suivre</h3><p>Consulter son portefeuille et les distributions réelles lorsqu’elles sont enregistrées.</p></div></li>
@@ -151,7 +151,7 @@
         </details>
         <details>
             <summary>Comment effectuer un dépôt ?</summary>
-            <p>Depuis votre espace, choisissez M-Pesa, Airtel Money ou Orange Money, envoyez les fonds au numéro indiqué par l’administration, puis joignez la preuve et la référence. Le montant reste en attente jusqu’à validation. Aucun numéro n’est inventé : s’il n’est pas encore configuré, il n’est pas affiché.</p>
+            <p>Depuis votre espace, choisissez M-Pesa, Airtel Money ou Orange Money, envoyez les fonds au numéro indiqué, puis joignez la preuve et la référence. Le montant est ajouté au solde disponible après validation.</p>
         </details>
         <details>
             <summary>Quel est le montant minimum ?</summary>
@@ -163,7 +163,7 @@
         </details>
         <details>
             <summary>Comment fonctionnent les rendements ?</summary>
-            <p>Un rendement affiché peut être prévisionnel. Une distribution réelle doit correspondre aux revenus effectivement enregistrés pour le projet. Elle apparaît alors dans le portefeuille, l’historique, le ledger, l’investissement et les notifications. Posséder un investissement ne crée pas d’argent tout seul.</p>
+            <p>Le pourcentage affiché est une estimation sur la durée du plan. Le revenu crédité correspond à une distribution enregistrée pour le projet. Il apparaît alors dans le portefeuille, l’historique et les notifications.</p>
         </details>
         <p class="note">{{ $disclaimer }}</p>
     </div>

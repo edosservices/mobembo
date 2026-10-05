@@ -2,7 +2,7 @@
 @section('title', 'KYC')
 @section('content')
 <h1 style="font-size:2.3rem;">Vérification d’identité</h1>
-<p class="note">Le KYC est préparé pour une mise en conformité avant lancement public. Le statut actuel est : {{ auth()->user()->kyc_status->label() }}.</p>
+<p class="note">Envoyez une pièce d’identité ou un justificatif de domicile. Statut actuel : {{ auth()->user()->kyc_status->label() }}.</p>
 <form class="panel" method="POST" action="{{ route('kyc.store') }}" enctype="multipart/form-data">
     @csrf
     <div class="field">

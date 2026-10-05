@@ -10,6 +10,7 @@
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="@yield('body-class', 'site-public')">
+    @include('partials.support-banner')
     <header class="topbar">
         <a class="brand" href="{{ route('home') }}">
             <span class="mark">Z</span>

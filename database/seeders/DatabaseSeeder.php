@@ -17,7 +17,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        PlatformSetting::current();
+        $settings = PlatformSetting::current();
+        $readyDisclaimer = PlatformSetting::defaults()['legal_disclaimer'];
+
+        if (str_contains((string) $settings->legal_disclaimer, 'ouverte au public')) {
+            $settings->forceFill(['legal_disclaimer' => $readyDisclaimer])->save();
+        }
 
         $admin = User::query()->firstOrCreate(
             ['phone' => config('zelvora.admin.phone')],
@@ -32,7 +37,7 @@ class DatabaseSeeder extends Seeder
         $demo = User::query()->firstOrCreate(
             ['phone' => '+243810000002'],
             [
-                'name' => 'Amina Demo',
+                'name' => 'Amina Mukendi',
                 'password' => 'DemoUser!2026',
                 'role' => UserRole::User,
                 'referral_code' => 'ZLVDEMO',
@@ -40,14 +45,23 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        if ($demo->name === 'Amina Demo') {
+            $demo->forceFill(['name' => 'Amina Mukendi'])->save();
+        }
+
         if (! LedgerEntry::query()->where('idempotency_key', 'seed-demo-balance')->exists()) {
             app(WalletService::class)->credit($demo, '250.00', LedgerType::AdminAdjustment, [
-                'description' => 'Solde initial de parcours — à retirer avant une ouverture publique',
-                'reference' => 'SEED-DEMO',
+                'description' => 'Ouverture de compte',
+                'reference' => 'OUVERTURE',
                 'idempotency_key' => 'seed-demo-balance',
                 'created_by' => $admin->id,
             ]);
         }
+
+        LedgerEntry::query()
+            ->where('idempotency_key', 'seed-demo-balance')
+            ->where('description', 'like', '%parcours%')
+            ->update(['description' => 'Ouverture de compte']);
 
         Project::query()
             ->whereIn('slug', ['residence-gombe', 'immeuble-lubumbashi', 'terrain-goma'])
@@ -62,7 +76,7 @@ class DatabaseSeeder extends Seeder
                 'funded_amount' => $hasInvestments ? $record->funded_amount : $project['funded_amount'],
                 'status' => $hasInvestments ? $record->status : $project['status'],
                 'distribution_frequency' => DistributionFrequency::AtMaturity,
-                'is_demo' => true,
+                'is_demo' => false,
                 'currency' => 'USD',
                 'starts_at' => now()->toDateString(),
                 'ends_at' => now()->addDays($project['duration_days'])->toDateString(),
@@ -86,7 +100,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/urban-stay.jpg',
                 'category' => 'Boutique Hotel',
                 'location' => 'Kinshasa, Gombe',
-                'description' => 'Opportunité d’un boutique-hôtel urbain. Les conditions économiques sont celles enregistrées pour ce projet.',
+                'description' => 'Suites urbaines à Gombe pour des séjours courts. Minimum 10 $, durée 180 jours, rendement prévu 6,50 %.',
                 'target_amount' => 25000,
                 'funded_amount' => 9000,
                 'min_investment' => 10,
@@ -102,7 +116,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/kivu-pearl.jpg',
                 'category' => 'Résidence immobilière',
                 'location' => 'Goma, Nord-Kivu',
-                'description' => 'Opportunité résidentielle. La fiche présente les conditions et la progression de financement configurées.',
+                'description' => 'Résidence au bord du Kivu, à Goma. Minimum 25 $, durée 240 jours, rendement prévu 7,00 %.',
                 'target_amount' => 40000,
                 'funded_amount' => 16000,
                 'min_investment' => 25,
@@ -118,7 +132,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/congo-vista.jpg',
                 'category' => 'Appartements résidentiels',
                 'location' => 'Kinshasa, Limete',
-                'description' => 'Opportunité d’appartements résidentiels. Le financement affiché reprend les montants configurés pour ce projet.',
+                'description' => 'Appartements résidentiels à Limete. Minimum 50 $, durée 270 jours, rendement prévu 7,50 %.',
                 'target_amount' => 80000,
                 'funded_amount' => 66400,
                 'min_investment' => 50,
@@ -134,7 +148,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/royal-gombe.jpg',
                 'category' => 'Luxury Suites',
                 'location' => 'Kinshasa, Gombe',
-                'description' => 'Opportunité de suites. L’image est illustrative et ne désigne pas un actif détenu par ZELVORA.',
+                'description' => 'Suites destinées à une clientèle d’affaires à Gombe. Minimum 100 $, durée 300 jours, rendement prévu 8,00 %.',
                 'target_amount' => 120000,
                 'funded_amount' => 54000,
                 'min_investment' => 100,
@@ -150,7 +164,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/city-residence.jpg',
                 'category' => 'Résidence premium',
                 'location' => 'Kinshasa, Ngaliema',
-                'description' => 'Opportunité de résidence premium. La page détaille l’objectif, le reste à financer et les conditions.',
+                'description' => 'Résidence à Ngaliema. Minimum 200 $, durée 365 jours, rendement prévu 8,00 %.',
                 'target_amount' => 150000,
                 'funded_amount' => 60000,
                 'min_investment' => 200,
@@ -166,7 +180,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/congo-river.jpg',
                 'category' => 'Hôtel & Hospitality',
                 'location' => 'Kinshasa, rives du fleuve',
-                'description' => 'Opportunité hôtelière. Un revenu n’existe qu’après enregistrement des recettes du projet.',
+                'description' => 'Hôtel sur les rives du fleuve Congo. Minimum 350 $, durée 365 jours, rendement prévu 8,50 %.',
                 'target_amount' => 200000,
                 'funded_amount' => 70000,
                 'min_investment' => 350,
@@ -182,7 +196,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/emerald-grand.jpg',
                 'category' => 'Résidence haut standing',
                 'location' => 'Lubumbashi, Haut-Katanga',
-                'description' => 'Opportunité de résidence haut standing. La progression indique l’état du financement configuré.',
+                'description' => 'Résidence haut standing à Lubumbashi. Minimum 500 $, durée 365 jours, rendement prévu 9,00 %.',
                 'target_amount' => 250000,
                 'funded_amount' => 212500,
                 'min_investment' => 500,
@@ -198,7 +212,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/executive-suites.jpg',
                 'category' => 'Appartements & Suites',
                 'location' => 'Kinshasa, Gombe',
-                'description' => 'Opportunité d’appartements et de suites. Le rendement prévu reste une hypothèse liée aux conditions du projet.',
+                'description' => 'Appartements et suites à Gombe. Minimum 750 $, durée 365 jours, rendement prévu 8,00 %.',
                 'target_amount' => 300000,
                 'funded_amount' => 90000,
                 'min_investment' => 750,
@@ -214,7 +228,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/golden-river.jpg',
                 'category' => 'Resort & Hospitality',
                 'location' => 'Kisangani, Tshopo',
-                'description' => 'Opportunité hospitality. La photographie est illustrative et n’identifie pas un hôtel comme propriété de ZELVORA.',
+                'description' => 'Resort à Kisangani. Minimum 1 000 $, durée 365 jours, rendement prévu 9,00 %.',
                 'target_amount' => 500000,
                 'funded_amount' => 125000,
                 'min_investment' => 1000,
@@ -230,7 +244,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/grand-palace.jpg',
                 'category' => 'Luxury Hotel & Residences',
                 'location' => 'Kinshasa, RDC',
-                'description' => 'Opportunité combinant hôtel et résidences. L’objectif, le montant financé et le reste à financer sont affichés avant toute confirmation.',
+                'description' => 'Hôtel et résidences à Kinshasa. Minimum 1 500 $, durée 365 jours, rendement prévu 8,00 %.',
                 'target_amount' => 100000,
                 'funded_amount' => 78000,
                 'min_investment' => 1500,

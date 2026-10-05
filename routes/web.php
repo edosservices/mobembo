@@ -22,6 +22,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReferralController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+Route::post('/support/quitter', [SupportController::class, 'leave'])->middleware(['auth', 'active'])->name('support.leave');
 
 Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -71,6 +73,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::get('/', AdminDashboardController::class)->name('dashboard');
     Route::get('/utilisateurs', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/utilisateurs/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::post('/utilisateurs/{user}/depannage', [AdminUserController::class, 'impersonate'])->name('users.impersonate');
     Route::post('/utilisateurs/{user}/bloquer', [AdminUserController::class, 'block'])->name('users.block');
     Route::post('/utilisateurs/{user}/debloquer', [AdminUserController::class, 'unblock'])->name('users.unblock');
     Route::post('/utilisateurs/{user}/bonus', [AdminUserController::class, 'bonus'])->name('users.bonus');
@@ -84,6 +87,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::get('/projets/{project}', [AdminProjectController::class, 'show'])->name('projects.show');
     Route::get('/projets/{project}/modifier', [AdminProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projets/{project}', [AdminProjectController::class, 'update'])->name('projects.update');
+    Route::post('/projets/{project}/rendement', [AdminProjectController::class, 'updateReturn'])->name('projects.return');
     Route::post('/projets/{project}/distribuer', [AdminProjectController::class, 'distribute'])->name('projects.distribute');
     Route::post('/projets/{project}/cloturer', [AdminProjectController::class, 'close'])->name('projects.close');
     Route::delete('/projets/{project}', [AdminProjectController::class, 'destroy'])->name('projects.destroy');

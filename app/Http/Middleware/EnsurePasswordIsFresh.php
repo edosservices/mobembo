@@ -12,7 +12,11 @@ class EnsurePasswordIsFresh
     {
         $user = $request->user();
 
-        if ($user?->must_change_password && ! $request->routeIs('profile.edit', 'profile.password', 'logout')) {
+        if ($request->session()->has('impersonator_id')) {
+            return $next($request);
+        }
+
+        if ($user?->must_change_password && ! $request->routeIs('profile.edit', 'profile.password', 'logout', 'support.leave')) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->json(['message' => 'Vous devez changer votre mot de passe.'], 423);
             }

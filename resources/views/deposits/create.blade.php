@@ -12,7 +12,7 @@
             @if ($settings->orange_number)<li>Orange Money : {{ $settings->orange_number }}</li>@endif
         </ul>
     @else
-        <p class="muted">Aucun numéro de réception n’est configuré pour le moment. L’administration doit l’enregistrer avant qu’un dépôt puisse être adressé.</p>
+        <p class="muted">Le numéro de réception s’affiche ici. S’il est absent, contactez l’administration avant d’envoyer les fonds.</p>
     @endif
 </div>
 <form class="panel" method="POST" action="{{ route('deposits.store') }}" enctype="multipart/form-data">

@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AccountStatus;
 use App\Enums\KycStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\AccountService;
+use App\Services\AuditService;
 use App\Services\PortfolioService;
 use App\Support\Money;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -48,6 +51,25 @@ class UserController extends Controller
             'investments' => $user->investments()->with('project')->latest('invested_at')->limit(8)->get(),
             'audits' => $user->hasMany(\App\Models\AuditLog::class)->latest('created_at')->limit(12)->get(),
         ]);
+    }
+
+    public function impersonate(Request $request, User $user, AuditService $audit)
+    {
+        abort_if($user->isAdmin(), 403);
+
+        if ($user->status !== AccountStatus::Active) {
+            return back()->with('error', 'Ce compte est bloqué. Débloquez-le avant d’ouvrir le dépannage.');
+        }
+
+        $admin = $request->user();
+        $audit->record($admin, $user, 'support_access_started', null, null, null, 'Ouverture du compte client pour dépannage.');
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $request->session()->put('impersonator_id', $admin->id);
+        $request->session()->put('impersonated_user_id', $user->id);
+
+        return redirect()->route('dashboard')->with('success', 'Vous consultez le compte de '.$user->name.'.');
     }
 
     public function block(Request $request, User $user, AccountService $accounts)

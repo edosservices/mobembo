@@ -5,7 +5,7 @@
     <div>
         <div class="kicker">Connexion</div>
         <h1 style="font-size:3rem;">Revenir à votre portefeuille.</h1>
-        <p class="lede">Utilisez le numéro de téléphone enregistré. La vérification par SMS pourra être ajoutée plus tard, sans changer l’identifiant.</p>
+        <p class="lede">Utilisez le numéro de téléphone de votre compte.</p>
     </div>
     <form class="panel" method="POST" action="{{ route('login') }}">
         @csrf

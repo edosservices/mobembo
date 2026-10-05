@@ -2,7 +2,7 @@
 @section('title', 'Dashboard admin')
 @section('content')
 <h1 class="serif">Pilotage</h1>
-<div class="note" style="margin-bottom:1rem;">Avant un lancement public : changez le mot de passe administrateur, retirez les projets de démonstration, activez le KYC obligatoire pour les retraits, et faites valider le modèle par un conseil juridique en RDC.</div>
+<div class="note" style="margin-bottom:1rem;">Les pourcentages des plans se règlent dans Projets. Les frais de retrait et la commission de parrainage se règlent dans Paramètres. Un revenu n’est crédité que par une distribution enregistrée.</div>
 <div class="grid-4">
     @foreach ([
         'Utilisateurs' => $stats['users_total'],

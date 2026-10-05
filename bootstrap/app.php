@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\FinancialException;
+use App\Http\Middleware\BlockImpersonatedMutations;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsurePasswordIsFresh;
 use App\Http\Middleware\EnsureUserIsActive;
@@ -20,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         __DIR__.'/../app/Console/Commands',
     ])
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            BlockImpersonatedMutations::class,
+        ]);
         $middleware->alias([
             'active' => EnsureUserIsActive::class,
             'admin' => EnsureAdmin::class,
