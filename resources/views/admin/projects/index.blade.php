@@ -4,7 +4,7 @@
     <h1 class="serif mb-0">Projets immobiliers</h1>
     <a class="btn-z" href="{{ route('admin.projects.create') }}">Nouveau projet</a>
 </div>
-<div class="table-responsive panel">
+<div class="table-responsive panel projects-board">
     <table class="table table-sm table-hover align-middle mb-0 table-fit">
         <colgroup>
             <col style="width:13%"><col style="width:12%"><col style="width:9%"><col style="width:9%"><col style="width:7%">
@@ -21,20 +21,17 @@
                 <td class="text-nowrap">{{ str_replace('.', ',', $project->progressPercent()) }} %</td>
                 <td class="text-nowrap">{{ money($project->min_investment) }}</td>
                 <td class="yield-cell">
-                    <form method="POST" action="{{ route('admin.projects.return', $project) }}" class="percent-form">
-                        @csrf
-                        <input name="expected_return_percent" value="{{ $project->expected_return_percent }}" inputmode="decimal" aria-label="Rendement prévu de {{ $project->name }}">
-                        <button class="btn-z small" type="submit">OK</button>
-                    </form>
+                    <strong>{{ str_replace('.', ',', rtrim(rtrim((string) $project->expected_return_percent, '0'), '.')) }} %</strong>
                     <span class="muted">{{ \App\Support\ReturnEstimator::percentLabel($project->dailyReturnPercent()) }}</span>
                 </td>
                 <td class="text-nowrap">{{ $project->duration_days }} jours</td>
                 <td>@include('partials.status', ['status' => $project->status])</td>
-                <td>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-dark rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">Actions</button>
+                <td class="text-nowrap">
+                    <a class="btn btn-sm btn-dark rounded-pill" href="{{ route('admin.projects.edit', $project) }}">Modifier</a>
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-outline-dark rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">Plus</button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="{{ route('admin.projects.edit', $project) }}">Modifier</a>
+                            <a class="dropdown-item" href="{{ route('admin.projects.edit', $project) }}">Modifier le plan</a>
                             <a class="dropdown-item" href="{{ route('admin.projects.show', $project) }}">Voir les investissements</a>
                             @if ($project->status !== \App\Enums\ProjectStatus::Suspended)
                                 <form method="POST" action="{{ route('admin.projects.suspend', $project) }}">

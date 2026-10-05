@@ -54,7 +54,7 @@ class ReferralProgressService
             'remaining' => $remaining,
             'target' => $target,
             'progress' => $progress,
-            'benefits' => config('zelvora.level_benefits.'.$level['key'], []),
+            'benefits' => $level['benefits'] ?? config('zelvora.level_benefits.'.$level['key'], []),
             'investments_count' => $user->investments()->count(),
             'active_investments' => $user->investments()->where('status', 'active')->count(),
         ];
@@ -93,10 +93,12 @@ class ReferralProgressService
             if (! is_array($rule) || ! isset($rule['key'], $rule['name'], $rule['min_active'])) {
                 continue;
             }
+            $benefits = $rule['benefits'] ?? config('zelvora.level_benefits.'.$rule['key'], []);
             $rules[] = [
                 'key' => (string) $rule['key'],
                 'name' => (string) $rule['name'],
                 'min_active' => (int) $rule['min_active'],
+                'benefits' => array_values(is_array($benefits) ? $benefits : []),
             ];
         }
 

@@ -9,6 +9,15 @@
     </form>
 </div>
 <p>{{ $user->phone }} · @include('partials.status', ['status' => $user->status]) · KYC {{ $user->kyc_status->label() }} · Parrain {{ $user->referrer->name ?? 'aucun' }} · Inscrit le {{ $user->created_at->format('d/m/Y H:i') }}</p>
+<form class="panel plan-form" method="POST" action="{{ route('admin.users.update', $user) }}">
+    @csrf @method('PUT')
+    <h2>Fiche du client</h2>
+    <div class="grid-2">
+        <div class="field"><label for="client-name">Nom</label><input id="client-name" name="name" value="{{ old('name', $user->name) }}" required></div>
+        <div class="field"><label for="client-phone">Téléphone</label><input id="client-phone" name="phone" value="{{ old('phone', $user->phone) }}" required></div>
+    </div>
+    <button class="btn-z" type="submit">Enregistrer la fiche</button>
+</form>
 <div class="grid-4">
     <div class="stat"><span>Disponible</span><strong>{{ money($summary['available']) }}</strong></div>
     <div class="stat"><span>Bloqué au retrait</span><strong>{{ money($summary['locked']) }}</strong></div>

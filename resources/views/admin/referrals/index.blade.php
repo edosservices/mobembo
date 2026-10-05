@@ -18,7 +18,7 @@
             <p>Membres actifs requis : {{ $level['min_active'] }}</p>
             <p>Commission : {{ str_replace('.', ',', bcadd((string) $rate, '0', 2)) }} %</p>
             <ul>
-                @foreach ($benefits[$level['key']] ?? [] as $benefit)
+                @foreach ($level['benefits'] ?? ($benefits[$level['key']] ?? []) as $benefit)
                     <li>{{ $benefit }}</li>
                 @endforeach
             </ul>

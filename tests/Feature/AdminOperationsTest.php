@@ -115,6 +115,52 @@ class AdminOperationsTest extends TestCase
         $this->assertSame([], app(WalletService::class)->findDrift());
     }
 
+    public function test_admin_can_edit_a_whole_plan_and_a_client_profile_without_touching_the_ledger(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $user = User::factory()->create(['name' => 'Client Avant']);
+        $this->credit($user, '30.00');
+        $project = $this->project(['name' => 'Plan ancien', 'duration_days' => 90, 'min_investment' => '10.00']);
+        $before = LedgerEntry::query()->count();
+
+        $this->actingAs($admin)->get(route('admin.projects.edit', $project))
+            ->assertOk()
+            ->assertSee('Modifier le plan')
+            ->assertSee('Règles économiques')
+            ->assertSee('Investissement minimum');
+
+        $this->actingAs($admin)->put(route('admin.projects.update', $project), [
+            'name' => 'Plan complet',
+            'slug' => 'plan-complet',
+            'location' => 'Lubumbashi',
+            'category' => 'Commercial',
+            'currency' => 'USD',
+            'target_amount' => '200000.00',
+            'min_investment' => '25.00',
+            'duration_days' => 120,
+            'expected_return_percent' => '9,5',
+            'distribution_frequency' => 'at_maturity',
+            'economic_terms' => 'Conditions mises à jour.',
+            'description' => 'Description mise à jour.',
+            'status' => ProjectStatus::Open->value,
+        ])->assertRedirect();
+
+        $project->refresh();
+        $this->assertSame('Plan complet', $project->name);
+        $this->assertSame('plan-complet', $project->slug);
+        $this->assertSame(120, $project->duration_days);
+        $this->assertSame('25.00', Money::of($project->min_investment));
+        $this->assertSame($before, LedgerEntry::query()->count());
+
+        $this->actingAs($admin)->put(route('admin.users.update', $user), [
+            'name' => 'Client Après',
+            'phone' => $user->phone,
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $this->assertSame('Client Après', $user->fresh()->name);
+        $this->assertSame('30.00', Money::of($user->wallet()->first()->available_balance));
+    }
+
     public function test_a_client_cannot_open_another_account(): void
     {
         $user = User::factory()->create();

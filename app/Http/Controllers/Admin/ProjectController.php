@@ -175,6 +175,8 @@ class ProjectController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
+            'slug' => ['nullable', 'string', 'max:160'],
+            'currency' => ['required', 'string', 'max:8'],
             'description' => ['required', 'string', 'max:5000'],
             'location' => ['required', 'string', 'max:160'],
             'category' => ['required', 'string', 'max:80'],
@@ -198,7 +200,7 @@ class ProjectController extends Controller
             ]);
         }
 
-        $slug = $project->exists ? $project->slug : $this->uniqueSlug($data['name']);
+        $slug = $this->slugFor($project, $data['name'], $data['slug'] ?? null);
         $image = $project->image_path;
 
         if ($request->hasFile('image')) {
@@ -208,6 +210,7 @@ class ProjectController extends Controller
         $project->fill([
             'name' => $data['name'],
             'slug' => $slug,
+            'currency' => strtoupper($data['currency']),
             'image_path' => $image,
             'description' => $data['description'],
             'location' => $data['location'],
@@ -224,6 +227,30 @@ class ProjectController extends Controller
             'next_distribution_on' => $data['next_distribution_on'] ?? null,
             'is_demo' => false,
         ]);
+    }
+
+    private function slugFor(Project $project, string $name, ?string $requested): string
+    {
+        $candidate = filled($requested) ? Str::slug($requested) : ($project->slug ?: $this->uniqueSlug($name));
+
+        if ($candidate === '') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'slug' => 'Indiquez une adresse publique lisible, par exemple residence-gombe.',
+            ]);
+        }
+
+        $taken = Project::query()
+            ->where('slug', $candidate)
+            ->when($project->exists, fn ($query) => $query->whereKeyNot($project->id))
+            ->exists();
+
+        if ($taken) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'slug' => 'Cette adresse publique est déjà utilisée.',
+            ]);
+        }
+
+        return $candidate;
     }
 
     private function uniqueSlug(string $name): string

@@ -11,6 +11,7 @@ use App\Services\AccountService;
 use App\Services\AuditService;
 use App\Services\PortfolioService;
 use App\Support\Money;
+use App\Support\PhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -56,6 +57,29 @@ class UserController extends Controller
             'investments' => $user->investments()->with('project')->latest('invested_at')->limit(8)->get(),
             'audits' => $user->hasMany(\App\Models\AuditLog::class)->latest('created_at')->limit(12)->get(),
         ]);
+    }
+
+    public function update(Request $request, User $user, AuditService $audit)
+    {
+        abort_if($user->isAdmin(), 404);
+        $phone = PhoneNumber::normalize($request->input('phone'));
+
+        if (! $phone) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'phone' => 'Indiquez un numéro mobile RDC valide, par exemple 0812345678.',
+            ]);
+        }
+
+        $request->merge(['phone' => $phone]);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
+        ]);
+
+        $user->forceFill($data)->save();
+        $audit->record($request->user(), $user, 'user_profile_updated', null, null, null, 'Nom ou numéro modifié depuis l’administration.');
+
+        return back()->with('success', 'La fiche du client a été mise à jour.');
     }
 
     public function impersonate(Request $request, User $user, AuditService $audit)

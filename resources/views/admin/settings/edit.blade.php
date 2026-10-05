@@ -28,7 +28,9 @@
     <div class="grid-2">
         @foreach (['starter' => 'STARTER', 'pro' => 'PRO', 'elite' => 'ELITE', 'vip' => 'VIP'] as $key => $label)
             @php($current = collect($levels)->firstWhere('key', $key))
+            <div class="field"><label>Nom affiché · {{ $label }}</label><input name="level_name_{{ $key }}" value="{{ old('level_name_'.$key, $current['name'] ?? $label) }}" required></div>
             <div class="field"><label>Membres actifs minimum · {{ $label }}</label><input name="level_{{ $key }}" value="{{ old('level_'.$key, $current['min_active'] ?? 0) }}" required></div>
+            <div class="field"><label>Avantages · {{ $label }}</label><textarea name="benefit_{{ $key }}" rows="3">{{ old('benefit_'.$key, implode("\n", $current['benefits'] ?? config('zelvora.level_benefits.'.$key, []))) }}</textarea></div>
         @endforeach
     </div>
     <p class="muted">Le rendement du projet se modifie dans Projets.</p>

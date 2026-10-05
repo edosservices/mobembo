@@ -106,12 +106,36 @@ class SettingsController extends Controller
             'level_vip' => ['required', 'integer', 'min:1', 'max:100000'],
         ]);
 
-        $rules = [
-            ['key' => 'starter', 'name' => 'STARTER', 'min_active' => (int) $data['level_starter']],
-            ['key' => 'pro', 'name' => 'PRO', 'min_active' => (int) $data['level_pro']],
-            ['key' => 'elite', 'name' => 'ELITE', 'min_active' => (int) $data['level_elite']],
-            ['key' => 'vip', 'name' => 'VIP', 'min_active' => (int) $data['level_vip']],
-        ];
+        $names = $request->validate([
+            'level_name_starter' => ['nullable', 'string', 'max:40'],
+            'level_name_pro' => ['nullable', 'string', 'max:40'],
+            'level_name_elite' => ['nullable', 'string', 'max:40'],
+            'level_name_vip' => ['nullable', 'string', 'max:40'],
+            'benefit_starter' => ['nullable', 'string', 'max:1000'],
+            'benefit_pro' => ['nullable', 'string', 'max:1000'],
+            'benefit_elite' => ['nullable', 'string', 'max:1000'],
+            'benefit_vip' => ['nullable', 'string', 'max:1000'],
+        ]);
+        $stored = collect(PlatformSetting::current()->referral_levels ?? [])->keyBy('key');
+        $rules = [];
+        foreach ([
+            'starter' => [(int) $data['level_starter'], 'STARTER'],
+            'pro' => [(int) $data['level_pro'], 'PRO'],
+            'elite' => [(int) $data['level_elite'], 'ELITE'],
+            'vip' => [(int) $data['level_vip'], 'VIP'],
+        ] as $key => [$minimum, $fallback]) {
+            $lines = preg_split('/\r\n|\r|\n/', (string) ($names['benefit_'.$key] ?? ''));
+            $benefits = array_values(array_filter(array_map('trim', $lines ?: [])));
+            if ($benefits === []) {
+                $benefits = $stored->get($key)['benefits'] ?? config('zelvora.level_benefits.'.$key, []);
+            }
+            $rules[] = [
+                'key' => $key,
+                'name' => trim((string) ($names['level_name_'.$key] ?? '')) ?: $fallback,
+                'min_active' => $minimum,
+                'benefits' => array_values($benefits),
+            ];
+        }
 
         if ($rules[1]['min_active'] <= $rules[0]['min_active']
             || $rules[2]['min_active'] <= $rules[1]['min_active']

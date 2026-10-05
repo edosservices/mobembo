@@ -101,6 +101,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::get('/utilisateurs', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/support', [AdminUserController::class, 'index'])->name('support');
     Route::get('/utilisateurs/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::put('/utilisateurs/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::post('/utilisateurs/{user}/depannage', [AdminUserController::class, 'impersonate'])->name('users.impersonate');
     Route::post('/utilisateurs/{user}/bloquer', [AdminUserController::class, 'block'])->name('users.block');
     Route::post('/utilisateurs/{user}/debloquer', [AdminUserController::class, 'unblock'])->name('users.unblock');
