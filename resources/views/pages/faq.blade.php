@@ -9,10 +9,6 @@
         <p>ZELVORA vous permet d’investir dans des opportunités immobilières et de suivre votre portefeuille depuis votre espace personnel.</p>
     </details>
     <details>
-        <summary>Comment effectuer un dépôt ?</summary>
-        <p>Depuis votre espace, choisissez M-Pesa, Airtel Money ou Orange Money, envoyez le montant au numéro indiqué, puis joignez la preuve de paiement.</p>
-    </details>
-    <details>
         <summary>Quel est le montant minimum ?</summary>
         <p>Le montant minimum dépend du projet sélectionné. Chaque projet affiche clairement son montant minimum avant l'investissement.</p>
     </details>

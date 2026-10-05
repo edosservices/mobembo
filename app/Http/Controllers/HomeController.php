@@ -20,7 +20,6 @@ class HomeController extends Controller
         $maximumPlan = $projects->max('min_investment');
 
         return view('home', [
-            'projects' => $projects,
             'stats' => [
                 'projects' => $projects->count(),
                 'minimum' => $minimum !== null ? Money::of($minimum) : null,

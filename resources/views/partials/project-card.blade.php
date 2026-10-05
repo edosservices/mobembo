@@ -1,23 +1,63 @@
 @php($quote = $project->quote())
-<article class="opportunity plan-card" data-plan-card="{{ $project->slug }}">
+<article class="opportunity plan-card h-100" data-plan-card="{{ $project->slug }}">
     <a class="cover" href="{{ route('projects.show', $project) }}#investir">
         @if ($project->imageUrl())
             <img src="{{ $project->imageUrl() }}" alt="{{ $project->name }}">
         @endif
     </a>
-    <div class="body">
+    <div class="body text-center">
         <span class="badge-z">{{ $project->category }}</span>
         <h2>{{ $project->name }}</h2>
-        <dl class="plan-facts">
-            <div><dt>À partir de</dt><dd>{{ money($project->min_investment) }}</dd></div>
-            <div><dt>Durée</dt><dd>{{ $project->duration_days }} jours</dd></div>
-            <div><dt>Rendement estimatif</dt><dd>{{ $quote->totalPercentLabel() }}</dd></div>
-            <div><dt>Rendement journalier estimatif</dt><dd data-daily-percent>{{ \App\Support\ReturnEstimator::percentLabel($quote->dailyPercent) }}</dd></div>
-            <div><dt>Gain estimatif / jour</dt><dd data-daily-amount>{{ \App\Support\ReturnEstimator::amountLabel($quote->dailyAmount) }}</dd></div>
-            <div><dt>Gain estimatif total</dt><dd data-total-return>{{ money($quote->totalReturn) }}</dd></div>
-            <div><dt>Capital investi</dt><dd>{{ money($quote->capital) }}</dd></div>
-            <div><dt>Total estimatif à l'échéance</dt><dd data-maturity>{{ money($quote->maturity) }}</dd></div>
-        </dl>
+        <div class="row row-cols-2 g-2 plan-facts">
+            <div class="col">
+                <div class="fact">
+                    <span>À partir de</span>
+                    <strong>{{ money($project->min_investment) }}</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Durée</span>
+                    <strong>{{ $project->duration_days }} jours</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Rendement estimatif</span>
+                    <strong>{{ $quote->totalPercentLabel() }}</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Rendement journalier estimatif</span>
+                    <strong data-daily-percent>{{ \App\Support\ReturnEstimator::percentLabel($quote->dailyPercent) }}</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Gain estimatif / jour</span>
+                    <strong data-daily-amount>{{ \App\Support\ReturnEstimator::amountLabel($quote->dailyAmount) }}</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Gain estimatif total</span>
+                    <strong data-total-return>{{ money($quote->totalReturn) }}</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Capital investi</span>
+                    <strong>{{ money($quote->capital) }}</strong>
+                </div>
+            </div>
+            <div class="col">
+                <div class="fact">
+                    <span>Total estimatif à l'échéance</span>
+                    <strong data-maturity>{{ money($quote->maturity) }}</strong>
+                </div>
+            </div>
+        </div>
         <div class="progress" role="img" aria-label="{{ str_replace('.', ',', $project->progressPercent()) }} % financé">
             <span style="width: {{ min(100, (float) $project->progressPercent()) }}%"></span>
         </div>
