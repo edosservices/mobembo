@@ -56,9 +56,18 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $user->forceFill(['last_login_at' => now()])->save();
 
-        $target = $user->isAdmin() ? route('admin.dashboard') : route('dashboard');
+        if ($user->isAdmin()) {
+            $intended = (string) $request->session()->pull('url.intended', '');
+            $path = parse_url($intended, PHP_URL_PATH) ?: '';
 
-        return redirect()->intended($target);
+            if ($intended !== '' && str_starts_with($path, '/admin')) {
+                return redirect()->to($intended);
+            }
+
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->intended(route('dashboard'));
     }
 
     public function destroy(Request $request)

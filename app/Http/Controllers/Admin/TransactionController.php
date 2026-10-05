@@ -33,4 +33,15 @@ class TransactionController extends Controller
             'types' => LedgerType::cases(),
         ]);
     }
+
+    public function adjustments()
+    {
+        $entries = LedgerEntry::query()
+            ->with('user')
+            ->whereIn('type', [LedgerType::Bonus, LedgerType::AdminAdjustment])
+            ->latest()
+            ->paginate(30);
+
+        return view('admin.adjustments.index', ['entries' => $entries]);
+    }
 }

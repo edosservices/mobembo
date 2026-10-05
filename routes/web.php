@@ -73,6 +73,7 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
 Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
     Route::get('/utilisateurs', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/support', [AdminUserController::class, 'index'])->name('support');
     Route::get('/utilisateurs/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::post('/utilisateurs/{user}/depannage', [AdminUserController::class, 'impersonate'])->name('users.impersonate');
     Route::post('/utilisateurs/{user}/bloquer', [AdminUserController::class, 'block'])->name('users.block');
@@ -90,6 +91,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::put('/projets/{project}', [AdminProjectController::class, 'update'])->name('projects.update');
     Route::post('/projets/{project}/rendement', [AdminProjectController::class, 'updateReturn'])->name('projects.return');
     Route::post('/projets/{project}/distribuer', [AdminProjectController::class, 'distribute'])->name('projects.distribute');
+    Route::post('/projets/{project}/suspendre', [AdminProjectController::class, 'suspend'])->name('projects.suspend');
     Route::post('/projets/{project}/cloturer', [AdminProjectController::class, 'close'])->name('projects.close');
     Route::delete('/projets/{project}', [AdminProjectController::class, 'destroy'])->name('projects.destroy');
 
@@ -109,6 +111,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
 
     Route::get('/parrainage', [AdminReferralController::class, 'index'])->name('referrals.index');
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/ajustements', [AdminTransactionController::class, 'adjustments'])->name('adjustments.index');
     Route::get('/notifications', [AdminNotificationController::class, 'create'])->name('notifications.create');
     Route::post('/notifications', [AdminNotificationController::class, 'store'])->name('notifications.store');
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit.index');

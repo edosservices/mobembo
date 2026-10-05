@@ -1,21 +1,32 @@
 @extends('layouts.admin')
+@section('title', 'Dépôts')
 @section('content')
 <h1 class="serif">Dépôts</h1>
 <form method="GET"><select name="status" onchange="this.form.submit()"><option value="">Tous</option>@foreach (\App\Enums\ReviewStatus::cases() as $item)<option value="{{ $item->value }}" @selected($status === $item->value)>{{ $item->label() }}</option>@endforeach</select></form>
 <div class="table-wrap panel">
     <table>
-        <thead><tr><th>Date</th><th>Client</th><th>Montant</th><th>Moyen</th><th>Référence</th><th>Statut</th></tr></thead>
+        <thead><tr><th>Utilisateur</th><th>Méthode</th><th>Montant</th><th>Référence</th><th>Preuve</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
         <tbody>
-        @foreach ($deposits as $deposit)
+        @forelse ($deposits as $deposit)
             <tr>
-                <td>{{ $deposit->created_at->format('d/m/Y H:i') }}</td>
                 <td>{{ $deposit->user->name }}</td>
-                <td>{{ money($deposit->amount) }}</td>
                 <td>{{ $deposit->method->label() }}</td>
+                <td>{{ money($deposit->amount) }}</td>
                 <td>{{ $deposit->reference }}</td>
-                <td><a href="{{ route('admin.deposits.show', $deposit) }}">@include('partials.status', ['status' => $deposit->status])</a></td>
+                <td><a href="{{ route('admin.deposits.proof', $deposit) }}">Voir</a></td>
+                <td>{{ $deposit->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i') }}</td>
+                <td>@include('partials.status', ['status' => $deposit->status])</td>
+                <td class="admin-actions">
+                    <a href="{{ route('admin.deposits.show', $deposit) }}">Voir détails</a>
+                    @if ($deposit->status->value === 'pending')
+                        <form method="POST" action="{{ route('admin.deposits.approve', $deposit) }}">@csrf<button class="btn-z small" type="submit">Approuver</button></form>
+                        <form method="POST" action="{{ route('admin.deposits.reject', $deposit) }}">@csrf<input name="reason" placeholder="Motif" required><button class="btn-z-ghost small" type="submit">Rejeter</button></form>
+                    @endif
+                </td>
             </tr>
-        @endforeach
+        @empty
+            <tr><td colspan="8">Aucun dépôt.</td></tr>
+        @endforelse
         </tbody>
     </table>
 </div>

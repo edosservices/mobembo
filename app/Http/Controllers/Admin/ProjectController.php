@@ -119,6 +119,24 @@ class ProjectController extends Controller
         return back()->with('success', 'La distribution a été enregistrée.');
     }
 
+    public function suspend(Request $request, Project $project, AuditService $audit)
+    {
+        $data = $request->validate(['reason' => ['required', 'string', 'min:5', 'max:500']]);
+        $project->forceFill(['status' => ProjectStatus::Suspended])->save();
+        $audit->record(
+            $request->user(),
+            null,
+            'project_suspended',
+            null,
+            null,
+            null,
+            $data['reason'],
+            ['project_id' => $project->id],
+        );
+
+        return back()->with('success', 'Le projet a été suspendu. Les soldes n’ont pas été modifiés.');
+    }
+
     public function close(Request $request, Project $project, InvestmentService $investments)
     {
         $data = $request->validate(['reason' => ['required', 'string', 'min:5', 'max:500']]);

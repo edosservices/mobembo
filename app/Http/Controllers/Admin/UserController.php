@@ -24,6 +24,7 @@ class UserController extends Controller
         $users = User::query()
             ->where('role', UserRole::User)
             ->with(['wallet', 'referrer'])
+            ->withCount('referrals as team_count')
             ->withSum(['ledgerEntries as returns_total' => fn ($query) => $query->where('type', 'investment_return')->where('status', 'completed')], 'amount')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($inner) use ($q) {
@@ -34,7 +35,11 @@ class UserController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.users.index', compact('users', 'q'));
+        return view('admin.users.index', [
+            'users' => $users,
+            'q' => $q,
+            'heading' => $request->routeIs('admin.support') ? 'Support clients' : 'Utilisateurs',
+        ]);
     }
 
     public function show(User $user, PortfolioService $portfolio)
