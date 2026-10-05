@@ -34,6 +34,6 @@ class KycController extends Controller
 
         $request->user()->forceFill(['kyc_status' => KycStatus::Pending])->save();
 
-        return back()->with('success', 'Document envoyé. Il sera examiné avant toute ouverture publique exigeant le KYC.');
+        return back()->with('success', 'Document envoyé. Il sera examiné par l’administration.');
     }
 }

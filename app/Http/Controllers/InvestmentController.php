@@ -86,6 +86,6 @@ class InvestmentController extends Controller
 
         return redirect()
             ->route('investments.show', $investment)
-            ->with('success', 'Investissement enregistré. Le rendement prévu reste une estimation tant qu’aucune distribution réelle n’est créditée.');
+            ->with('success', 'Votre investissement est confirmé.');
     }
 }

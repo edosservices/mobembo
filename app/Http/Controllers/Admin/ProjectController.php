@@ -103,7 +103,7 @@ class ProjectController extends Controller
             ['project_id' => $project->id],
         );
 
-        return back()->with('success', 'Rendement prévu mis à jour. Aucun solde n’a été modifié.');
+        return back()->with('success', 'Le rendement du projet a été mis à jour.');
     }
 
     public function distribute(Request $request, Project $project, DistributionService $distributions)
@@ -116,7 +116,7 @@ class ProjectController extends Controller
 
         $distributions->distribute($project, $data['total_amount'], $data['reason'], $request->user());
 
-        return back()->with('success', 'Distribution réelle créditée au prorata des investissements actifs.');
+        return back()->with('success', 'La distribution a été enregistrée.');
     }
 
     public function close(Request $request, Project $project, InvestmentService $investments)

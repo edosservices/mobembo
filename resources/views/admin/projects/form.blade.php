@@ -20,9 +20,9 @@
         <div class="field"><label>Investissement minimum</label><input name="min_investment" value="{{ old('min_investment', $project->min_investment) }}" required></div>
         <div class="field"><label>Durée (jours)</label><input name="duration_days" value="{{ old('duration_days', $project->duration_days) }}" required></div>
         <div class="field">
-            <label>Rendement prévu sur la durée (%)</label>
+            <label>Rendement du projet (%)</label>
             <input name="expected_return_percent" value="{{ old('expected_return_percent', $project->expected_return_percent) }}" required>
-            <p class="muted">Le client voit le taux journalier : ce pourcentage divisé par la durée. Les investissements déjà ouverts conservent leur taux. Aucun solde n’est modifié.</p>
+            <p class="muted">Les investissements déjà ouverts conservent leur taux. Les prochains investissements utilisent ce rendement.</p>
         </div>
         <div class="field">
             <label>Rythme de distribution</label>
@@ -48,6 +48,6 @@
         @endif
     @endif
     <div class="field"><label>Image</label><input type="file" name="image" accept="image/*"></div>
-    <button class="btn-z" type="submit" style="margin-top:1rem;">Enregistrer</button>
+    <button class="btn-z" type="submit" style="margin-top:1rem;">Enregistrer les modifications</button>
 </form>
 @endsection

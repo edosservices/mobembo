@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Tableau de bord · ZELVORA')
 @section('content')
-<h1 style="font-size:clamp(2rem, 6vw, 2.8rem);margin-bottom:1rem;">Bonjour {{ $firstName }}</h1>
+<h1 style="font-size:clamp(2rem, 6vw, 2.8rem);margin-bottom:.2rem;">Bonjour {{ $firstName }}</h1>
+<p class="kicker">Votre portefeuille</p>
 <div class="dash-stats">
     <div class="stat"><span>Solde disponible</span><strong>{{ money($summary['available']) }}</strong></div>
     <div class="stat"><span>Bonus</span><strong>{{ money($summary['bonus']) }}</strong></div>

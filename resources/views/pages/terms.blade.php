@@ -4,8 +4,9 @@
 <p class="kicker">Conditions</p>
 <h1 style="font-size:clamp(2rem,5vw,3.2rem);">Conditions d’utilisation</h1>
 <div class="panel">
-    <p>L’accès à ZELVORA suppose un compte actif. Le téléphone est l’identifiant. Les informations de projet, y compris le rendement prévu, sont données à titre indicatif.</p>
-    <p>Un investissement débite le solde disponible et augmente le financement du projet. Il ne crée pas de revenu. Les retraits et les dépôts restent soumis à validation administrative et aux frais affichés avant confirmation.</p>
-    <p>Les conditions affichées sur chaque plan sont celles enregistrées par l’administration. <a href="{{ route('legal') }}">Lire les mentions</a>.</p>
+    <p>L’accès à ZELVORA se fait avec un compte actif. Votre numéro de téléphone est l’identifiant du compte.</p>
+    <p>Les informations affichées sur un projet, y compris le rendement prévu, sont indicatives et dépendent des conditions de ce projet.</p>
+    <p>Un investissement est confirmé depuis votre espace personnel. Les dépôts et les retraits sont traités selon les conditions applicables à votre compte.</p>
+    <p>Les revenus crédités apparaissent dans votre portefeuille après leur distribution. <a href="{{ route('legal') }}">Lire les mentions</a>.</p>
 </div>
 @endsection

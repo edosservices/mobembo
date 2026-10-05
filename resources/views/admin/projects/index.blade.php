@@ -6,7 +6,7 @@
 </div>
 <div class="table-wrap panel">
     <table>
-        <thead><tr><th>Nom</th><th>Lieu</th><th>Objectif</th><th>Financé</th><th>Restant</th><th>Rendement prévu</th><th>Statut</th><th></th></tr></thead>
+        <thead><tr><th>Nom</th><th>Lieu</th><th>Objectif</th><th>Financé</th><th>Restant</th><th>Rendement du projet</th><th>Statut</th><th></th></tr></thead>
         <tbody>
         @foreach ($projects as $project)
             <tr>
@@ -24,7 +24,7 @@
                     <span class="muted">{{ \App\Support\ReturnEstimator::percentLabel($project->dailyReturnPercent()) }}</span>
                 </td>
                 <td>@include('partials.status', ['status' => $project->status])</td>
-                <td><a href="{{ route('admin.projects.edit', $project) }}">Modifier</a></td>
+                <td><a href="{{ route('admin.projects.edit', $project) }}">Modifier le projet</a></td>
             </tr>
         @endforeach
         </tbody>

@@ -2,7 +2,7 @@
 @section('title', 'Dashboard admin')
 @section('content')
 <h1 class="serif">Pilotage</h1>
-<div class="note" style="margin-bottom:1rem;">Les pourcentages des plans se règlent dans Projets. Les frais de retrait et la commission de parrainage se règlent dans Paramètres. Un revenu n’est crédité que par une distribution enregistrée.</div>
+<p class="fine-print">Le rendement du projet se règle dans Projets. Les frais de retrait et la commission de parrainage se règlent dans Paramètres.</p>
 <div class="grid-4">
     @foreach ([
         'Utilisateurs' => $stats['users_total'],

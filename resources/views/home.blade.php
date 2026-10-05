@@ -7,9 +7,9 @@
 <section class="hero-screen" style="background-image: url('{{ asset('images/hero.jpg') }}')">
     <div class="overlay"></div>
     <div class="hero-copy">
-        <p class="kicker">Immobilier · ZELVORA</p>
-        <h1>Investissez dans l'immobilier.<br>Construisez votre avenir.</h1>
-        <p class="lede">Découvrez des opportunités immobilières sélectionnées et suivez vos investissements directement depuis votre téléphone.</p>
+        <p class="kicker">ZELVORA</p>
+        <h1>Votre patrimoine commence ici.</h1>
+        <p class="lede">Investissez dans l'immobilier à votre rythme. Découvrez des opportunités immobilières et construisez progressivement votre patrimoine.</p>
         <div class="actions hero-actions">
             <a class="btn-z gold" href="{{ route('register') }}">Commencer à investir</a>
             <a class="btn-z-ghost light" href="{{ route('projects.index') }}">Découvrir les projets</a>
@@ -29,7 +29,7 @@
             @else
                 <strong>—</strong>
             @endif
-            <span>Investissement minimum</span>
+            <span>À partir de</span>
         </article>
         <article>
             @if ($stats['maximum_plan'] !== null)
@@ -37,11 +37,11 @@
             @else
                 <strong>—</strong>
             @endif
-            <span>Plan maximum</span>
+            <span>Plan le plus élevé</span>
         </article>
         <article>
             <strong data-count="100" data-suffix=" %">100 %</strong>
-            <span>Suivi digital</span>
+            <span>Suivi depuis votre espace</span>
         </article>
     </div>
 </section>
@@ -49,27 +49,27 @@
 <section class="section reveal" id="pourquoi">
     <div class="wrap">
         <p class="kicker">Pourquoi ZELVORA</p>
-        <h2>Une lecture claire de chaque opportunité.</h2>
+        <h2>Investissez dans des opportunités immobilières sélectionnées.</h2>
         <div class="why-grid">
             <article class="why-card">
                 <span aria-hidden="true">▣</span>
                 <h3>Projets immobiliers</h3>
-                <p>Découvrez différentes opportunités immobilières.</p>
+                <p>Découvrez des opportunités présentées avec leurs conditions.</p>
             </article>
             <article class="why-card">
                 <span aria-hidden="true">▢</span>
-                <h3>Investissement mobile</h3>
-                <p>Gérez vos investissements directement depuis votre téléphone.</p>
+                <h3>À votre rythme</h3>
+                <p>Choisissez un projet et un montant depuis votre téléphone.</p>
             </article>
             <article class="why-card">
                 <span aria-hidden="true">◈</span>
-                <h3>Transparence</h3>
-                <p>Consultez vos opérations et l'historique de votre portefeuille.</p>
+                <h3>Portefeuille</h3>
+                <p>Suivez votre solde, vos investissements et vos revenus.</p>
             </article>
             <article class="why-card">
                 <span aria-hidden="true">▤</span>
-                <h3>Suivi</h3>
-                <p>Suivez vos investissements et les performances prévues des projets.</p>
+                <h3>Suivi clair</h3>
+                <p>Chaque projet affiche sa durée, son minimum et sa progression.</p>
             </article>
         </div>
     </div>
@@ -80,15 +80,15 @@
         <div class="section-head">
             <div>
                 <p class="kicker">Nos opportunités</p>
-                <h2>Des conditions lisibles.</h2>
+                <h2>Découvrez des projets immobiliers sélectionnés.</h2>
             </div>
-            <a class="btn-z-ghost" href="{{ route('projects.index') }}">Voir tous les projets</a>
+            <a class="btn-z-ghost" href="{{ route('projects.index') }}">Découvrir les projets</a>
         </div>
         <div class="opportunity-grid">
             @forelse ($projects as $project)
                 @include('partials.project-card', ['project' => $project])
             @empty
-                <p class="muted">Aucun projet n’est publié pour le moment.</p>
+                <p class="muted">De nouvelles opportunités seront publiées ici.</p>
             @endforelse
         </div>
     </div>
@@ -99,11 +99,11 @@
         <p class="kicker">Comment ça marche</p>
         <h2>Cinq étapes pour investir.</h2>
         <ol class="timeline">
-            <li><span>01</span><div><h3>Créer un compte</h3><p>Nom, téléphone et mot de passe.</p></div></li>
-            <li><span>02</span><div><h3>Déposer des fonds</h3><p>Choisir M-Pesa, Airtel Money ou Orange Money, envoyer les fonds au numéro indiqué, puis joindre la preuve. Le dépôt est ajouté au solde après validation.</p></div></li>
-            <li><span>03</span><div><h3>Choisir un projet</h3><p>Explorer les différentes opportunités.</p></div></li>
-            <li><span>04</span><div><h3>Investir</h3><p>Choisir le montant et confirmer. Le solde disponible est débité dans une opération unique.</p></div></li>
-            <li><span>05</span><div><h3>Suivre</h3><p>Consulter son portefeuille et les distributions réelles lorsqu’elles sont enregistrées.</p></div></li>
+            <li><span>01</span><div><h3>Créer un compte</h3><p>Inscrivez-vous avec votre numéro de téléphone.</p></div></li>
+            <li><span>02</span><div><h3>Faire un dépôt</h3><p>Envoyez vos fonds par M-Pesa, Airtel Money ou Orange Money, puis joignez la preuve.</p></div></li>
+            <li><span>03</span><div><h3>Choisir un projet</h3><p>Parcourez les opportunités et retenez celle qui correspond à votre stratégie.</p></div></li>
+            <li><span>04</span><div><h3>Investir</h3><p>Indiquez le montant et confirmez votre investissement.</p></div></li>
+            <li><span>05</span><div><h3>Suivre</h3><p>Consultez votre portefeuille et vos revenus depuis votre espace personnel.</p></div></li>
         </ol>
     </div>
 </section>
@@ -112,22 +112,22 @@
     <div class="wrap mobile-band">
         <div class="phone" aria-hidden="true">
             <div class="phone-screen">
-                <p class="phone-kicker">Aperçu</p>
+                <p class="phone-kicker">Espace personnel</p>
                 <strong>ZELVORA</strong>
                 <ul>
-                    <li><span>Solde</span><em>Compte</em></li>
+                    <li><span>Solde</span><em>Disponible</em></li>
                     <li><span>Investissements</span><em>Portefeuille</em></li>
                     <li><span>Projets</span><em>Opportunités</em></li>
-                    <li><span>Revenus</span><em>Distributions</em></li>
-                    <li><span>Transactions</span><em>Historique</em></li>
+                    <li><span>Revenus</span><em>Crédités</em></li>
+                    <li><span>Historique</span><em>Opérations</em></li>
                 </ul>
             </div>
         </div>
         <div>
             <p class="kicker">Mobile</p>
             <h2>Votre portefeuille immobilier dans votre poche.</h2>
-            <p class="lede">Solde, investissements, projets, revenus crédités et transactions restent accessibles depuis le téléphone. Un revenu n’apparaît que s’il a été enregistré.</p>
-            <a class="btn-z" href="{{ auth()->check() ? route('dashboard') : route('register') }}">Ouvrir mon espace</a>
+            <p class="lede">Investissez dans des opportunités immobilières sélectionnées et suivez votre portefeuille depuis votre espace personnel.</p>
+            <a class="btn-z" href="{{ auth()->check() ? route('dashboard') : route('register') }}">Commencer à investir</a>
         </div>
     </div>
 </section>
@@ -135,37 +135,37 @@
 <section class="visual-band reveal" style="background-image: url('{{ asset('images/architecture.jpg') }}')">
     <div class="overlay"></div>
     <div class="wrap visual-copy">
-        <h2>Votre capital mérite des opportunités réelles.</h2>
-        <p>Explorez des projets immobiliers présentés avec leurs informations, leurs conditions et leur progression.</p>
-        <a class="btn-z gold" href="{{ route('projects.index') }}">Explorer les projets</a>
+        <h2>Investissez dans l'immobilier à votre rythme.</h2>
+        <p>Découvrez des opportunités immobilières et construisez progressivement votre patrimoine.</p>
+        <a class="btn-z gold" href="{{ route('projects.index') }}">Découvrir les projets</a>
     </div>
 </section>
 
 <section class="section reveal" id="faq">
     <div class="wrap faq-list">
         <p class="kicker">FAQ</p>
-        <h2>Les questions utiles avant d’investir.</h2>
+        <h2>Questions fréquentes</h2>
         <details open>
             <summary>Qu'est-ce que ZELVORA ?</summary>
-            <p>ZELVORA présente des opportunités immobilières et permet de suivre les dépôts, investissements, retraits et distributions depuis un compte identifié par le téléphone. Ce n’est pas une banque. Un pourcentage affiché est une prévision, pas un crédit automatique.</p>
+            <p>ZELVORA vous permet d’investir dans des opportunités immobilières et de suivre votre portefeuille depuis votre espace personnel.</p>
         </details>
         <details>
             <summary>Comment effectuer un dépôt ?</summary>
-            <p>Depuis votre espace, choisissez M-Pesa, Airtel Money ou Orange Money, envoyez les fonds au numéro indiqué, puis joignez la preuve et la référence. Le montant est ajouté au solde disponible après validation.</p>
+            <p>Depuis votre espace, choisissez M-Pesa, Airtel Money ou Orange Money, envoyez le montant au numéro indiqué, puis joignez la preuve de paiement.</p>
         </details>
         <details>
             <summary>Quel est le montant minimum ?</summary>
-            <p>À partir de {{ $stats['minimum'] !== null ? money($stats['minimum']) : '10,00 $' }}, selon les projets disponibles.</p>
+            <p>Le montant minimum dépend du projet sélectionné. Chaque projet affiche clairement son montant minimum avant l'investissement.</p>
         </details>
         <details>
             <summary>Puis-je retirer mon argent ?</summary>
-            <p>Une demande de retrait utilise le solde disponible, affiche les frais, le brut et le net, puis reste en attente. Elle est soumise aux conditions applicables et à la validation administrative. Le capital investi n’est pas retiré comme un solde : il revient lors d’une restitution enregistrée.</p>
+            <p>Vous pouvez demander un retrait depuis votre espace personnel. Les demandes sont traitées selon les conditions applicables à votre compte.</p>
         </details>
         <details>
             <summary>Comment fonctionnent les rendements ?</summary>
-            <p>Le pourcentage affiché est une estimation sur la durée du plan. Le revenu crédité correspond à une distribution enregistrée pour le projet. Il apparaît alors dans le portefeuille, l’historique et les notifications.</p>
+            <p>Chaque projet présente un rendement prévu et une durée. Les montants affichés permettent d'estimer les revenus potentiels. Les revenus réellement crédités apparaissent dans votre portefeuille lorsqu'une distribution est enregistrée.</p>
         </details>
-        <p class="note">{{ $disclaimer }}</p>
+        <p class="fine-print">Les performances présentées sont indicatives et dépendent des conditions de chaque projet.</p>
     </div>
 </section>
 @endsection

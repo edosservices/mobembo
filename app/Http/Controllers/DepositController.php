@@ -50,6 +50,6 @@ class DepositController extends Controller
             throw $exception;
         }
 
-        return redirect()->route('deposits.create')->with('success', 'Dépôt envoyé. Le solde ne bougera qu’après validation d’un administrateur.');
+        return redirect()->route('deposits.create')->with('success', 'Votre demande de dépôt a été envoyée.');
     }
 }

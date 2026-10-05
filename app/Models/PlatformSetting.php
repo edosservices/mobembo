@@ -38,7 +38,7 @@ class PlatformSetting extends Model
             'referral_rate_percent' => '2.0000',
             'otp_enabled' => false,
             'kyc_required_for_withdrawal' => false,
-            'legal_disclaimer' => 'Les rendements affichés sont des estimations. Un revenu est crédité uniquement lorsqu’une distribution réelle est enregistrée pour le projet.',
+            'legal_disclaimer' => 'Les performances présentées sont indicatives et dépendent des conditions de chaque projet.',
             'mpesa_number' => null,
             'airtel_number' => null,
             'orange_number' => null,

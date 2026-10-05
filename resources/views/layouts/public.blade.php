@@ -6,6 +6,7 @@
     <title>@yield('title', 'ZELVORA')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,640&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('css/zelvora.css') }}">
     <script>document.documentElement.classList.add('js');</script>
 </head>
@@ -13,8 +14,7 @@
     @include('partials.support-banner')
     <header class="topbar">
         <a class="brand" href="{{ route('home') }}">
-            <span class="mark">Z</span>
-            <span><strong>ZELVORA</strong><small>Votre avenir prend la valeur.</small></span>
+            <img class="brand-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA, investissement immobilier">
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
         <nav id="site-nav" class="nav-links">

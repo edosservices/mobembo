@@ -4,7 +4,7 @@
 <h1 style="font-size:2.4rem;">Retirer</h1>
 <p class="muted">Frais : {{ number_format((float) $settings->withdrawal_fee_percent, 2, ',', ' ') }} % + {{ money($settings->withdrawal_fee_fixed) }}. Minimum {{ money($settings->withdrawal_min) }}, maximum {{ money($settings->withdrawal_max) }}.</p>
 @if ($settings->kyc_required_for_withdrawal)
-    <p class="note">Le KYC vérifié est exigé avant un retrait. <a href="{{ route('kyc.edit') }}">Déposer une pièce</a>.</p>
+    <p class="fine-print">Une vérification d’identité est demandée avant un retrait. <a href="{{ route('kyc.edit') }}">Envoyer un document</a>.</p>
 @endif
 <form class="panel" method="POST" action="{{ route('withdrawals.store') }}">
     @csrf
@@ -24,7 +24,7 @@
         <div class="stat"><span>Frais</span><strong id="fee">—</strong></div>
         <div class="stat"><span>Montant net</span><strong id="net">—</strong></div>
     </div>
-    <p class="muted">Le calcul affiché est indicatif. Le serveur recalcule les trois montants au moment de l’envoi et bloque la somme demandée.</p>
+    <p class="fine-print">Les frais et le montant net sont confirmés au moment de votre demande.</p>
     <button class="btn-z" type="submit">Demander le retrait</button>
 </form>
 <h2>Demandes récentes</h2>

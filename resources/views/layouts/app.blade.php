@@ -6,14 +6,15 @@
     <title>@yield('title', 'ZELVORA')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('css/zelvora.css') }}">
 </head>
 <body class="site-app">
     @include('partials.support-banner')
     <header class="topbar">
         <a class="brand" href="{{ route('dashboard') }}">
-            <span class="mark">Z</span>
-            <span><strong>ZELVORA</strong><small>{{ auth()->user()->name }}</small></span>
+            <img class="brand-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA">
+            <span><small>{{ auth()->user()->name }}</small></span>
         </a>
         <nav class="nav-links">
             <a href="{{ route('dashboard') }}" @class(['active' => request()->routeIs('dashboard')])>Accueil</a>

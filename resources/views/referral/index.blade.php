@@ -11,7 +11,7 @@
 <div class="panel" style="margin-top:.8rem;">
     <label>Lien d’invitation</label>
     <input readonly value="{{ url('/register?ref='.auth()->user()->referral_code) }}">
-    <p class="muted">Un filleul actif a un compte ouvert et au moins un dépôt approuvé. Règle actuelle : {{ $settings->referral_enabled ? $settings->referral_trigger->label().' · '.$settings->referral_rate_percent.' %' : 'commissions désactivées' }}. L’inscription seule ne paie rien.</p>
+    <p class="muted">Partagez ce lien. {{ $settings->referral_enabled ? 'Commission actuelle : '.$settings->referral_rate_percent.' % sur '.$settings->referral_trigger->label().'.' : 'Les commissions ne sont pas activées pour le moment.' }}</p>
 </div>
 <h2>Historique des commissions</h2>
 <div class="table-wrap panel">

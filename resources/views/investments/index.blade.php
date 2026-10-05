@@ -4,7 +4,7 @@
 <h1 style="font-size:2.3rem;">Portefeuille</h1>
 <div class="table-wrap panel">
     <table>
-        <thead><tr><th>Projet</th><th>Capital</th><th>Revenus crédités</th><th>Estimation</th><th>Statut</th><th>Échéance</th></tr></thead>
+        <thead><tr><th>Projet</th><th>Montant</th><th>Revenus crédités</th><th>Revenu estimatif</th><th>Statut</th><th>Date de fin</th></tr></thead>
         <tbody>
         @forelse ($investments as $investment)
             <tr>

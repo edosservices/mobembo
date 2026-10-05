@@ -98,7 +98,7 @@ class UserController extends Controller
         ]);
         $accounts->bonus($user, $request->user(), $data['amount'], $data['reason'], $data['idempotency_key']);
 
-        return back()->with('success', 'Bonus enregistré dans le ledger et le journal d’audit.');
+        return back()->with('success', 'Bonus enregistré dans l’historique des opérations.');
     }
 
     public function adjust(Request $request, User $user, AccountService $accounts)
@@ -114,7 +114,7 @@ class UserController extends Controller
         $signed = $data['direction'] === 'debit' ? Money::sub('0', $data['amount']) : $data['amount'];
         $accounts->adjust($user, $request->user(), $signed, $data['reason'], $data['idempotency_key']);
 
-        return back()->with('success', 'Ajustement enregistré. Le solde n’a pas été modifié en silence.');
+        return back()->with('success', 'Ajustement enregistré dans l’historique des opérations.');
     }
 
     public function password(Request $request, User $user, AccountService $accounts)

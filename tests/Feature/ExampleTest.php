@@ -11,6 +11,6 @@ class ExampleTest extends TestCase
 
     public function test_the_home_page_introduces_zelvora(): void
     {
-        $this->get('/')->assertOk()->assertSee('ZELVORA')->assertSee('Votre avenir prend la valeur.');
+        $this->get('/')->assertOk()->assertSee('ZELVORA')->assertSee('Votre patrimoine commence ici.');
     }
 }

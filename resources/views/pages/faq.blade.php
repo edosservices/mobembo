@@ -6,23 +6,24 @@
 <div class="faq-list">
     <details open>
         <summary>Qu'est-ce que ZELVORA ?</summary>
-        <p>Une plateforme qui présente des projets immobiliers et permet de suivre dépôts, investissements, retraits et distributions depuis un compte ouvert avec un numéro de téléphone.</p>
+        <p>ZELVORA vous permet d’investir dans des opportunités immobilières et de suivre votre portefeuille depuis votre espace personnel.</p>
     </details>
     <details>
         <summary>Comment effectuer un dépôt ?</summary>
-        <p>Choisissez M-Pesa, Airtel Money ou Orange Money, envoyez les fonds au numéro indiqué sur la page de dépôt, puis envoyez la preuve. Le solde disponible est mis à jour après validation.</p>
+        <p>Depuis votre espace, choisissez M-Pesa, Airtel Money ou Orange Money, envoyez le montant au numéro indiqué, puis joignez la preuve de paiement.</p>
     </details>
     <details>
         <summary>Quel est le montant minimum ?</summary>
-        <p>À partir de 10 $ selon les projets disponibles.</p>
+        <p>Le montant minimum dépend du projet sélectionné. Chaque projet affiche clairement son montant minimum avant l'investissement.</p>
     </details>
     <details>
         <summary>Puis-je retirer mon argent ?</summary>
-        <p>Les retraits portent sur le solde disponible. Ils sont soumis aux frais, aux conditions applicables et à la validation administrative.</p>
+        <p>Vous pouvez demander un retrait depuis votre espace personnel. Les demandes sont traitées selon les conditions applicables à votre compte.</p>
     </details>
     <details>
         <summary>Comment fonctionnent les rendements ?</summary>
-        <p>Un rendement affiché peut être prévisionnel. Une distribution réelle doit correspondre aux revenus effectivement enregistrés pour le projet. Elle est alors visible dans le portefeuille, l’historique, le ledger, l’investissement et les notifications.</p>
+        <p>Chaque projet présente un rendement prévu et une durée. Les montants affichés permettent d'estimer les revenus potentiels. Les revenus réellement crédités apparaissent dans votre portefeuille lorsqu'une distribution est enregistrée.</p>
     </details>
 </div>
+<p class="fine-print">Les performances présentées sont indicatives et dépendent des conditions de chaque projet.</p>
 @endsection

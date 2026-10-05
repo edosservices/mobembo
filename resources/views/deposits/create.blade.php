@@ -2,7 +2,7 @@
 @section('title', 'Déposer')
 @section('content')
 <h1 style="font-size:2.4rem;">Déposer</h1>
-<p class="note">Le montant reste « en attente ». Il n’est ajouté au solde disponible qu’après vérification de la preuve.</p>
+<p class="fine-print">Votre dépôt est ajouté au solde disponible après vérification de la preuve.</p>
 <div class="panel">
     <h2>Numéro ZELVORA</h2>
     @if ($settings->mpesa_number || $settings->airtel_number || $settings->orange_number)
@@ -12,7 +12,7 @@
             @if ($settings->orange_number)<li>Orange Money : {{ $settings->orange_number }}</li>@endif
         </ul>
     @else
-        <p class="muted">Le numéro de réception s’affiche ici. S’il est absent, contactez l’administration avant d’envoyer les fonds.</p>
+        <p class="muted">Le numéro de réception sera indiqué ici.</p>
     @endif
 </div>
 <form class="panel" method="POST" action="{{ route('deposits.store') }}" enctype="multipart/form-data">

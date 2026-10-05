@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-<p><a href="{{ route('admin.projects.index') }}">Projets</a> · <a href="{{ route('admin.projects.edit', $project) }}">Modifier</a></p>
+<p><a href="{{ route('admin.projects.index') }}">Projets</a> · <a href="{{ route('admin.projects.edit', $project) }}">Modifier le projet</a></p>
 <h1 class="serif">{{ $project->name }}</h1>
 <p>{{ $project->location }} · @include('partials.status', ['status' => $project->status]) · Financé {{ money($project->funded_amount) }} / {{ money($project->target_amount) }} · Restant {{ money($project->remainingAmount()) }}</p>
 @if ($project->imageUrl())
@@ -11,14 +11,14 @@
     @method('DELETE')
     <button class="btn-z-ghost" type="submit">Supprimer ou suspendre</button>
 </form>
-<div class="note">Estimation de revenus encore non distribués sur les investissements actifs : {{ money($estimatedOutstanding) }}. Ce n’est pas un montant dû. Une distribution doit correspondre à un produit réel du projet.</div>
+<p class="fine-print">Revenus estimés non encore distribués : {{ money($estimatedOutstanding) }}. Enregistrez une distribution pour les créditer.</p>
 <div class="grid-2" style="margin-top:1rem;">
     <form class="panel" method="POST" action="{{ route('admin.projects.distribute', $project) }}">
         @csrf
-        <h2>Enregistrer une distribution réelle</h2>
+        <h2>Distribution</h2>
         <div class="field"><label>Montant total à répartir</label><input name="total_amount" required></div>
         <div class="field"><label>Origine économique</label><textarea name="reason" required placeholder="Loyers encaissés en octobre, nets des charges."></textarea></div>
-        <button class="btn-z" type="submit">Créditer au prorata</button>
+        <button class="btn-z" type="submit">Enregistrer la distribution</button>
     </form>
     <form class="panel" method="POST" action="{{ route('admin.projects.close', $project) }}">
         @csrf

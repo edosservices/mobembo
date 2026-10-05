@@ -63,6 +63,7 @@ img { max-width: 100%; height: auto; }
     font-family: var(--serif);
     font-weight: 600;
 }
+.brand-logo { height: 46px; width: auto; display: block; }
 .brand strong { display: block; letter-spacing: 0.14em; font-size: 0.86rem; }
 .brand small { color: var(--muted); font-size: 0.75rem; }
 .nav-links { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
@@ -113,13 +114,11 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
 .stat span, .muted { color: var(--muted); font-size: 0.82rem; }
 .stat strong, .money { font-family: var(--serif); font-size: 1.45rem; display: block; }
 .money.sm { font-size: 1.05rem; }
-.note {
-    background: #fff8ea;
-    border: 1px solid #ead7ae;
-    border-radius: 1rem;
-    padding: 0.8rem 0.9rem;
-    color: #6d5424;
+.note, .fine-print {
+    margin: 0.2rem 0 0.8rem;
+    color: var(--muted);
     font-size: 0.92rem;
+    line-height: 1.5;
 }
 .danger-note { background: var(--danger-bg); border-color: #f3c7c7; color: var(--danger); }
 
@@ -305,6 +304,13 @@ body.home-page .topbar {
     color: white;
 }
 body.home-page .topbar a, body.home-page .brand small { color: white; }
+body.home-page .brand-logo,
+.side .brand-logo,
+.footer-logo {
+    background: #fff;
+    border-radius: 12px;
+    padding: 4px 8px;
+}
 body.home-page .nav-toggle { color: #111; background: #fff; border-color: transparent; }
 body.home-page .topbar .btn-z.small { color: #111; }
 .hero-copy { animation: rise .7s ease both; }
@@ -397,9 +403,10 @@ body.home-page .topbar .btn-z.small { color: #111; }
 .faq-list details p { color: #3f3a34; }
 .site-footer { background: #0b0b0b; color: #f3efe8; padding: 2.5rem 0 1.4rem; }
 .footer-grid { display: grid; gap: 1.2rem; }
-.footer-brand { letter-spacing: 0.16em; }
-.footer-note, .site-footer p { color: #c9c1b6; max-width: 36rem; }
-.footer-links { display: flex; flex-wrap: wrap; gap: 0.7rem 1rem; }
+.footer-logo { height: 58px; width: auto; display: block; }
+.footer-tagline { margin: 0.85rem 0 0; color: #f3efe8; font-size: 1.02rem; max-width: 22rem; }
+.site-footer p { color: #c9c1b6; max-width: 36rem; }
+.footer-links { display: grid; gap: 0.45rem; align-content: start; }
 .footer-links a { color: #f3efe8; text-decoration: none; }
 .footer-copy { margin-top: 1.4rem; color: #9d958a; }
 .project-detail h1 { font-size: clamp(2rem, 6vw, 4rem); margin-bottom: 0.2rem; }
@@ -415,7 +422,7 @@ body.home-page .topbar .btn-z.small { color: #111; }
     .stat-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .why-grid, .opportunity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .mobile-band { grid-template-columns: 280px 1fr; }
-    .footer-grid { grid-template-columns: 1.4fr 1fr; }
+    .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
 }
 @media (min-width: 1024px) {
     .opportunity-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }

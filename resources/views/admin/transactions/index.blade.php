@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-<h1 class="serif">Toutes les transactions</h1>
+<h1 class="serif">Historique des opérations</h1>
 <form method="GET" class="grid-2">
     <div class="field"><label>Client</label><input name="q" value="{{ $q }}" placeholder="Nom ou téléphone"></div>
     <div class="field"><label>Type</label><select name="type"><option value="">Tous</option>@foreach ($types as $item)<option value="{{ $item->value }}" @selected($type === $item->value)>{{ $item->label() }}</option>@endforeach</select></div>

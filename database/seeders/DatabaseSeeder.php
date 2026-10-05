@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
         $settings = PlatformSetting::current();
         $readyDisclaimer = PlatformSetting::defaults()['legal_disclaimer'];
 
-        if (str_contains((string) $settings->legal_disclaimer, 'ouverte au public')) {
+        $disclaimer = (string) $settings->legal_disclaimer;
+        if (str_contains($disclaimer, 'ouverte au public') || str_contains($disclaimer, 'distribution réelle') || str_contains($disclaimer, 'ledger')) {
             $settings->forceFill(['legal_disclaimer' => $readyDisclaimer])->save();
         }
 
@@ -90,7 +91,7 @@ class DatabaseSeeder extends Seeder
      */
     private function demoProjects(): array
     {
-        $terms = 'Le pourcentage sur la durée est une estimation. Le taux journalier en est le quotient. Il n’est pas garanti et n’est jamais crédité automatiquement. Une distribution réelle n’existe que si l’administration enregistre un produit effectif du projet.';
+        $terms = 'Les revenus crédités apparaissent dans le portefeuille après leur distribution.';
 
         return [
             [

@@ -6,12 +6,13 @@
     <title>@yield('title', 'Administration ZELVORA')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('css/zelvora.css') }}">
 </head>
 <body>
 <div class="admin-shell">
     <aside class="side">
-        <a class="brand" href="{{ route('admin.dashboard') }}" style="margin-bottom:1rem;"><span class="mark">Z</span><span><strong>ZELVORA</strong><small style="color:#b9c0cc;">Administration</small></span></a>
+        <a class="brand" href="{{ route('admin.dashboard') }}" style="margin-bottom:1rem;"><img class="brand-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA"></a>
         @foreach ([
             'admin.dashboard' => 'Dashboard',
             'admin.users.index' => 'Utilisateurs',
@@ -20,9 +21,9 @@
             'admin.deposits.index' => 'Dépôts',
             'admin.withdrawals.index' => 'Retraits',
             'admin.referrals.index' => 'Parrainage',
-            'admin.transactions.index' => 'Transactions',
+            'admin.transactions.index' => 'Historique des opérations',
             'admin.notifications.create' => 'Notifications',
-            'admin.audit.index' => 'Audit',
+            'admin.audit.index' => 'Journal d’activité',
             'admin.settings.edit' => 'Paramètres',
         ] as $route => $label)
             <a href="{{ route($route) }}" @class(['active' => request()->routeIs(str_replace('.index', '.*', str_replace('.edit', '.*', str_replace('.create', '.*', $route)))) || request()->routeIs($route)])>{{ $label }}</a>

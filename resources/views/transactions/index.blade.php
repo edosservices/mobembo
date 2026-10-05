@@ -25,7 +25,7 @@
                 <td>{{ $entry->balance_after === null ? '—' : money($entry->balance_after) }}</td>
             </tr>
         @empty
-            <tr><td colspan="6">Aucune écriture. Le solde se reconstitue à partir de ce registre.</td></tr>
+            <tr><td colspan="6">Aucune opération pour le moment.</td></tr>
         @endforelse
         </tbody>
     </table>

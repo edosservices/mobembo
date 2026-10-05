@@ -24,8 +24,8 @@ class PlatformController extends Controller
         return response()->json([
             'summary' => $portfolio->summary($user),
             'summary_notes' => [
-                'returns_today' => 'Revenus réellement crédités aujourd’hui.',
-                'estimate_today' => 'Estimation non garantie, non créditée.',
+                'returns_today' => 'Revenus crédités aujourd’hui.',
+                'estimate_today' => 'Rendement journalier estimatif.',
             ],
             'referral' => [
                 'code' => $user->referral_code,

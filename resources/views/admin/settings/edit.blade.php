@@ -22,8 +22,8 @@
             @endforeach
         </select>
     </div>
-    <div class="field"><label>Pourcentage de commission</label><input name="referral_rate_percent" value="{{ old('referral_rate_percent', $settings->referral_rate_percent) }}" required></div>
-    <p class="muted">Le rendement prévu de chaque plan se modifie dans Projets.</p>
+    <div class="field"><label>Commission de parrainage (%)</label><input name="referral_rate_percent" value="{{ old('referral_rate_percent', $settings->referral_rate_percent) }}" required></div>
+    <p class="muted">Le rendement du projet se modifie dans Projets.</p>
     <h2>Numéros de réception</h2>
     <p class="muted">Laissez vide tant que le numéro n’est pas attribué. La page de dépôt n’affiche que les numéros enregistrés.</p>
     <div class="grid-2">
@@ -35,6 +35,6 @@
     <label style="display:flex;gap:.5rem;align-items:center;"><input type="checkbox" name="kyc_required_for_withdrawal" value="1" style="width:auto;" @checked($settings->kyc_required_for_withdrawal)> Exiger un KYC vérifié avant tout retrait</label>
     <label style="display:flex;gap:.5rem;align-items:center;margin-top:.6rem;"><input type="checkbox" name="otp_enabled" value="1" style="width:auto;" @checked($settings->otp_enabled)> Exiger un code SMS à la connexion</label>
     <div class="field" style="margin-top:.8rem;"><label>Mention légale</label><textarea name="legal_disclaimer" required>{{ old('legal_disclaimer', $settings->legal_disclaimer) }}</textarea></div>
-    <button class="btn-z" type="submit">Enregistrer</button>
+    <button class="btn-z" type="submit">Enregistrer les modifications</button>
 </form>
 @endsection

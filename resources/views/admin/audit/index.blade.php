@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-<h1 class="serif">Journal d’audit</h1>
+<h1 class="serif">Journal d’activité</h1>
 <form method="GET" class="field" style="max-width:320px;"><label>Action</label><input name="action" value="{{ $action }}" placeholder="deposit_approved"></form>
 <div class="table-wrap panel">
     <table>

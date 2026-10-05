@@ -29,6 +29,6 @@ class SupportController extends Controller
 
         return redirect()
             ->route($subject ? 'admin.users.show' : 'admin.users.index', $subject)
-            ->with('success', 'Session d’administration rétablie.');
+            ->with('success', 'Vous êtes de retour dans l’administration.');
     }
 }

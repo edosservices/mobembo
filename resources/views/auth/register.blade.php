@@ -5,7 +5,7 @@
     <div>
         <div class="kicker">Inscription</div>
         <h1 style="font-size:3rem;">Un numéro suffit pour commencer.</h1>
-        <p class="lede">Aucune adresse e-mail n’est demandée. Si vous arrivez par un lien d’invitation, le parrain est associé au compte. L’inscription seule ne crée pas de revenu.</p>
+        <p class="lede">Créez votre espace avec votre numéro de téléphone. Ajoutez un code de parrainage si vous en avez un.</p>
     </div>
     <form class="panel" method="POST" action="{{ route('register') }}">
         @csrf

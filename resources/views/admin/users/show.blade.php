@@ -5,7 +5,7 @@
     <h1 class="serif">{{ $user->name }}</h1>
     <form method="POST" action="{{ route('admin.users.impersonate', $user) }}">
         @csrf
-        <button class="btn-z" type="submit">Ouvrir le compte</button>
+        <button class="btn-z" type="submit">Accéder au compte</button>
     </form>
 </div>
 <p>{{ $user->phone }} · @include('partials.status', ['status' => $user->status]) · KYC {{ $user->kyc_status->label() }} · Parrain {{ $user->referrer->name ?? 'aucun' }} · Inscrit le {{ $user->created_at->format('d/m/Y H:i') }}</p>
@@ -35,9 +35,9 @@
     </form>
     <form class="panel" method="POST" action="{{ $user->status->value === 'active' ? route('admin.users.block', $user) : route('admin.users.unblock', $user) }}">
         @csrf
-        <h2>{{ $user->status->value === 'active' ? 'Bloquer' : 'Débloquer' }}</h2>
+        <h2>{{ $user->status->value === 'active' ? 'Bloquer le compte' : 'Débloquer le compte' }}</h2>
         <div class="field"><label>Motif</label><input name="reason" required></div>
-        <button class="btn-z {{ $user->status->value === 'active' ? 'danger' : 'ok' }}" type="submit">{{ $user->status->value === 'active' ? 'Bloquer' : 'Débloquer' }}</button>
+        <button class="btn-z {{ $user->status->value === 'active' ? 'danger' : 'ok' }}" type="submit">{{ $user->status->value === 'active' ? 'Bloquer le compte' : 'Débloquer le compte' }}</button>
     </form>
     <form class="panel" method="POST" action="{{ route('admin.users.password', $user) }}">
         @csrf
@@ -60,7 +60,7 @@
     <div class="field"><label>Note</label><input name="kyc_note" value="{{ $user->kyc_note }}"></div>
     <button class="btn-z" type="submit">Mettre à jour le KYC</button>
 </form>
-<h2>Transactions</h2>
+<h2>Historique des opérations</h2>
 <div class="table-wrap panel">
     <table>
         <thead><tr><th>Date</th><th>Type</th><th>Montant</th><th>Statut</th><th>Description</th></tr></thead>
@@ -78,7 +78,7 @@
     </table>
 </div>
 <p><a href="{{ route('admin.transactions.index', ['q' => $user->phone]) }}">Tout l’historique</a></p>
-<h2>Journal concernant ce compte</h2>
+<h2>Journal d’activité</h2>
 <div class="table-wrap panel">
     <table>
         <thead><tr><th>Date</th><th>Action</th><th>Ancien</th><th>Nouveau</th><th>Delta</th><th>Motif</th></tr></thead>
