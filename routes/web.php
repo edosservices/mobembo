@@ -29,6 +29,32 @@ use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/manifest.webmanifest', function () {
+    return response(json_encode([
+        'name' => 'ZELVORA',
+        'short_name' => 'ZELVORA',
+        'description' => 'Investissement immobilier',
+        'start_url' => '/',
+        'scope' => '/',
+        'display' => 'standalone',
+        'background_color' => '#0c1220',
+        'theme_color' => '#0c1220',
+        'lang' => 'fr',
+        'icons' => [
+            ['src' => '/images/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => '/images/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => '/images/icons/icon-maskable.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 200, [
+        'Content-Type' => 'application/manifest+json',
+    ]);
+})->name('pwa.manifest');
+Route::get('/sw.js', function () {
+    return response((string) file_get_contents(public_path('sw.js')), 200, [
+        'Content-Type' => 'application/javascript; charset=UTF-8',
+        'Service-Worker-Allowed' => '/',
+    ]);
+})->name('pwa.worker');
 Route::view('/mentions-legales', 'legal')->name('legal');
 Route::view('/a-propos', 'pages.about')->name('about');
 Route::view('/faq', 'pages.faq')->name('faq');

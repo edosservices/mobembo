@@ -343,14 +343,20 @@ footer.site { padding: 2rem 0 5rem; color: var(--muted); font-size: 0.85rem; }
 .method-picks legend { font-weight: 800; margin-bottom: 0.35rem; }
 .method-picks label { display: flex; align-items: center; gap: 0.55rem; background: #faf7f2; border: 1px solid var(--line); border-radius: 0.9rem; padding: 0.75rem 0.8rem; }
 .method-picks input { width: auto; }
-#pay-dialog {
+#pay-dialog, #install-dialog {
     width: min(26rem, calc(100% - 1.5rem));
     border: 0;
     border-radius: 1.2rem;
     padding: 1.1rem;
     box-shadow: var(--shadow);
 }
-#pay-dialog::backdrop { background: rgba(10, 10, 10, 0.55); }
+#pay-dialog::backdrop, #install-dialog::backdrop { background: rgba(10, 10, 10, 0.55); }
+#install-dialog { display: none; }
+#install-dialog[open] { display: grid; gap: 0.7rem; }
+#install-dialog h2 { font-size: 1.55rem; margin: 0; }
+#install-dialog p, #install-dialog ol { margin: 0; }
+#install-dialog ol { padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+#install-steps[hidden] { display: none; }
 .pay-target { background: #faf7f2; border-radius: 0.9rem; padding: 0.8rem; margin: 0.55rem 0; text-align: center; }
 .pay-target strong { display: block; }
 .dialog-actions { display: grid; gap: 0.5rem; margin-top: 0.8rem; }
