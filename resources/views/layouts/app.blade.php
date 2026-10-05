@@ -13,11 +13,13 @@
 <body class="site-app">
     @include('partials.support-banner')
     <header class="topbar">
+        <button class="corner-btn" type="button" data-back data-fallback="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) hidden @endif>Retour</button>
         <a class="brand" href="{{ route('dashboard') }}">
             <img class="brand-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA">
             <span><small>{{ auth()->user()->name }}</small></span>
         </a>
-        <nav class="nav-links">
+        <button class="corner-btn nav-toggle" type="button" aria-expanded="false" aria-controls="app-nav">Menu</button>
+        <nav id="app-nav" class="nav-links">
             <a href="{{ route('dashboard') }}" @class(['active' => request()->routeIs('dashboard')])>Accueil</a>
             <a href="{{ route('projects.index') }}" @class(['active' => request()->routeIs('projects.*')])>Investir</a>
             <a href="{{ route('investments.index') }}" @class(['active' => request()->routeIs('investments.*')])>Portefeuille</a>
@@ -43,6 +45,19 @@
         <a href="{{ route('profile.edit') }}" @class(['active' => request()->routeIs('profile.*')])><strong>●</strong>Profil</a>
     </nav>
     <script>
+        document.querySelector('[data-back]')?.addEventListener('click', () => {
+            const fallback = document.querySelector('[data-back]').dataset.fallback;
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+            window.location.href = fallback;
+        });
+        document.querySelector('.nav-toggle')?.addEventListener('click', (event) => {
+            const nav = document.getElementById('app-nav');
+            const open = nav.classList.toggle('is-open');
+            event.currentTarget.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
         document.querySelectorAll('[data-copy]').forEach((button) => {
             button.addEventListener('click', async () => {
                 const value = button.getAttribute('data-copy');

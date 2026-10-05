@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DepositController as AdminDepositController;
 use App\Http\Controllers\Admin\InvestmentController as AdminInvestmentController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Admin\PaymentDestinationController as AdminPaymentDestinationController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
@@ -113,4 +114,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit.index');
     Route::get('/parametres', [AdminSettingsController::class, 'edit'])->name('settings.edit');
     Route::put('/parametres', [AdminSettingsController::class, 'update'])->name('settings.update');
+    Route::post('/paiements', [AdminPaymentDestinationController::class, 'store'])->name('payments.store');
+    Route::put('/paiements/{destination}', [AdminPaymentDestinationController::class, 'update'])->name('payments.update');
+    Route::delete('/paiements/{destination}', [AdminPaymentDestinationController::class, 'destroy'])->name('payments.destroy');
 });

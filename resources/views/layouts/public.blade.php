@@ -14,6 +14,9 @@
 <body class="@yield('body-class', 'site-public')">
     @include('partials.support-banner')
     <header class="topbar">
+        @unless (request()->routeIs('home'))
+            <button class="corner-btn" type="button" data-back data-fallback="{{ url()->previous() === url()->current() ? route('home') : url()->previous() }}">Retour</button>
+        @endunless
         <a class="brand" href="{{ route('home') }}">
             <img class="brand-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA, investissement immobilier">
         </a>
@@ -39,6 +42,14 @@
     </main>
     @include('partials.site-footer')
     <script>
+        document.querySelector('[data-back]')?.addEventListener('click', () => {
+            const fallback = document.querySelector('[data-back]').dataset.fallback;
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+            window.location.href = fallback;
+        });
         document.querySelector('.nav-toggle')?.addEventListener('click', (event) => {
             const nav = document.getElementById('site-nav');
             const open = nav.classList.toggle('is-open');

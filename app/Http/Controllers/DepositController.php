@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PaymentMethod;
-use App\Models\PlatformSetting;
 use App\Services\DepositService;
 use App\Support\Money;
+use App\Support\PaymentDirectory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -14,9 +14,11 @@ class DepositController extends Controller
     public function create(Request $request)
     {
         $deposits = $request->user()->deposits()->latest()->limit(8)->get();
-        $settings = PlatformSetting::current();
 
-        return view('deposits.create', compact('deposits', 'settings'));
+        return view('deposits.create', [
+            'deposits' => $deposits,
+            'destinations' => PaymentDirectory::grouped(),
+        ]);
     }
 
     public function store(Request $request, DepositService $deposits)

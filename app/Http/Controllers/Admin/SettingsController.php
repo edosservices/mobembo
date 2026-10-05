@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\ReferralTrigger;
 use App\Http\Controllers\Controller;
+use App\Models\PaymentDestination;
 use App\Models\PlatformSetting;
 use App\Services\AuditService;
 use App\Services\ReferralProgressService;
@@ -18,6 +19,7 @@ class SettingsController extends Controller
         return view('admin.settings.edit', [
             'settings' => PlatformSetting::current(),
             'levels' => $progress->rules(),
+            'destinations' => PaymentDestination::query()->latest()->get(),
         ]);
     }
 
@@ -40,11 +42,14 @@ class SettingsController extends Controller
             'referral_rate_percent' => ['required', 'numeric', 'min:0', 'max:100'],
             'legal_disclaimer' => ['required', 'string', 'max:5000'],
             'mpesa_number' => ['nullable', 'string', 'max:32'],
+            'mpesa_holder' => ['nullable', 'string', 'max:80'],
             'airtel_number' => ['nullable', 'string', 'max:32'],
+            'airtel_holder' => ['nullable', 'string', 'max:80'],
             'orange_number' => ['nullable', 'string', 'max:32'],
+            'orange_holder' => ['nullable', 'string', 'max:80'],
         ]);
 
-        foreach (['mpesa_number', 'airtel_number', 'orange_number'] as $field) {
+        foreach (['mpesa_number', 'mpesa_holder', 'airtel_number', 'airtel_holder', 'orange_number', 'orange_holder'] as $field) {
             $data[$field] = trim((string) ($data[$field] ?? '')) ?: null;
         }
 
@@ -61,8 +66,11 @@ class SettingsController extends Controller
             'otp_enabled',
             'kyc_required_for_withdrawal',
             'mpesa_number',
+            'mpesa_holder',
             'airtel_number',
+            'airtel_holder',
             'orange_number',
+            'orange_holder',
         ]);
 
         $levels = $this->levels($request);

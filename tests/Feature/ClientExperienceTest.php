@@ -6,6 +6,7 @@ use App\Enums\LedgerType;
 use App\Enums\ProjectStatus;
 use App\Enums\ReviewStatus;
 use App\Models\Deposit;
+use App\Models\PaymentDestination;
 use App\Models\LedgerEntry;
 use App\Models\PlatformSetting;
 use App\Models\Project;
@@ -204,6 +205,37 @@ class ClientExperienceTest extends TestCase
             ->assertSee('Filtrer')
             ->assertSee('Dépôt de test')
             ->assertDontSee('Retrait de test');
+    }
+
+    public function test_the_client_sees_a_payment_number_that_the_admin_can_change(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $client = User::factory()->create();
+
+        $this->actingAs($admin)->post(route('admin.payments.store'), [
+            'method' => 'airtel_money',
+            'holder_name' => 'Amina Mukendi',
+            'phone' => '0890000001',
+        ])->assertRedirect();
+
+        $this->actingAs($client)->get(route('deposits.create'))
+            ->assertOk()
+            ->assertSee('Amina Mukendi')
+            ->assertSee('0890000001')
+            ->assertSee('Retour')
+            ->assertSee('Menu')
+            ->assertSee('J’ai déjà envoyé');
+
+        $destination = PaymentDestination::query()->first();
+        $this->actingAs($admin)->put(route('admin.payments.update', $destination), [
+            'method' => 'airtel_money',
+            'holder_name' => 'Amina Mukendi',
+            'phone' => '0890000002',
+        ])->assertRedirect();
+
+        $this->actingAs($client)->get(route('deposits.create'))
+            ->assertSee('0890000002')
+            ->assertDontSee('0890000001');
     }
 
     public function test_admin_can_replace_level_thresholds(): void
