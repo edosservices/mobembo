@@ -13,8 +13,14 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
+        $next = (string) $request->query('next', '');
+
+        if ($next !== '' && str_starts_with($next, '/projets/') && ! str_contains($next, '://') && ! str_contains($next, '\\')) {
+            $request->session()->put('url.intended', url($next));
+        }
+
         return view('auth.login');
     }
 

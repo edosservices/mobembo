@@ -43,7 +43,7 @@ class InvestmentService
 
             $project = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
 
-            if ($project->status !== ProjectStatus::Active) {
+            if (! $project->status->acceptsInvestment()) {
                 throw new FinancialException('Ce projet n’accepte pas de nouvel investissement.');
             }
 
@@ -86,9 +86,21 @@ class InvestmentService
             ]);
 
             $funded = Money::add($project->funded_amount, $amount);
+            $status = $project->status;
+
+            if (Money::cmp($funded, $project->target_amount) >= 0) {
+                $status = ProjectStatus::Funded;
+            } elseif ($project->status->acceptsInvestment() && Money::cmp($project->target_amount, '0') > 0) {
+                $percent = bcdiv(bcmul($funded, '100', 8), (string) $project->target_amount, 2);
+
+                if (Money::cmp($percent, '80') >= 0) {
+                    $status = ProjectStatus::AlmostComplete;
+                }
+            }
+
             $project->forceFill([
                 'funded_amount' => $funded,
-                'status' => Money::cmp($funded, $project->target_amount) >= 0 ? ProjectStatus::Funded : $project->status,
+                'status' => $status,
             ])->save();
 
             $this->referrals->reward(ReferralTrigger::Investment, $user, $amount, Investment::class, $investment->id);

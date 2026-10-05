@@ -225,6 +225,32 @@ class FinancialIntegrityTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_guest_can_open_a_project_and_an_open_status_investment_stays_estimated(): void
+    {
+        $project = $this->project([
+            'status' => ProjectStatus::Open,
+            'slug' => 'projet-ouvert',
+            'min_investment' => '10.00',
+        ]);
+
+        $this->get(route('projects.show', $project))
+            ->assertOk()
+            ->assertSee('Investir maintenant')
+            ->assertSee('Prévisionnel');
+
+        $user = User::factory()->create();
+        $this->credit($user, '40.00');
+
+        $this->actingAs($user)->post(route('investments.store', $project), [
+            'amount' => '10',
+            'idempotency_key' => (string) Str::uuid(),
+        ])->assertRedirect();
+
+        $this->assertSame('10.00', Money::of(Investment::query()->value('amount')));
+        $this->assertSame(0, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
+        $this->assertSame([], app(WalletService::class)->findDrift());
+    }
+
     public function test_overfunding_is_refused_and_reconciliation_holds(): void
     {
         $user = User::factory()->create();

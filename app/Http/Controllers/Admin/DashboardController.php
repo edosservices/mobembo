@@ -61,7 +61,7 @@ class DashboardController extends Controller
                 'invested' => Money::of(Investment::query()->whereIn('status', ['active', 'suspended'])->sum('amount')),
                 'returns' => $this->sum(LedgerType::InvestmentReturn),
                 'commissions' => $this->sum(LedgerType::ReferralCommission),
-                'projects_active' => Project::query()->where('status', ProjectStatus::Active)->count(),
+                'projects_active' => Project::query()->whereIn('status', ProjectStatus::investableCases())->count(),
                 'volume' => Money::of(Deposit::query()->where('status', ReviewStatus::Approved)->sum('amount')),
             ],
             'series' => $series,

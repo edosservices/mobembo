@@ -27,6 +27,7 @@ class ApiPresenter
     {
         return [
             'id' => $project->id,
+            'uuid' => $project->uuid,
             'name' => $project->name,
             'slug' => $project->slug,
             'location' => $project->location,

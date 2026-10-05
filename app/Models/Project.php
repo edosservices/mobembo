@@ -6,11 +6,14 @@ use App\Enums\DistributionFrequency;
 use App\Enums\ProjectStatus;
 use App\Support\Money;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 #[Fillable([
+    'uuid',
     'name',
     'slug',
     'image_path',
@@ -49,9 +52,23 @@ class Project extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function (Project $project): void {
+            if (! $project->uuid) {
+                $project->uuid = (string) Str::uuid();
+            }
+        });
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function scopePublicCatalog(Builder $query): Builder
+    {
+        return $query->whereIn('status', ProjectStatus::publicCases());
     }
 
     public function investments(): HasMany
@@ -82,7 +99,7 @@ class Project extends Model
 
     public function isInvestable(): bool
     {
-        return $this->status === ProjectStatus::Active && Money::cmp($this->remainingAmount(), $this->min_investment) >= 0;
+        return $this->status->acceptsInvestment() && Money::cmp($this->remainingAmount(), $this->min_investment) >= 0;
     }
 
     public function imageUrl(): ?string

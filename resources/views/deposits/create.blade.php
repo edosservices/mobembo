@@ -3,6 +3,18 @@
 @section('content')
 <h1 style="font-size:2.4rem;">Déposer</h1>
 <p class="note">Le montant reste « en attente ». Il n’est ajouté au solde disponible qu’après vérification de la preuve.</p>
+<div class="panel">
+    <h2>Numéro ZELVORA</h2>
+    @if ($settings->mpesa_number || $settings->airtel_number || $settings->orange_number)
+        <ul>
+            @if ($settings->mpesa_number)<li>M-Pesa : {{ $settings->mpesa_number }}</li>@endif
+            @if ($settings->airtel_number)<li>Airtel Money : {{ $settings->airtel_number }}</li>@endif
+            @if ($settings->orange_number)<li>Orange Money : {{ $settings->orange_number }}</li>@endif
+        </ul>
+    @else
+        <p class="muted">Aucun numéro de réception n’est configuré pour le moment. L’administration doit l’enregistrer avant qu’un dépôt puisse être adressé.</p>
+    @endif
+</div>
 <form class="panel" method="POST" action="{{ route('deposits.store') }}" enctype="multipart/form-data">
     @csrf
     <div class="field"><label for="amount">Montant</label><input id="amount" name="amount" inputmode="decimal" value="{{ old('amount') }}" required></div>

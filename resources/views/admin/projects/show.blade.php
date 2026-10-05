@@ -2,7 +2,15 @@
 @section('content')
 <p><a href="{{ route('admin.projects.index') }}">Projets</a> · <a href="{{ route('admin.projects.edit', $project) }}">Modifier</a></p>
 <h1 class="serif">{{ $project->name }}</h1>
-<p>{{ $project->location }} · @include('partials.status', ['status' => $project->status]) · Financé {{ money($project->funded_amount) }} / {{ money($project->target_amount) }}</p>
+<p>{{ $project->location }} · @include('partials.status', ['status' => $project->status]) · Financé {{ money($project->funded_amount) }} / {{ money($project->target_amount) }} · Restant {{ money($project->remainingAmount()) }}</p>
+@if ($project->imageUrl())
+    <p><img src="{{ $project->imageUrl() }}" alt="" style="width:min(100%, 420px);border-radius:1rem;"></p>
+@endif
+<form method="POST" action="{{ route('admin.projects.destroy', $project) }}" onsubmit="return confirm('Supprimer ou suspendre ce projet ?');">
+    @csrf
+    @method('DELETE')
+    <button class="btn-z-ghost" type="submit">Supprimer ou suspendre</button>
+</form>
 <div class="note">Estimation de revenus encore non distribués sur les investissements actifs : {{ money($estimatedOutstanding) }}. Ce n’est pas un montant dû. Une distribution doit correspondre à un produit réel du projet.</div>
 <div class="grid-2" style="margin-top:1rem;">
     <form class="panel" method="POST" action="{{ route('admin.projects.distribute', $project) }}">

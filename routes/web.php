@@ -28,6 +28,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/mentions-legales', 'legal')->name('legal');
+Route::view('/a-propos', 'pages.about')->name('about');
+Route::view('/faq', 'pages.faq')->name('faq');
+Route::view('/contact', 'pages.contact')->name('contact');
+Route::view('/conditions', 'pages.terms')->name('terms');
+Route::view('/confidentialite', 'pages.privacy')->name('privacy');
+Route::get('/projets', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('/projets/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
@@ -40,8 +47,6 @@ Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')-
 
 Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
-    Route::get('/projets', [ProjectController::class, 'index'])->name('projects.index');
-    Route::get('/projets/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
     Route::post('/projets/{project:slug}/investir', [InvestmentController::class, 'store'])->name('investments.store');
     Route::get('/portefeuille', [InvestmentController::class, 'index'])->name('investments.index');
     Route::get('/portefeuille/{investment}', [InvestmentController::class, 'show'])->name('investments.show');
@@ -80,6 +85,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::put('/projets/{project}', [AdminProjectController::class, 'update'])->name('projects.update');
     Route::post('/projets/{project}/distribuer', [AdminProjectController::class, 'distribute'])->name('projects.distribute');
     Route::post('/projets/{project}/cloturer', [AdminProjectController::class, 'close'])->name('projects.close');
+    Route::delete('/projets/{project}', [AdminProjectController::class, 'destroy'])->name('projects.destroy');
 
     Route::get('/investissements', [AdminInvestmentController::class, 'index'])->name('investments.index');
     Route::post('/investissements/{investment}', [AdminInvestmentController::class, 'update'])->name('investments.update');

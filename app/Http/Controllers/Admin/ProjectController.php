@@ -97,6 +97,26 @@ class ProjectController extends Controller
         return back()->with('success', 'Projet clôturé. Le capital restant a été restitué sur les soldes disponibles.');
     }
 
+    public function destroy(Request $request, Project $project, AuditService $audit)
+    {
+        if ($project->investments()->exists()) {
+            $project->forceFill(['status' => ProjectStatus::Suspended])->save();
+            $audit->record($request->user(), null, 'project_suspended', null, null, null, 'Projet suspendu : des investissements existent.', [
+                'project_id' => $project->id,
+            ]);
+
+            return back()->with('success', 'Ce projet a déjà des investissements. Il a été suspendu, pas supprimé.');
+        }
+
+        $audit->record($request->user(), null, 'project_deleted', null, null, null, $project->name, [
+            'project_id' => $project->id,
+            'slug' => $project->slug,
+        ]);
+        $project->delete();
+
+        return redirect()->route('admin.projects.index')->with('success', 'Projet supprimé.');
+    }
+
     private function fill(Project $project, Request $request): void
     {
         $request->merge([

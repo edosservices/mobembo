@@ -35,7 +35,14 @@ class SettingsController extends Controller
             'referral_trigger' => ['required', Rule::enum(ReferralTrigger::class)],
             'referral_rate_percent' => ['required', 'numeric', 'min:0', 'max:100'],
             'legal_disclaimer' => ['required', 'string', 'max:5000'],
+            'mpesa_number' => ['nullable', 'string', 'max:32'],
+            'airtel_number' => ['nullable', 'string', 'max:32'],
+            'orange_number' => ['nullable', 'string', 'max:32'],
         ]);
+
+        foreach (['mpesa_number', 'airtel_number', 'orange_number'] as $field) {
+            $data[$field] = trim((string) ($data[$field] ?? '')) ?: null;
+        }
 
         $settings = PlatformSetting::current();
         $before = $settings->only([
@@ -48,6 +55,9 @@ class SettingsController extends Controller
             'referral_rate_percent',
             'otp_enabled',
             'kyc_required_for_withdrawal',
+            'mpesa_number',
+            'airtel_number',
+            'orange_number',
         ]);
 
         $settings->fill([

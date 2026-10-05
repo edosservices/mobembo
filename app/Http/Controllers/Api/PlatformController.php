@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\PaymentMethod;
-use App\Enums\ProjectStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Presenters\ApiPresenter;
 use App\Models\Project;
@@ -38,7 +37,7 @@ class PlatformController extends Controller
     public function projects()
     {
         $projects = Project::query()
-            ->whereIn('status', [ProjectStatus::Active, ProjectStatus::Funded, ProjectStatus::Closed])
+            ->publicCatalog()
             ->latest()
             ->paginate(20);
 

@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/zelvora.css') }}">
 </head>
-<body>
+<body class="site-app">
     <header class="topbar">
         <a class="brand" href="{{ route('dashboard') }}">
             <span class="mark">Z</span>

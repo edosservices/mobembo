@@ -39,6 +39,9 @@ class PlatformSetting extends Model
             'otp_enabled' => false,
             'kyc_required_for_withdrawal' => false,
             'legal_disclaimer' => 'ZELVORA présente des rendements prévus, estimés et non garantis. Aucun revenu n’est crédité tant qu’une distribution réelle, rattachée aux conditions du projet, n’a pas été enregistrée. La plateforme ne doit pas être ouverte au public avant mise en conformité juridique, KYC et agréments financiers applicables en RDC.',
+            'mpesa_number' => null,
+            'airtel_number' => null,
+            'orange_number' => null,
         ];
     }
 

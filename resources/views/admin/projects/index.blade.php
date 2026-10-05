@@ -6,7 +6,7 @@
 </div>
 <div class="table-wrap panel">
     <table>
-        <thead><tr><th>Nom</th><th>Lieu</th><th>Objectif</th><th>Financé</th><th>Statut</th><th></th></tr></thead>
+        <thead><tr><th>Nom</th><th>Lieu</th><th>Objectif</th><th>Financé</th><th>Restant</th><th>Statut</th><th></th></tr></thead>
         <tbody>
         @foreach ($projects as $project)
             <tr>
@@ -14,6 +14,7 @@
                 <td>{{ $project->location }}</td>
                 <td>{{ money($project->target_amount) }}</td>
                 <td>{{ money($project->funded_amount) }}</td>
+                <td>{{ money($project->remainingAmount()) }}</td>
                 <td>@include('partials.status', ['status' => $project->status])</td>
                 <td><a href="{{ route('admin.projects.show', $project) }}">Ouvrir</a></td>
             </tr>

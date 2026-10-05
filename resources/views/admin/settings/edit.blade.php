@@ -21,6 +21,13 @@
         </select>
     </div>
     <div class="field"><label>Taux (%)</label><input name="referral_rate_percent" value="{{ old('referral_rate_percent', $settings->referral_rate_percent) }}" required></div>
+    <h2>Numéros de réception</h2>
+    <p class="muted">Laissez vide tant que le numéro n’est pas attribué. La page de dépôt n’affiche que les numéros enregistrés.</p>
+    <div class="grid-2">
+        <div class="field"><label>M-Pesa</label><input name="mpesa_number" value="{{ old('mpesa_number', $settings->mpesa_number) }}"></div>
+        <div class="field"><label>Airtel Money</label><input name="airtel_number" value="{{ old('airtel_number', $settings->airtel_number) }}"></div>
+        <div class="field"><label>Orange Money</label><input name="orange_number" value="{{ old('orange_number', $settings->orange_number) }}"></div>
+    </div>
     <h2>Conformité</h2>
     <label style="display:flex;gap:.5rem;align-items:center;"><input type="checkbox" name="kyc_required_for_withdrawal" value="1" style="width:auto;" @checked($settings->kyc_required_for_withdrawal)> Exiger un KYC vérifié avant tout retrait</label>
     <label style="display:flex;gap:.5rem;align-items:center;margin-top:.6rem;"><input type="checkbox" name="otp_enabled" value="1" style="width:auto;" @checked($settings->otp_enabled)> Préparer l’OTP SMS (inactif tant que SMS_DRIVER n’est pas branché)</label>

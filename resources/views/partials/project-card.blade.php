@@ -1,27 +1,35 @@
-<article class="project-card">
-    <div class="cover">
+<article class="opportunity">
+    <a class="cover" href="{{ route('projects.show', $project) }}">
         @if ($project->imageUrl())
-            <img src="{{ $project->imageUrl() }}" alt="">
+            <img src="{{ $project->imageUrl() }}" alt="Visuel de démonstration pour {{ $project->name }}">
         @endif
-        <span class="chip">{{ $project->location }}</span>
-    </div>
+    </a>
     <div class="body">
-        <div class="meta">
-            <span>{{ $project->category }}</span>
+        <div class="card-badges">
+            <span class="badge-z">{{ $project->category }}</span>
             @include('partials.status', ['status' => $project->status])
         </div>
-        <h2 class="serif" style="font-size:1.35rem;margin:0 0 .4rem;">{{ $project->name }}</h2>
+        <h2>{{ $project->name }}</h2>
+        <p class="place">{{ $project->location }}</p>
         @if ($project->is_demo)
-            <div class="chip">Démonstration</div>
+            <p class="demo-label">Visuel et données de démonstration</p>
         @endif
-        <p class="muted">Objectif {{ money($project->target_amount) }} · Financé {{ money($project->funded_amount) }}</p>
-        <div class="progress" aria-hidden="true"><span style="width: {{ min(100, (float) $project->progressPercent()) }}%"></span></div>
-        <div class="meta"><span>Progression {{ str_replace('.', ',', $project->progressPercent()) }} %</span><span>Min. {{ money($project->min_investment) }}</span></div>
-        <p class="muted">Durée {{ $project->duration_days }} jours · Rendement prévu {{ rtrim(rtrim(number_format((float) $project->expected_return_percent, 2, ',', ' '), '0'), ',') }} % sur la durée, estimé et non garanti.</p>
-        @auth
-            <a class="btn-z full" href="{{ route('projects.show', $project) }}">Investir</a>
-        @else
-            <a class="btn-z full" href="{{ route('register') }}">Créer un compte pour investir</a>
-        @endauth
+        <p class="from">À partir de</p>
+        <p class="price">{{ money($project->min_investment) }}</p>
+        <div class="card-facts">
+            <div>
+                <span>Rendement prévu</span>
+                <strong>Selon les conditions du projet</strong>
+            </div>
+            <div>
+                <span>Durée</span>
+                <strong>{{ $project->duration_days }} jours</strong>
+            </div>
+        </div>
+        <div class="progress" role="img" aria-label="{{ str_replace('.', ',', $project->progressPercent()) }} % financé">
+            <span style="width: {{ min(100, (float) $project->progressPercent()) }}%"></span>
+        </div>
+        <p class="funded-line">{{ str_replace('.', ',', $project->progressPercent()) }} % financé</p>
+        <a class="btn-z full" href="{{ route('projects.show', $project) }}">Voir le projet</a>
     </div>
 </article>

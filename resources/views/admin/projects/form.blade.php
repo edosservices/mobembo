@@ -34,6 +34,15 @@
     </div>
     <div class="field"><label>Description</label><textarea name="description" required>{{ old('description', $project->description) }}</textarea></div>
     <div class="field"><label>Règles économiques</label><textarea name="economic_terms" required>{{ old('economic_terms', $project->economic_terms) }}</textarea></div>
+    @if ($project->exists)
+        <div class="grid-2">
+            <div class="stat"><span>Déjà financé</span><strong class="money sm">{{ money($project->funded_amount) }}</strong></div>
+            <div class="stat"><span>Restant</span><strong class="money sm">{{ money($project->remainingAmount()) }}</strong></div>
+        </div>
+        @if ($project->imageUrl())
+            <p><img src="{{ $project->imageUrl() }}" alt="" style="width:min(100%, 280px);border-radius:1rem;"></p>
+        @endif
+    @endif
     <div class="field"><label>Image</label><input type="file" name="image" accept="image/*"></div>
     <label style="display:flex;gap:.5rem;align-items:center;"><input type="checkbox" name="is_demo" value="1" style="width:auto;" @checked(old('is_demo', $project->is_demo))> Projet de démonstration</label>
     <button class="btn-z" type="submit" style="margin-top:1rem;">Enregistrer</button>

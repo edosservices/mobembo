@@ -11,8 +11,9 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::query()
-            ->whereIn('status', [ProjectStatus::Active, ProjectStatus::Funded, ProjectStatus::Closed])
-            ->latest()
+            ->publicCatalog()
+            ->orderBy('min_investment')
+            ->orderBy('name')
             ->paginate(12);
 
         return view('projects.index', compact('projects'));
@@ -28,7 +29,7 @@ class ProjectController extends Controller
             ?->investments()
             ->where('project_id', $project->id)
             ->latest('invested_at')
-            ->get();
+            ->get() ?? collect();
 
         return view('projects.show', compact('project', 'mine'));
     }
