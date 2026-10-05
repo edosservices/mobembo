@@ -3,8 +3,8 @@
 @section('content')
 <h1 class="serif">Bonus et ajustements</h1>
 <p class="muted">Un bonus ou un ajustement se saisit depuis la fiche du client. Cette page ne fait que les afficher.</p>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th></th></tr></thead>
         <tbody>
         @forelse ($entries as $entry)

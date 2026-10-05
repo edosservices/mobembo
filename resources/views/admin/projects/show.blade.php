@@ -28,8 +28,8 @@
     </form>
 </div>
 <h2>Investissements</h2>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Client</th><th>Montant</th><th>Revenus crédités</th><th>Statut</th></tr></thead>
         <tbody>
         @foreach ($investments as $investment)

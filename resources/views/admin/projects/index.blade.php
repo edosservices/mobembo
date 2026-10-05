@@ -1,48 +1,57 @@
 @extends('layouts.admin')
 @section('content')
-<div style="display:flex;justify-content:space-between;align-items:center;">
-    <h1 class="serif">Projets immobiliers</h1>
+<div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-3">
+    <h1 class="serif mb-0">Projets immobiliers</h1>
     <a class="btn-z" href="{{ route('admin.projects.create') }}">Nouveau projet</a>
 </div>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0 table-fit">
+        <colgroup>
+            <col style="width:13%"><col style="width:12%"><col style="width:9%"><col style="width:9%"><col style="width:7%">
+            <col style="width:8%"><col style="width:12%"><col style="width:8%"><col style="width:12%"><col style="width:10%">
+        </colgroup>
         <thead><tr><th>Nom</th><th>Catégorie</th><th>Objectif</th><th>Financé</th><th>Progression</th><th>Minimum</th><th>Rendement estimatif</th><th>Durée</th><th>Statut</th><th></th></tr></thead>
         <tbody>
         @foreach ($projects as $project)
             <tr>
-                <td>{{ $project->name }}</td>
-                <td>{{ $project->category }}</td>
-                <td>{{ money($project->target_amount) }}</td>
-                <td>{{ money($project->funded_amount) }}</td>
-                <td>{{ str_replace('.', ',', $project->progressPercent()) }} %</td>
-                <td>{{ money($project->min_investment) }}</td>
-                <td>
+                <td class="clip" title="{{ $project->name }}">{{ $project->name }}</td>
+                <td class="clip" title="{{ $project->category }}">{{ $project->category }}</td>
+                <td class="text-nowrap">{{ money($project->target_amount) }}</td>
+                <td class="text-nowrap">{{ money($project->funded_amount) }}</td>
+                <td class="text-nowrap">{{ str_replace('.', ',', $project->progressPercent()) }} %</td>
+                <td class="text-nowrap">{{ money($project->min_investment) }}</td>
+                <td class="yield-cell">
                     <form method="POST" action="{{ route('admin.projects.return', $project) }}" class="percent-form">
                         @csrf
                         <input name="expected_return_percent" value="{{ $project->expected_return_percent }}" inputmode="decimal" aria-label="Rendement prévu de {{ $project->name }}">
-                        <button class="btn-z small" type="submit">Enregistrer</button>
+                        <button class="btn-z small" type="submit">OK</button>
                     </form>
                     <span class="muted">{{ \App\Support\ReturnEstimator::percentLabel($project->dailyReturnPercent()) }}</span>
                 </td>
-                <td>{{ $project->duration_days }} jours</td>
+                <td class="text-nowrap">{{ $project->duration_days }} jours</td>
                 <td>@include('partials.status', ['status' => $project->status])</td>
-                <td class="admin-actions">
-                    <a href="{{ route('admin.projects.edit', $project) }}">Modifier</a>
-                    <a href="{{ route('admin.projects.show', $project) }}">Voir les investissements</a>
-                    @if ($project->status !== \App\Enums\ProjectStatus::Suspended)
-                        <form method="POST" action="{{ route('admin.projects.suspend', $project) }}">
-                            @csrf
-                            <input name="reason" placeholder="Motif" required minlength="5">
-                            <button class="btn-z-ghost small" type="submit">Suspendre</button>
-                        </form>
-                    @endif
-                    @if (! in_array($project->status, [\App\Enums\ProjectStatus::Closed, \App\Enums\ProjectStatus::Finished], true))
-                        <form method="POST" action="{{ route('admin.projects.close', $project) }}">
-                            @csrf
-                            <input name="reason" placeholder="Motif de clôture" required minlength="5">
-                            <button class="btn-z-ghost small" type="submit">Terminer</button>
-                        </form>
-                    @endif
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-dark rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">Actions</button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="{{ route('admin.projects.edit', $project) }}">Modifier</a>
+                            <a class="dropdown-item" href="{{ route('admin.projects.show', $project) }}">Voir les investissements</a>
+                            @if ($project->status !== \App\Enums\ProjectStatus::Suspended)
+                                <form method="POST" action="{{ route('admin.projects.suspend', $project) }}">
+                                    @csrf
+                                    <input name="reason" placeholder="Motif" required minlength="5" aria-label="Motif de suspension de {{ $project->name }}">
+                                    <button class="btn-z-ghost small" type="submit">Suspendre</button>
+                                </form>
+                            @endif
+                            @if (! in_array($project->status, [\App\Enums\ProjectStatus::Closed, \App\Enums\ProjectStatus::Finished], true))
+                                <form method="POST" action="{{ route('admin.projects.close', $project) }}">
+                                    @csrf
+                                    <input name="reason" placeholder="Motif de clôture" required minlength="5" aria-label="Motif de clôture de {{ $project->name }}">
+                                    <button class="btn-z-ghost small" type="submit">Terminer</button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
                 </td>
             </tr>
         @endforeach

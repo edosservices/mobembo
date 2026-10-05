@@ -2,8 +2,8 @@
 @section('content')
 <h1 class="serif">Journal d’activité</h1>
 <form method="GET" class="field" style="max-width:320px;"><label>Action</label><input name="action" value="{{ $action }}" placeholder="deposit_approved"></form>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Administrateur</th><th>Action</th><th>Utilisateur</th><th>Montant</th><th>Avant</th><th>Après</th><th>Raison</th><th>Date</th><th>IP</th></tr></thead>
         <tbody>
         @foreach ($logs as $log)
@@ -14,7 +14,7 @@
                 <td>{{ $log->delta_amount === null ? '—' : money($log->delta_amount) }}</td>
                 <td>{{ $log->old_amount === null ? '—' : money($log->old_amount) }}</td>
                 <td>{{ $log->new_amount === null ? '—' : money($log->new_amount) }}</td>
-                <td>{{ $log->reason }}</td>
+                <td class="cell-note" title="{{ $log->reason }}">{{ $log->reason }}</td>
                 <td>{{ $log->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i:s') }}</td>
                 <td>{{ $log->ip_address ?: '—' }}</td>
             </tr>

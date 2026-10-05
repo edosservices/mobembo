@@ -257,8 +257,48 @@ th { font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; colo
 .admin-backdrop { display: none; border: 0; padding: 0; }
 .admin-main { padding: 1.2rem; min-width: 0; }
 .admin-top { display: none; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
-.admin-actions { display: grid; gap: 0.35rem; min-width: 9rem; }
-.admin-actions input { width: 100%; padding: 0.35rem 0.45rem; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; min-width: 0; }
+.admin-body .table-responsive { overflow-x: auto; }
+.admin-body .table {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 0.82rem;
+    --bs-table-bg: #fff;
+    --bs-table-color: var(--ink);
+    --bs-table-border-color: var(--line);
+    --bs-table-hover-bg: #faf7f2;
+}
+.admin-body .table > :not(caption) > * > * { padding: 0.4rem 0.55rem; white-space: nowrap; vertical-align: middle; }
+.admin-body .table .cell-note,
+.admin-body .table .clip { max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
+.admin-body table.table-fit { table-layout: fixed; }
+.admin-body table.table-fit > :not(caption) > * > th { white-space: normal; line-height: 1.15; }
+.admin-body .table tr:has(.dropdown-menu.show) { position: relative; z-index: 4; }
+.admin-body .table .yield-cell { white-space: normal; }
+.admin-body .table .yield-cell .muted { display: block; max-width: 7.4rem; font-size: 0.68rem; line-height: 1.15; white-space: normal; }
+@media (min-width: 1100px) {
+    .admin-body .table th:first-child,
+    .admin-body .table td:first-child,
+    .admin-body .table th:last-child,
+    .admin-body .table td:last-child { position: static; box-shadow: none; }
+}
+.admin-body .table th:first-child,
+.admin-body .table td:first-child,
+.admin-body .table th:last-child,
+.admin-body .table td:last-child { position: sticky; background: #fff; z-index: 1; }
+.admin-body .table th:first-child,
+.admin-body .table td:first-child { left: 0; }
+.admin-body .table th:last-child,
+.admin-body .table td:last-child { right: 0; box-shadow: -8px 0 10px rgba(16, 25, 43, 0.04); }
+.admin-body .table thead th { z-index: 2; }
+.admin-body .table tbody tr:hover > * { background: #faf7f2; }
+.admin-body .dropdown-menu { border: 1px solid var(--line); border-radius: 0.8rem; box-shadow: var(--shadow); font-size: 0.85rem; min-width: 14rem; padding: 0.35rem; }
+.admin-body .dropdown-item { border-radius: 0.45rem; }
+.admin-body .dropdown-menu form { display: grid; gap: 0.35rem; padding: 0.45rem 0.35rem 0.2rem; }
+.admin-body .dropdown-menu input,
+.admin-body .dropdown-menu select { width: 100%; padding: 0.35rem 0.5rem; border-radius: 0.5rem; font-size: 0.82rem; }
+.admin-body .percent-form { flex-wrap: nowrap; }
+.admin-body a { text-decoration: none; }
 .fund-line { display: flex; justify-content: space-between; gap: 0.6rem; margin: 0.55rem 0 0.2rem; }
 .bars { display: flex; align-items: end; gap: 0.45rem; height: 160px; }
 .bar-col { flex: 1; display: flex; align-items: end; gap: 2px; height: 100%; }
@@ -566,7 +606,7 @@ body.home-page .topbar .btn-z.small { color: #111; background: #f3efe8; }
 }
 .support-banner p { margin: 0; }
 .percent-form { display: flex; gap: 0.35rem; align-items: center; }
-.percent-form input { width: 5.5rem; padding: 0.4rem 0.5rem; }
+.percent-form input { width: 4.4rem; padding: 0.35rem 0.45rem; }
 .plan-facts { width: 100%; margin: 0.35rem 0 0.7rem; text-align: center; }
 .plan-facts .fact {
     height: 100%;

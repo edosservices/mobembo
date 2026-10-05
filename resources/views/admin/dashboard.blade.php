@@ -97,8 +97,8 @@
 
 <section style="margin-top:1.2rem;">
     <h2>Activité récente</h2>
-    <div class="table-wrap panel">
-        <table>
+    <div class="table-responsive panel">
+        <table class="table table-sm table-hover align-middle mb-0">
             <thead><tr><th>Date</th><th>Utilisateur</th><th>Type</th><th>Montant</th><th>Statut</th><th>Action</th></tr></thead>
             <tbody>
             @forelse ($recent as $entry)

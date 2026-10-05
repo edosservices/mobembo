@@ -61,8 +61,8 @@
     <button class="btn-z" type="submit">Mettre à jour le KYC</button>
 </form>
 <h2>Historique des opérations</h2>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Date</th><th>Type</th><th>Montant</th><th>Statut</th><th>Description</th></tr></thead>
         <tbody>
         @foreach ($transactions as $entry)
@@ -79,8 +79,8 @@
 </div>
 <p><a href="{{ route('admin.transactions.index', ['q' => $user->phone]) }}">Tout l’historique</a></p>
 <h2>Journal d’activité</h2>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Date</th><th>Action</th><th>Ancien</th><th>Nouveau</th><th>Delta</th><th>Motif</th></tr></thead>
         <tbody>
         @foreach ($audits as $log)

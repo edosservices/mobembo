@@ -26,8 +26,8 @@
     @endforeach
 </div>
 <h2>Parrains les plus actifs</h2>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Nom</th><th>Commissions</th></tr></thead>
         <tbody>
         @forelse ($top as $user)
@@ -39,8 +39,8 @@
     </table>
 </div>
 <h2>Commissions</h2>
-<div class="table-wrap panel">
-    <table>
+<div class="table-responsive panel">
+    <table class="table table-sm table-hover align-middle mb-0">
         <thead><tr><th>Date</th><th>Parrain</th><th>Filleul</th><th>Déclencheur</th><th>Base</th><th>Commission</th></tr></thead>
         <tbody>
         @foreach ($commissions as $commission)
