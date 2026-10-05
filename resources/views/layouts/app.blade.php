@@ -38,8 +38,21 @@
         <a href="{{ route('dashboard') }}" @class(['active' => request()->routeIs('dashboard')])><strong>⌂</strong>Accueil</a>
         <a href="{{ route('projects.index') }}" @class(['active' => request()->routeIs('projects.*')])><strong>▣</strong>Investir</a>
         <a href="{{ route('investments.index') }}" @class(['active' => request()->routeIs('investments.*')])><strong>▤</strong>Portefeuille</a>
-        <a href="{{ route('transactions.index') }}"><strong>≡</strong>Transactions</a>
-        <a href="{{ route('profile.edit') }}"><strong>●</strong>Profil</a>
+        <a href="{{ route('transactions.index') }}" @class(['active' => request()->routeIs('transactions.*')])><strong>≡</strong>Transactions</a>
+        <a href="{{ route('profile.edit') }}" @class(['active' => request()->routeIs('profile.*')])><strong>●</strong>Profil</a>
     </nav>
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                const value = button.getAttribute('data-copy');
+                try {
+                    await navigator.clipboard.writeText(value);
+                    button.textContent = 'Lien copié';
+                } catch (error) {
+                    button.textContent = value;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

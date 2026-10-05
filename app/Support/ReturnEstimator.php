@@ -21,6 +21,11 @@ class ReturnEstimator
         return Money::truncate(bcdiv($total, (string) $days, 8));
     }
 
+    public static function durationPercent(mixed $percent): string
+    {
+        return bcadd(self::plain($percent), '0', 2);
+    }
+
     public static function dailyPercent(mixed $percent, int $days): string
     {
         $days = max(1, $days);

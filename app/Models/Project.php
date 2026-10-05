@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\DistributionFrequency;
 use App\Enums\ProjectStatus;
+use App\Support\InvestmentQuote;
 use App\Support\Money;
 use App\Support\ReturnEstimator;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -101,6 +102,11 @@ class Project extends Model
     public function dailyReturnPercent(): string
     {
         return ReturnEstimator::dailyPercent($this->expected_return_percent, (int) $this->duration_days);
+    }
+
+    public function quote(?string $amount = null): InvestmentQuote
+    {
+        return InvestmentQuote::for($amount ?? $this->min_investment, $this->expected_return_percent, (int) $this->duration_days);
     }
 
     public function isInvestable(): bool

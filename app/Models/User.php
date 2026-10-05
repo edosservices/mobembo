@@ -104,4 +104,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReferralCommission::class, 'referrer_id');
     }
+
+    public function commissionsAsReferred(): HasMany
+    {
+        return $this->hasMany(ReferralCommission::class, 'referred_user_id');
+    }
 }

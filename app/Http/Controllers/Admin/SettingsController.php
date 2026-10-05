@@ -6,15 +6,19 @@ use App\Enums\ReferralTrigger;
 use App\Http\Controllers\Controller;
 use App\Models\PlatformSetting;
 use App\Services\AuditService;
+use App\Services\ReferralProgressService;
 use App\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class SettingsController extends Controller
 {
-    public function edit()
+    public function edit(ReferralProgressService $progress)
     {
-        return view('admin.settings.edit', ['settings' => PlatformSetting::current()]);
+        return view('admin.settings.edit', [
+            'settings' => PlatformSetting::current(),
+            'levels' => $progress->rules(),
+        ]);
     }
 
     public function update(Request $request, AuditService $audit)
@@ -53,6 +57,7 @@ class SettingsController extends Controller
             'referral_enabled',
             'referral_trigger',
             'referral_rate_percent',
+            'referral_levels',
             'otp_enabled',
             'kyc_required_for_withdrawal',
             'mpesa_number',
@@ -60,11 +65,13 @@ class SettingsController extends Controller
             'orange_number',
         ]);
 
+        $levels = $this->levels($request);
         $settings->fill([
             ...$data,
             'referral_enabled' => $request->boolean('referral_enabled'),
             'otp_enabled' => $request->boolean('otp_enabled'),
             'kyc_required_for_withdrawal' => $request->boolean('kyc_required_for_withdrawal'),
+            'referral_levels' => $levels ?? $settings->referral_levels,
         ])->save();
 
         $audit->record($request->user(), null, 'settings_updated', null, null, null, 'Mise à jour des paramètres de la plateforme', [
@@ -73,5 +80,39 @@ class SettingsController extends Controller
         ]);
 
         return back()->with('success', 'Paramètres enregistrés.');
+    }
+
+    /**
+     * @return list<array{key: string, name: string, min_active: int}>|null
+     */
+    private function levels(Request $request): ?array
+    {
+        if (! $request->exists('level_pro')) {
+            return null;
+        }
+
+        $data = $request->validate([
+            'level_starter' => ['required', 'integer', 'min:0', 'max:100000'],
+            'level_pro' => ['required', 'integer', 'min:1', 'max:100000'],
+            'level_elite' => ['required', 'integer', 'min:1', 'max:100000'],
+            'level_vip' => ['required', 'integer', 'min:1', 'max:100000'],
+        ]);
+
+        $rules = [
+            ['key' => 'starter', 'name' => 'STARTER', 'min_active' => (int) $data['level_starter']],
+            ['key' => 'pro', 'name' => 'PRO', 'min_active' => (int) $data['level_pro']],
+            ['key' => 'elite', 'name' => 'ELITE', 'min_active' => (int) $data['level_elite']],
+            ['key' => 'vip', 'name' => 'VIP', 'min_active' => (int) $data['level_vip']],
+        ];
+
+        if ($rules[1]['min_active'] <= $rules[0]['min_active']
+            || $rules[2]['min_active'] <= $rules[1]['min_active']
+            || $rules[3]['min_active'] <= $rules[2]['min_active']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'level_vip' => 'Chaque niveau doit demander plus de membres actifs que le précédent.',
+            ]);
+        }
+
+        return $rules;
     }
 }

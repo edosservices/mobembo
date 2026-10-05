@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\InvestmentStatus;
+use App\Support\InvestmentQuote;
 use App\Support\ReturnEstimator;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,11 @@ class Investment extends Model
     public function estimatedDailyReturn(): string
     {
         return ReturnEstimator::daily($this->amount, $this->expected_return_percent, (int) $this->duration_days);
+    }
+
+    public function quote(): InvestmentQuote
+    {
+        return InvestmentQuote::for($this->amount, $this->expected_return_percent, (int) $this->duration_days);
     }
 
     public function dailyReturnPercent(): string

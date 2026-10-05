@@ -23,6 +23,14 @@
         </select>
     </div>
     <div class="field"><label>Commission de parrainage (%)</label><input name="referral_rate_percent" value="{{ old('referral_rate_percent', $settings->referral_rate_percent) }}" required></div>
+    <h2>Niveaux</h2>
+    <p class="muted">Le niveau dépend du nombre de membres actifs : un compte ouvert avec au moins un dépôt approuvé. Une inscription seule ne change pas le niveau.</p>
+    <div class="grid-2">
+        @foreach (['starter' => 'STARTER', 'pro' => 'PRO', 'elite' => 'ELITE', 'vip' => 'VIP'] as $key => $label)
+            @php($current = collect($levels)->firstWhere('key', $key))
+            <div class="field"><label>Membres actifs minimum · {{ $label }}</label><input name="level_{{ $key }}" value="{{ old('level_'.$key, $current['min_active'] ?? 0) }}" required></div>
+        @endforeach
+    </div>
     <p class="muted">Le rendement du projet se modifie dans Projets.</p>
     <h2>Numéros de réception</h2>
     <p class="muted">Laissez vide tant que le numéro n’est pas attribué. La page de dépôt n’affiche que les numéros enregistrés.</p>

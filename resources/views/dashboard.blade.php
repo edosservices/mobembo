@@ -1,20 +1,84 @@
 @extends('layouts.app')
 @section('title', 'Tableau de bord · ZELVORA')
 @section('content')
-<h1 style="font-size:clamp(2rem, 6vw, 2.8rem);margin-bottom:.2rem;">Bonjour {{ $firstName }}</h1>
-<p class="kicker">Votre portefeuille</p>
+<header class="dash-head">
+    <h1>Bonjour {{ $firstName }}</h1>
+    <p>Voici l'état de votre portefeuille.</p>
+</header>
 <div class="dash-stats">
     <div class="stat"><span>Solde disponible</span><strong>{{ money($summary['available']) }}</strong></div>
-    <div class="stat"><span>Bonus</span><strong>{{ money($summary['bonus']) }}</strong></div>
-    <div class="stat"><span>Commissions</span><strong>{{ money($summary['commissions']) }}</strong></div>
     <div class="stat"><span>Montant investi</span><strong>{{ money($summary['invested']) }}</strong></div>
-    <div class="stat"><span>Revenus crédités</span><strong>{{ money($summary['returns_total']) }}</strong></div>
+    <div class="stat"><span>Revenus réellement distribués</span><strong>{{ money($summary['returns_total']) }}</strong></div>
+    <div class="stat"><span>Bonus</span><strong>{{ money($summary['bonus']) }}</strong></div>
+    <div class="stat"><span>Commissions de parrainage</span><strong>{{ money($summary['commissions']) }}</strong></div>
     <div class="stat"><span>Investissements actifs</span><strong>{{ $summary['active_count'] }}</strong></div>
 </div>
 <div class="dash-actions">
-    <a class="btn-z" data-dashboard-invest href="{{ $investUrl }}">Investir</a>
-    <a class="btn-z-ghost" data-dashboard-deposit href="{{ route('deposits.create') }}">Faire un dépôt</a>
+    <a class="btn-z" data-dashboard-deposit href="{{ route('deposits.create') }}">+ Faire un dépôt</a>
+    <a class="btn-z-ghost" data-dashboard-invest href="{{ $investUrl }}">Investir</a>
 </div>
+
+<section class="panel chart-card">
+    <div class="section-head">
+        <h2>Évolution du solde</h2>
+        <div class="chips" role="tablist">
+            @foreach (['7d' => '7 jours', '30d' => '30 jours', '90d' => '3 mois', '1y' => '1 an'] as $key => $label)
+                <a href="{{ route('dashboard', ['range' => $key]) }}" @class(['chip-link', 'is-on' => $chart['range'] === $key])>{{ $label }}</a>
+            @endforeach
+        </div>
+    </div>
+    @if ($chart['empty'])
+        <p class="empty-chart">Votre historique apparaîtra ici après vos premières opérations.</p>
+    @else
+        <svg class="chart" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="Évolution du solde disponible">
+            <polyline points="{{ $chart['polyline'] }}" fill="none" stroke="#b8956c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            @foreach ($chart['dots'] as $dot)
+                <circle cx="{{ $dot['x'] }}" cy="{{ $dot['y'] }}" r="3" fill="#111"></circle>
+            @endforeach
+        </svg>
+        <p class="fine-print">De {{ money($chart['min']) }} à {{ money($chart['max']) }}, d'après les opérations enregistrées.</p>
+    @endif
+</section>
+
+<div class="dash-split">
+    <section>
+        <h2>Activité récente</h2>
+        <div class="txn-list">
+            @forelse ($activity as $entry)
+                <article class="txn">
+                    <strong @class(['pos' => \App\Support\Money::cmp($entry->amount, '0') > 0])>{{ \App\Support\TransactionPresenter::signedAmount($entry) }}</strong>
+                    <span>{{ $entry->type->label() }}</span>
+                    <span class="desc">{{ $entry->description }}</span>
+                    <time>{{ \App\Support\TransactionPresenter::date($entry) }}</time>
+                    <em>{{ \App\Support\TransactionPresenter::clientStatus($entry) }}</em>
+                </article>
+            @empty
+                <p class="muted">Aucune opération pour le moment.</p>
+            @endforelse
+        </div>
+        <p><a class="btn-z-ghost small" href="{{ route('transactions.index') }}">Voir toutes les transactions</a></p>
+    </section>
+    <section class="panel team-card">
+        <p class="kicker">Votre équipe</p>
+        <h2>{{ $team['level']['name'] }}</h2>
+        <dl class="plan-facts">
+            <div><dt>Membres parrainés</dt><dd>{{ $team['referred'] }}</dd></div>
+            <div><dt>Membres actifs</dt><dd>{{ $team['active'] }}</dd></div>
+            <div><dt>Dépôts de l'équipe</dt><dd>{{ money($team['deposits']) }}</dd></div>
+            <div><dt>Investissements de l'équipe</dt><dd>{{ money($team['investments']) }}</dd></div>
+            <div><dt>Commissions générées</dt><dd>{{ money($team['commissions']) }}</dd></div>
+            <div><dt>Taux actuel de commission</dt><dd>{{ str_replace('.', ',', bcadd($team['rate'], '0', 2)) }} %</dd></div>
+        </dl>
+        <p class="muted">Code de parrainage</p>
+        <p class="ref-code">{{ $team['code'] ?: '—' }}</p>
+        @if ($team['link'])
+            <p class="ref-link">{{ $team['link'] }}</p>
+            <button class="btn-z-ghost small" type="button" data-copy="{{ $team['link'] }}">Copier le lien</button>
+        @endif
+        <p><a class="btn-z small" href="{{ route('referral') }}">Inviter un membre</a></p>
+    </section>
+</div>
+
 <h2>Investissements actifs</h2>
 <div class="holding-list">
     @forelse ($investments as $investment)

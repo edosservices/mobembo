@@ -19,6 +19,7 @@ class PlatformSetting extends Model
             'referral_enabled' => 'boolean',
             'referral_trigger' => ReferralTrigger::class,
             'referral_rate_percent' => 'decimal:4',
+            'referral_levels' => 'array',
             'otp_enabled' => 'boolean',
             'kyc_required_for_withdrawal' => 'boolean',
         ];
@@ -35,7 +36,7 @@ class PlatformSetting extends Model
             'withdrawal_max' => '10000.00',
             'referral_enabled' => true,
             'referral_trigger' => ReferralTrigger::ApprovedDeposit->value,
-            'referral_rate_percent' => '2.0000',
+            'referral_rate_percent' => '10.0000',
             'otp_enabled' => false,
             'kyc_required_for_withdrawal' => false,
             'legal_disclaimer' => 'Les performances présentées sont indicatives et dépendent des conditions de chaque projet.',

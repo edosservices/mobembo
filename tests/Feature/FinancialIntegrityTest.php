@@ -90,7 +90,7 @@ class FinancialIntegrityTest extends TestCase
         $this->actingAs($admin)->post(route('admin.deposits.approve', $deposit));
 
         $referrer->wallet->refresh();
-        $this->assertSame('1.60', Money::of($referrer->wallet->available_balance));
+        $this->assertSame('8.00', Money::of($referrer->wallet->available_balance));
         $this->assertSame(1, ReferralCommission::query()->count());
         $this->assertDatabaseHas('notifications', [
             'notifiable_id' => $referrer->id,

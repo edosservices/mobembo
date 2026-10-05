@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BadgeService;
+use App\Services\ReferralProgressService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
-    public function edit(Request $request)
+    public function edit(Request $request, ReferralProgressService $progress, BadgeService $badges)
     {
-        return view('profile.edit', ['user' => $request->user()]);
+        $team = $progress->snapshot($request->user());
+
+        return view('profile.edit', [
+            'user' => $request->user(),
+            'team' => $team,
+            'badges' => $badges->evaluate($team),
+        ]);
     }
 
     public function update(Request $request)
