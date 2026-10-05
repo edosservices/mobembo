@@ -15,14 +15,12 @@
         <div class="field"><label for="password_confirmation">Confirmation</label><input id="password_confirmation" name="password_confirmation" type="password" required></div>
         <div class="field"><label for="referral_code">Code de parrainage, facultatif</label><input id="referral_code" name="referral_code" value="{{ old('referral_code', request('ref')) }}" placeholder="ZLV00000"></div>
         <button class="btn-z full" type="submit">Créer mon compte</button>
-        <button class="btn-z-ghost full" type="button" id="install-reopen">Télécharger pour Android</button>
+        <button class="btn-z-ghost full" type="button" id="install-reopen">Télécharger l'APK</button>
     </form>
 </div>
 <dialog id="install-dialog">
-    <p class="kicker">Android</p>
-    <h2>Téléchargez l'APK pour Android</h2>
-    <p>Ajoutez ZELVORA à votre écran d'accueil. Il n'y a pas encore d'application officielle : votre téléphone peut l'installer depuis cette page.</p>
-    <button class="btn-z full" type="button" id="install-android">Installer sur l'écran d'accueil</button>
+    <h2>Télécharger l'APK</h2>
+    <button class="btn-z full" type="button" id="install-android">Télécharger l'APK</button>
     <div id="install-steps" hidden>
         <ol>
             <li>Ouvrez le menu du navigateur.</li>

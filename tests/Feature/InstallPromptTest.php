@@ -10,9 +10,9 @@ class InstallPromptTest extends TestCase
     {
         $this->get(route('register'))
             ->assertOk()
-            ->assertSee('APK pour Android')
-            ->assertSee('Installer sur l')
-            ->assertSee('Télécharger pour Android')
+            ->assertSee('Télécharger l')
+            ->assertSee('APK')
+            ->assertDontSee('application officielle')
             ->assertSee('manifest.webmanifest', false)
             ->assertSee('sw.js', false);
 
