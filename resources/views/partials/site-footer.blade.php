@@ -3,7 +3,7 @@
         <div>
             <strong class="footer-brand">ZELVORA</strong>
             <p>Votre avenir prend la valeur.</p>
-            <p class="footer-note">Les rendements affichés sont prévisionnels tant qu’aucune distribution réelle n’est enregistrée. Les photographies sont des visuels de démonstration.</p>
+            <p class="footer-note">Les rendements affichés sont des estimations. Un revenu n’est crédité que lorsqu’une distribution est enregistrée.</p>
         </div>
         <nav class="footer-links" aria-label="Pied de page">
             <a href="{{ route('home') }}">Accueil</a>

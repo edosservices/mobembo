@@ -59,4 +59,63 @@ class Investment extends Model
     {
         return ReturnEstimator::daily($this->amount, $this->expected_return_percent, (int) $this->duration_days);
     }
+
+    public function dailyReturnPercent(): string
+    {
+        return ReturnEstimator::dailyPercent($this->expected_return_percent, (int) $this->duration_days);
+    }
+
+    public function estimatedDailyAmount(): string
+    {
+        return ReturnEstimator::dailyAmount($this->amount, $this->expected_return_percent, (int) $this->duration_days);
+    }
+
+    public function elapsedDays(): int
+    {
+        if ($this->starts_at === null) {
+            return 0;
+        }
+
+        $start = $this->starts_at->copy()->startOfDay();
+        $end = ($this->ends_at ?? $start->copy()->addDays(max(1, (int) $this->duration_days)))->copy()->startOfDay();
+        $today = now()->startOfDay();
+
+        if ($today->lt($start)) {
+            return 0;
+        }
+
+        $elapsed = (int) $start->diffInDays($today, false);
+        $span = max(0, (int) $start->diffInDays($end, false));
+
+        return min($elapsed, $span);
+    }
+
+    public function remainingDays(): int
+    {
+        if ($this->ends_at === null) {
+            return max(0, (int) $this->duration_days - $this->elapsedDays());
+        }
+
+        $today = now()->startOfDay();
+        $end = $this->ends_at->copy()->startOfDay();
+
+        if ($today->gte($end)) {
+            return 0;
+        }
+
+        return (int) $today->diffInDays($end, false);
+    }
+
+    public function progressPercent(): string
+    {
+        $span = max(1, (int) $this->duration_days);
+        $raw = bcdiv(bcmul((string) $this->elapsedDays(), '100', 4), (string) $span, 4);
+
+        return bcadd($raw, '0', 2);
+    }
+
+    public function estimatedAccruedReturn(): string
+    {
+        return bcmul($this->estimatedDailyAmount(), (string) $this->elapsedDays(), 4);
+    }
 }

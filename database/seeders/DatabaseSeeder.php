@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
 
         if (! LedgerEntry::query()->where('idempotency_key', 'seed-demo-balance')->exists()) {
             app(WalletService::class)->credit($demo, '250.00', LedgerType::AdminAdjustment, [
-                'description' => 'Solde de démonstration — à retirer avant une ouverture publique',
+                'description' => 'Solde initial de parcours — à retirer avant une ouverture publique',
                 'reference' => 'SEED-DEMO',
                 'idempotency_key' => 'seed-demo-balance',
                 'created_by' => $admin->id,
@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
      */
     private function demoProjects(): array
     {
-        $terms = 'Le pourcentage affiché est une estimation sur la durée du projet. Il n’est pas garanti et n’est jamais crédité automatiquement. Une distribution réelle n’existe que si l’administration enregistre un produit effectif du projet. Le montant déjà financé des fiches de démonstration est un instantané illustratif : il ne correspond pas à un solde client.';
+        $terms = 'Le pourcentage sur la durée est une estimation. Le taux journalier en est le quotient. Il n’est pas garanti et n’est jamais crédité automatiquement. Une distribution réelle n’existe que si l’administration enregistre un produit effectif du projet.';
 
         return [
             [
@@ -86,7 +86,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/urban-stay.jpg',
                 'category' => 'Boutique Hotel',
                 'location' => 'Kinshasa, Gombe',
-                'description' => 'Projet de démonstration : un boutique-hôtel urbain, pensé pour des séjours courts au centre de Kinshasa. Les visuels sont illustratifs et ne représentent pas un établissement détenu par ZELVORA.',
+                'description' => 'Opportunité d’un boutique-hôtel urbain. Les conditions économiques sont celles enregistrées pour ce projet.',
                 'target_amount' => 25000,
                 'funded_amount' => 9000,
                 'min_investment' => 10,
@@ -102,7 +102,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/kivu-pearl.jpg',
                 'category' => 'Résidence immobilière',
                 'location' => 'Goma, Nord-Kivu',
-                'description' => 'Résidence de démonstration au bord du lac Kivu. La fiche sert à présenter une opportunité résidentielle, ses conditions et sa progression de financement.',
+                'description' => 'Opportunité résidentielle. La fiche présente les conditions et la progression de financement configurées.',
                 'target_amount' => 40000,
                 'funded_amount' => 16000,
                 'min_investment' => 25,
@@ -113,12 +113,12 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'uuid' => '6f1c2a10-0a01-4a11-8a01-000000000003',
-                'name' => 'Congo Vista Apartments',
+                'name' => 'Congo Vista',
                 'slug' => 'congo-vista-apartments',
                 'image_path' => 'images/projects/congo-vista.jpg',
                 'category' => 'Appartements résidentiels',
                 'location' => 'Kinshasa, Limete',
-                'description' => 'Ensemble d’appartements résidentiels de démonstration. Le financement affiché illustre une collecte déjà bien avancée, sans créer de revenu pour les comptes.',
+                'description' => 'Opportunité d’appartements résidentiels. Le financement affiché reprend les montants configurés pour ce projet.',
                 'target_amount' => 80000,
                 'funded_amount' => 66400,
                 'min_investment' => 50,
@@ -129,12 +129,12 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'uuid' => '6f1c2a10-0a01-4a11-8a01-000000000004',
-                'name' => 'Royal Gombe Suites',
+                'name' => 'Royal Suites',
                 'slug' => 'royal-gombe-suites',
                 'image_path' => 'images/projects/royal-gombe.jpg',
                 'category' => 'Luxury Suites',
                 'location' => 'Kinshasa, Gombe',
-                'description' => 'Suites de démonstration destinées à une clientèle d’affaires. L’image montre un intérieur hôtelier générique, pas un actif identifié de ZELVORA.',
+                'description' => 'Opportunité de suites. L’image est illustrative et ne désigne pas un actif détenu par ZELVORA.',
                 'target_amount' => 120000,
                 'funded_amount' => 54000,
                 'min_investment' => 100,
@@ -145,12 +145,12 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'uuid' => '6f1c2a10-0a01-4a11-8a01-000000000005',
-                'name' => 'Zelvora City Residence',
+                'name' => 'Zelvora Residence',
                 'slug' => 'zelvora-city-residence',
                 'image_path' => 'images/projects/city-residence.jpg',
                 'category' => 'Résidence premium',
                 'location' => 'Kinshasa, Ngaliema',
-                'description' => 'Résidence premium de démonstration à Ngaliema. La page détaille l’objectif, le reste à financer et les conditions avant tout investissement.',
+                'description' => 'Opportunité de résidence premium. La page détaille l’objectif, le reste à financer et les conditions.',
                 'target_amount' => 150000,
                 'funded_amount' => 60000,
                 'min_investment' => 200,
@@ -166,7 +166,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/congo-river.jpg',
                 'category' => 'Hôtel & Hospitality',
                 'location' => 'Kinshasa, rives du fleuve',
-                'description' => 'Projet hôtelier de démonstration face au fleuve. L’exploitation, si elle était réelle, ne produirait un revenu qu’après enregistrement des recettes.',
+                'description' => 'Opportunité hôtelière. Un revenu n’existe qu’après enregistrement des recettes du projet.',
                 'target_amount' => 200000,
                 'funded_amount' => 70000,
                 'min_investment' => 350,
@@ -182,7 +182,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/emerald-grand.jpg',
                 'category' => 'Résidence haut standing',
                 'location' => 'Lubumbashi, Haut-Katanga',
-                'description' => 'Résidence haut standing de démonstration à Lubumbashi. La progression élevée indique une collecte presque close, encore ouverte au minimum indiqué.',
+                'description' => 'Opportunité de résidence haut standing. La progression indique l’état du financement configuré.',
                 'target_amount' => 250000,
                 'funded_amount' => 212500,
                 'min_investment' => 500,
@@ -198,7 +198,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/executive-suites.jpg',
                 'category' => 'Appartements & Suites',
                 'location' => 'Kinshasa, Gombe',
-                'description' => 'Appartements et suites de démonstration pour des séjours longs. Le rendement prévu reste une hypothèse liée aux conditions du projet.',
+                'description' => 'Opportunité d’appartements et de suites. Le rendement prévu reste une hypothèse liée aux conditions du projet.',
                 'target_amount' => 300000,
                 'funded_amount' => 90000,
                 'min_investment' => 750,
@@ -214,7 +214,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/golden-river.jpg',
                 'category' => 'Resort & Hospitality',
                 'location' => 'Kisangani, Tshopo',
-                'description' => 'Resort de démonstration sur le fleuve, présenté pour explorer une opportunité hospitality. Aucune photographie n’identifie un hôtel réel comme propriété de ZELVORA.',
+                'description' => 'Opportunité hospitality. La photographie est illustrative et n’identifie pas un hôtel comme propriété de ZELVORA.',
                 'target_amount' => 500000,
                 'funded_amount' => 125000,
                 'min_investment' => 1000,
@@ -230,7 +230,7 @@ class DatabaseSeeder extends Seeder
                 'image_path' => 'images/projects/grand-palace.jpg',
                 'category' => 'Luxury Hotel & Residences',
                 'location' => 'Kinshasa, RDC',
-                'description' => 'Projet de démonstration combinant hôtel de luxe et résidences. L’objectif, le montant déjà illustré et le reste à financer sont affichés avant toute confirmation.',
+                'description' => 'Opportunité combinant hôtel et résidences. L’objectif, le montant financé et le reste à financer sont affichés avant toute confirmation.',
                 'target_amount' => 100000,
                 'funded_amount' => 78000,
                 'min_investment' => 1500,

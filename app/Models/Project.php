@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\DistributionFrequency;
 use App\Enums\ProjectStatus;
 use App\Support\Money;
+use App\Support\ReturnEstimator;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -95,6 +96,11 @@ class Project extends Model
         $raw = bcdiv(bcmul((string) $this->funded_amount, '100', 8), (string) $this->target_amount, 8);
 
         return Money::of($raw);
+    }
+
+    public function dailyReturnPercent(): string
+    {
+        return ReturnEstimator::dailyPercent($this->expected_return_percent, (int) $this->duration_days);
     }
 
     public function isInvestable(): bool

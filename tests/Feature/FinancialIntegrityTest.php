@@ -235,8 +235,8 @@ class FinancialIntegrityTest extends TestCase
 
         $this->get(route('projects.show', $project))
             ->assertOk()
-            ->assertSee('Investir maintenant')
-            ->assertSee('Prévisionnel');
+            ->assertSee('Investir')
+            ->assertSee('Rendement journalier estimatif');
 
         $user = User::factory()->create();
         $this->credit($user, '40.00');

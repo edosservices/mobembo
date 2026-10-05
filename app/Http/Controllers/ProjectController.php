@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ProjectStatus;
 use App\Models\Project;
-use Illuminate\Http\Request;
+use App\Support\Money;
 
 class ProjectController extends Controller
 {
@@ -25,12 +25,20 @@ class ProjectController extends Controller
             abort(404);
         }
 
-        $mine = auth()->user()
+        $user = auth()->user();
+        $mine = $user
             ?->investments()
             ->where('project_id', $project->id)
             ->latest('invested_at')
             ->get() ?? collect();
+        $available = $user ? Money::of($user->wallet()->value('available_balance') ?? '0') : null;
+        $canFundMinimum = $available !== null && Money::cmp($available, $project->min_investment) >= 0;
+        $preview = session('investment_preview');
 
-        return view('projects.show', compact('project', 'mine'));
+        if (! is_array($preview) || (int) ($preview['project_id'] ?? 0) !== $project->id) {
+            $preview = null;
+        }
+
+        return view('projects.show', compact('project', 'mine', 'available', 'canFundMinimum', 'preview'));
     }
 }

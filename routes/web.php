@@ -47,6 +47,7 @@ Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')-
 
 Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::post('/projets/{project:slug}/apercu', [InvestmentController::class, 'preview'])->name('investments.preview');
     Route::post('/projets/{project:slug}/investir', [InvestmentController::class, 'store'])->name('investments.store');
     Route::get('/portefeuille', [InvestmentController::class, 'index'])->name('investments.index');
     Route::get('/portefeuille/{investment}', [InvestmentController::class, 'show'])->name('investments.show');

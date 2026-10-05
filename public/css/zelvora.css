@@ -445,6 +445,16 @@ body.home-page .topbar .btn-z.small { color: #111; }
     .hero-actions .btn-z, .hero-actions .btn-z-ghost, .visual-copy .btn-z { width: 100%; }
     .card-facts { grid-template-columns: 1fr; }
 }
+.dash-stats { display: grid; gap: 0.7rem; grid-template-columns: 1fr; }
+.dash-actions { display: grid; gap: 0.7rem; margin: 1.1rem 0 1.4rem; }
+.dash-actions .btn-z, .dash-actions .btn-z-ghost { width: 100%; }
+.holding-list { display: grid; gap: 0.7rem; }
+.holding { display: flex; justify-content: space-between; gap: 0.8rem; align-items: center; }
+.holding p { margin: 0.15rem 0; }
+@media (min-width: 700px) {
+    .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dash-actions { grid-template-columns: 1fr 1fr; }
+}
 @media (prefers-reduced-motion: reduce) {
     .hero-copy, .opportunity, .js .reveal, .progress > span { animation: none !important; transition: none !important; }
     .js .reveal { opacity: 1; transform: none; }

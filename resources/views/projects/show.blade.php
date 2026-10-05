@@ -4,19 +4,15 @@
 <article class="project-detail">
     <p class="kicker">{{ $project->category }}</p>
     <h1>{{ $project->name }}</h1>
-    <p class="place">{{ $project->location }}</p>
+    <p class="place">Localisation · {{ $project->location }}</p>
     <div class="detail-badges">
         @include('partials.status', ['status' => $project->status])
-        @if ($project->is_demo)<span class="badge-z tone-warn">Démonstration</span>@endif
     </div>
     <figure class="detail-hero">
         @if ($project->imageUrl())
-            <img src="{{ $project->imageUrl() }}" alt="Visuel de démonstration pour {{ $project->name }}">
+            <img src="{{ $project->imageUrl() }}" alt="{{ $project->name }}">
         @endif
     </figure>
-    @if ($project->is_demo)
-        <p class="demo-label">Image illustrative. Elle ne représente pas un actif détenu par ZELVORA.</p>
-    @endif
     <p class="detail-copy">{{ $project->description }}</p>
 
     <section class="detail-block">
@@ -35,40 +31,56 @@
         <div class="grid-3">
             <div class="stat"><span>Minimum</span><strong class="money sm">{{ money($project->min_investment) }}</strong></div>
             <div class="stat"><span>Durée</span><strong class="money sm">{{ $project->duration_days }} jours</strong></div>
-            <div class="stat"><span>Rendement</span><strong class="money sm">Prévisionnel</strong></div>
+            <div class="stat"><span>Rendement journalier estimatif</span><strong class="money sm">{{ \App\Support\ReturnEstimator::percentLabel($project->dailyReturnPercent()) }}</strong></div>
         </div>
-        <div class="note">Estimation affichée : {{ number_format((float) $project->expected_return_percent, 2, ',', ' ') }} % sur la durée. {{ $project->distribution_frequency->label() }}. {{ $project->economic_terms }}</div>
+        <div class="note">{{ number_format((float) $project->expected_return_percent, 2, ',', ' ') }} % sur la durée du projet. Ce taux journalier est une estimation. Il n’est pas crédité. {{ $project->economic_terms }}</div>
     </section>
 
     <section class="detail-block panel" id="investir">
         <h2>Votre investissement</h2>
-        @auth
-            @if ($project->isInvestable())
-                <form method="POST" action="{{ route('investments.store', $project) }}" id="invest-form">
+        @guest
+            <a class="btn-z" href="{{ route('login', ['next' => '/projets/'.$project->slug.'#investir']) }}">Investir</a>
+        @else
+            @if (! $project->isInvestable())
+                <p class="muted">Ce projet n’accepte pas de nouvel apport.</p>
+            @elseif (! $canFundMinimum)
+                <h3>Solde insuffisant</h3>
+                <p>Votre solde : {{ money($available) }}</p>
+                <p>Minimum requis : {{ money($project->min_investment) }}</p>
+                <a class="btn-z" href="{{ route('deposits.create') }}">Faire un dépôt</a>
+            @else
+                <form method="POST" action="{{ route('investments.preview', $project) }}">
                     @csrf
                     <div class="field">
                         <label for="amount">Montant à investir</label>
-                        <input id="amount" name="amount" inputmode="decimal" value="{{ old('amount', $project->min_investment) }}" required>
+                        <input id="amount" name="amount" inputmode="decimal" value="{{ old('amount', $preview['amount'] ?? $project->min_investment) }}" required>
                     </div>
-                    <input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', (string) \Illuminate\Support\Str::uuid()) }}">
-                    <button class="btn-z full" type="button" id="preview-invest">Investir maintenant</button>
-                    <div id="invest-preview" class="confirm-box" @if ($errors->any()) @else hidden @endif>
-                        <h3>Résumé avant confirmation</h3>
-                        <p>Montant investi <strong id="sum-amount">—</strong></p>
-                        <p>Frais éventuels <strong>0,00 $</strong></p>
-                        <p>Capital investi <strong id="sum-capital">—</strong></p>
-                        <p class="muted">Aucun frais n’est prélevé sur l’investissement. Le montant quitte le solde disponible et finance ce projet. Le rendement prévu n’est pas crédité.</p>
-                        <p class="muted">Conditions : minimum {{ money($project->min_investment) }}, durée {{ $project->duration_days }} jours, rendement prévisionnel selon les conditions du projet.</p>
-                        <button class="btn-z gold full" type="submit">Confirmer l'investissement</button>
-                    </div>
+                    <input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', $preview['idempotency_key'] ?? (string) \Illuminate\Support\Str::uuid()) }}">
+                    <button class="btn-z full" type="submit">Investir</button>
                 </form>
-            @else
-                <p class="muted">Ce projet n’accepte pas de nouvel apport.</p>
+                @if ($preview)
+                    <div class="confirm-box">
+                        <h3>Résumé avant confirmation</h3>
+                        <p>Montant <strong>{{ money($preview['amount']) }}</strong></p>
+                        <p>Projet <strong>{{ $project->name }}</strong></p>
+                        <p>Rendement journalier estimatif <strong>{{ \App\Support\ReturnEstimator::percentLabel($preview['daily_percent']) }}</strong></p>
+                        <p>Durée <strong>{{ $preview['duration_days'] }} jours</strong></p>
+                        <p>Date de début <strong>{{ \Illuminate\Support\Carbon::parse($preview['starts_at'])->format('d/m/Y') }}</strong></p>
+                        <p>Date de fin <strong>{{ \Illuminate\Support\Carbon::parse($preview['ends_at'])->format('d/m/Y') }}</strong></p>
+                        <p>Revenu journalier estimatif <strong>{{ \App\Support\ReturnEstimator::amountLabel($preview['daily_amount']) }}</strong></p>
+                        <p>Revenu total estimatif <strong>{{ money($preview['total']) }}</strong></p>
+                        <p>Frais <strong>{{ money($preview['fee']) }}</strong></p>
+                        <p class="muted">Ces revenus sont des estimations. Ils ne sont pas ajoutés au solde.</p>
+                        <form method="POST" action="{{ route('investments.store', $project) }}">
+                            @csrf
+                            <input type="hidden" name="amount" value="{{ $preview['amount'] }}">
+                            <input type="hidden" name="idempotency_key" value="{{ $preview['idempotency_key'] }}">
+                            <button class="btn-z gold full" type="submit">Confirmer l'investissement</button>
+                        </form>
+                    </div>
+                @endif
             @endif
-        @else
-            <p>Connectez-vous pour investir depuis votre solde disponible.</p>
-            <a class="btn-z" href="{{ route('login', ['next' => '/projets/'.$project->slug]) }}">Investir maintenant</a>
-        @endauth
+        @endguest
     </section>
 </article>
 @if ($mine->isNotEmpty())
@@ -77,29 +89,4 @@
         <p><a href="{{ route('investments.show', $investment) }}">{{ money($investment->amount) }} · @include('partials.status', ['status' => $investment->status])</a></p>
     @endforeach
 @endif
-@auth
-<script>
-const input = document.getElementById('amount');
-const preview = document.getElementById('invest-preview');
-const button = document.getElementById('preview-invest');
-const format = (value) => {
-    const amount = Number(String(value).replace(/\s/g, '').replace(',', '.'));
-    if (!Number.isFinite(amount)) return '—';
-    return amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' $';
-};
-const paint = () => {
-    const label = format(input.value);
-    document.getElementById('sum-amount').textContent = label;
-    document.getElementById('sum-capital').textContent = label;
-};
-button?.addEventListener('click', () => {
-    if (!input.reportValidity()) return;
-    paint();
-    preview.hidden = false;
-    preview.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
-});
-input?.addEventListener('input', () => { if (!preview.hidden) paint(); });
-if (preview && !preview.hidden) paint();
-</script>
-@endauth
 @endsection

@@ -57,8 +57,7 @@ class InvestmentService
                 throw new FinancialException('Il reste '.Money::format($remaining).' à financer sur ce projet.');
             }
 
-            $starts = $project->starts_at && $project->starts_at->isFuture() ? $project->starts_at->copy() : now()->startOfDay();
-            $ends = $starts->copy()->addDays((int) $project->duration_days);
+            [$starts, $ends] = $this->term($project);
 
             $investment = Investment::query()->create([
                 'uuid' => (string) Str::uuid(),
@@ -114,6 +113,18 @@ class InvestmentService
 
             return $investment->load('project');
         });
+    }
+
+    /**
+     * @return array{0: \Illuminate\Support\Carbon, 1: \Illuminate\Support\Carbon}
+     */
+    public function term(Project $project): array
+    {
+        $starts = $project->starts_at && $project->starts_at->isFuture()
+            ? $project->starts_at->copy()
+            : now()->startOfDay();
+
+        return [$starts, $starts->copy()->addDays((int) $project->duration_days)];
     }
 
     public function setStatus(Investment $investment, InvestmentStatus $status, User $admin, string $reason): Investment
