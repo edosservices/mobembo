@@ -13,6 +13,17 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    public function entry(Request $request)
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        return redirect()->route($user->isAdmin() ? 'admin.dashboard' : 'dashboard');
+    }
+
     public function create(Request $request)
     {
         $next = (string) $request->query('next', '');
@@ -76,6 +87,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()->route('login');
     }
 }

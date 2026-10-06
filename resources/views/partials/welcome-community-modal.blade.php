@@ -9,9 +9,8 @@
                 </div>
                 <div class="modal-body pt-2">
                     <h2 class="modal-title" id="welcome-community-title">Bienvenue sur ZELVORA</h2>
-                    <p>Merci de votre visite. Rejoignez notre communauté pour recevoir nos actualités, nos opportunités immobilières et nos annonces.</p>
+                    <p>Rejoignez notre communauté WhatsApp et Telegram pour recevoir nos actualités, opportunités et annonces.</p>
                     @include('partials.community-links', ['variant' => 'buttons'])
-                    <p class="text-muted mb-0 mt-3">Restez connecté avec la communauté ZELVORA.</p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button class="btn btn-dark rounded-pill px-4" type="button" data-bs-dismiss="modal">Fermer</button>

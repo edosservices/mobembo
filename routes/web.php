@@ -16,7 +16,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvestmentController;
 use App\Http\Controllers\KycController;
 use App\Http\Controllers\NotificationController;
@@ -28,7 +27,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [LoginController::class, 'entry'])->name('home');
 Route::get('/manifest.webmanifest', function () {
     return response(json_encode([
         'name' => 'ZELVORA',

@@ -598,6 +598,53 @@ body.home-page .topbar .btn-z.small { color: #111; background: #f3efe8; }
 .home-plan-facts li { display: flex; justify-content: space-between; gap: 0.6rem; font-size: 0.92rem; }
 .home-plan-facts span { color: var(--muted); }
 .home-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 1.2rem; }
+.auth-body { background: #0b0b0b; color: var(--ink); }
+.auth-visual {
+    position: relative;
+    min-height: 210px;
+    background: #111 center/cover no-repeat;
+    display: flex;
+    align-items: flex-end;
+    color: white;
+}
+.auth-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(8, 8, 8, 0.15), rgba(8, 8, 8, 0.72));
+}
+.auth-visual-copy { position: relative; z-index: 1; padding: 1.4rem 1.3rem 1.2rem; }
+.auth-logo { height: 52px; width: auto; background: white; border-radius: 0.7rem; padding: 0.25rem 0.4rem; }
+.auth-visual-copy p { margin: 0.8rem 0 0; max-width: 16rem; font-family: var(--serif); font-size: 1.35rem; line-height: 1.2; }
+.auth-stage { background: var(--sand); }
+.auth-panel { max-width: 440px; padding: 1.6rem 1.25rem 2.2rem; }
+.auth-panel h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.2rem); margin: 0.15rem 0 0.4rem; }
+.auth-password { position: relative; }
+.auth-password input { padding-right: 5.4rem; }
+.auth-password button {
+    position: absolute;
+    top: 50%;
+    right: 0.7rem;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0;
+}
+.auth-remember { display: flex; gap: 0.5rem; align-items: center; font-weight: 600; margin: 0.2rem 0 1rem; }
+.auth-remember input { width: auto; }
+.auth-panel .btn-dark { background: #111; border-color: #111; }
+.auth-panel .btn-outline-dark { border-color: #c9b89a; color: #141414; }
+.auth-panel .btn-link { color: var(--muted); text-decoration: none; }
+@media (min-width: 992px) {
+    .auth-visual { min-height: 100vh; }
+    .auth-visual-copy { padding: 3rem; }
+    .auth-visual-copy p { font-size: 2.1rem; max-width: 14ch; }
+    .auth-panel { padding: 2.5rem 1rem; }
+}
 #welcome-community .modal-content { border: 0; border-radius: 1.3rem; background: #f7f5f2; }
 #welcome-community .modal-title { font-family: var(--serif); font-size: clamp(1.7rem, 4vw, 2.2rem); margin: 0.2rem 0 0.6rem; }
 #welcome-community .modal-body > p:first-of-type { color: #3f3a34; }

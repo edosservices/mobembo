@@ -23,9 +23,7 @@
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
         <nav id="site-nav" class="nav-links">
-            <a href="{{ route('home') }}">Accueil</a>
             <a href="{{ route('projects.index') }}">Projets</a>
-            <a href="{{ route('home') }}#comment-ca-marche">Comment ça marche</a>
             <a href="{{ route('faq') }}">FAQ</a>
             @auth
                 <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('dashboard') }}">Espace</a>
@@ -42,7 +40,6 @@
         @yield('content')
     </main>
     @include('partials.site-footer')
-    @include('partials.welcome-community-modal')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.querySelector('[data-back]')?.addEventListener('click', () => {
@@ -99,18 +96,6 @@
         });
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('{{ asset('sw.js') }}');
-        }
-        const welcome = document.getElementById('welcome-community');
-        if (welcome && window.bootstrap && !localStorage.getItem('zelvora_welcome_seen')) {
-            window.setTimeout(() => {
-                window.bootstrap.Modal.getOrCreateInstance(welcome).show();
-            }, 600);
-            welcome.addEventListener('hidden.bs.modal', () => {
-                localStorage.setItem('zelvora_welcome_seen', '1');
-            });
-            welcome.querySelectorAll('a[target="_blank"]').forEach((link) => {
-                link.addEventListener('click', () => localStorage.setItem('zelvora_welcome_seen', '1'));
-            });
         }
     </script>
 </body>

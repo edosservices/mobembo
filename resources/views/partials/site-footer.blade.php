@@ -9,7 +9,7 @@
             <div class="col-6 col-lg-3">
                 <h2 class="footer-heading">Navigation</h2>
                 <nav class="footer-links" aria-label="Navigation">
-                    <a href="{{ route('home') }}">Accueil</a>
+                    <a href="{{ route('login') }}">Connexion</a>
                     <a href="{{ route('projects.index') }}">Opportunités</a>
                     <a href="{{ route('investments.index') }}">Investissements</a>
                     <a href="{{ route('about') }}">À propos</a>
