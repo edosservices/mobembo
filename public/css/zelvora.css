@@ -232,7 +232,7 @@ th { font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; colo
 .bottom-nav a.active { color: var(--gold-2); }
 .bottom-nav strong { display: block; font-size: 0.95rem; }
 
-.admin-body { background: #f4f1eb; overflow-x: clip; font-size: 0.9rem; }
+.admin-body { background: #f4f1eb; overflow-x: clip; overflow-y: auto; font-size: 0.9rem; }
 .admin-body h1 { font-size: clamp(1.35rem, 2.2vw, 1.8rem); }
 .admin-body h2 { font-size: 1.05rem; }
 .admin-shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
