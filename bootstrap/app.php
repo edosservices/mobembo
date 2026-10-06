@@ -30,7 +30,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.fresh' => EnsurePasswordIsFresh::class,
         ]);
         $middleware->redirectGuestsTo('/login');
-        $middleware->redirectUsersTo('/dashboard');
+        $middleware->redirectUsersTo(function (Request $request) {
+            $user = $request->user();
+
+            return $user && $user->isAdmin()
+                ? route('admin.dashboard')
+                : route('dashboard');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

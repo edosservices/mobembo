@@ -1,23 +1,20 @@
-@extends('layouts.public')
+@extends('layouts.auth')
 @section('title', 'Inscription · ZELVORA')
 @section('content')
-<div class="grid-2">
-    <div>
-        <div class="kicker">Inscription</div>
-        <h1 style="font-size:3rem;">Un numéro suffit pour commencer.</h1>
-        <p class="lede">Créez votre espace avec votre numéro de téléphone. Ajoutez un code de parrainage si vous en avez un.</p>
-    </div>
-    <form class="panel" method="POST" action="{{ route('register') }}">
+<p class="kicker">ZELVORA</p>
+<h1>Créer un compte</h1>
+<p class="lede">Un numéro de téléphone suffit. Ajoutez un code de parrainage si vous en avez un.</p>
+<form method="POST" action="{{ route('register') }}">
         @csrf
         <div class="field"><label for="name">Nom complet</label><input id="name" name="name" value="{{ old('name') }}" required></div>
         <div class="field"><label for="phone">Numéro de téléphone</label><input id="phone" name="phone" inputmode="tel" value="{{ old('phone') }}" placeholder="0812345678" required></div>
         <div class="field"><label for="password">Mot de passe</label><input id="password" name="password" type="password" required></div>
         <div class="field"><label for="password_confirmation">Confirmation</label><input id="password_confirmation" name="password_confirmation" type="password" required></div>
         <div class="field"><label for="referral_code">Code de parrainage, facultatif</label><input id="referral_code" name="referral_code" value="{{ old('referral_code', request('ref')) }}" placeholder="ZLV00000"></div>
-        <button class="btn-z full" type="submit">Créer mon compte</button>
-        <button class="btn-z-ghost full" type="button" id="install-reopen">Télécharger l'APK</button>
+        <button class="btn btn-dark btn-lg rounded-pill w-100" type="submit">Créer mon compte</button>
+        <button class="btn btn-outline-dark rounded-pill w-100 mt-2" type="button" id="install-reopen">Télécharger l'APK</button>
+        <a class="btn btn-link w-100 mt-2" href="{{ route('login') }}">Déjà un compte ? Se connecter</a>
     </form>
-</div>
 <dialog id="install-dialog">
     <h2>Télécharger l'APK</h2>
     <button class="btn-z full" type="button" id="install-android">Télécharger l'APK</button>

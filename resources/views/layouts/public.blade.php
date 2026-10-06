@@ -23,9 +23,7 @@
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
         <nav id="site-nav" class="nav-links">
-            <a href="{{ route('home') }}">Accueil</a>
             <a href="{{ route('projects.index') }}">Projets</a>
-            <a href="{{ route('home') }}#comment-ca-marche">Comment ça marche</a>
             <a href="{{ route('faq') }}">FAQ</a>
             @auth
                 <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('dashboard') }}">Espace</a>
@@ -42,6 +40,7 @@
         @yield('content')
     </main>
     @include('partials.site-footer')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.querySelector('[data-back]')?.addEventListener('click', () => {
             const fallback = document.querySelector('[data-back]').dataset.fallback;

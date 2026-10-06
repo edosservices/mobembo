@@ -2,9 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Enums\ProjectStatus;
 use App\Models\PlatformSetting;
-use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,35 +11,30 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_the_home_page_introduces_zelvora(): void
+    public function test_the_entry_opens_the_login_then_the_right_interface(): void
     {
-        Project::query()->create([
-            'name' => 'Résidence Absente',
-            'slug' => 'residence-absente',
-            'description' => 'Projet de test.',
-            'location' => 'Kinshasa',
-            'category' => 'Résidentiel',
-            'target_amount' => '1000.00',
-            'funded_amount' => '0.00',
-            'min_investment' => '10.00',
-            'duration_days' => 30,
-            'expected_return_percent' => '5.0000',
-            'distribution_frequency' => 'at_maturity',
-            'economic_terms' => 'Estimation.',
-            'status' => ProjectStatus::Active,
-            'is_demo' => true,
-        ]);
-
         $this->get('/')
+            ->assertRedirect(route('login'));
+
+        $this->get(route('login'))
             ->assertOk()
-            ->assertSee('ZELVORA')
-            ->assertSee('Votre argent travaille pour vous pendant que vous dormez.')
-            ->assertSee('Votre patrimoine commence ici.')
-            ->assertSee('Des adresses que l’on a envie de retenir.')
-            ->assertDontSee('Résidence Absente')
-            ->assertDontSee('Rejoindre WhatsApp')
-            ->assertDontSee('Rejoindre Telegram')
-            ->assertDontSee('Comment effectuer un dépôt');
+            ->assertSee('Connexion')
+            ->assertSee('Se connecter')
+            ->assertSee('Créer un compte')
+            ->assertSee('Numéro de téléphone')
+            ->assertSee('Mot de passe')
+            ->assertSee('images/logo.png', false)
+            ->assertSee('images/hero.jpg', false)
+            ->assertDontSee('id="welcome-community"', false)
+            ->assertDontSee('Des adresses que l’on a envie de retenir.');
+
+        $user = User::factory()->create();
+        $this->actingAs($user)->get('/')->assertRedirect(route('dashboard'));
+        $this->actingAs($user)->get(route('login'))->assertRedirect(route('dashboard'));
+
+        $admin = User::factory()->admin()->create();
+        $this->actingAs($admin)->get('/')->assertRedirect(route('admin.dashboard'));
+        $this->actingAs($admin)->get(route('login'))->assertRedirect(route('admin.dashboard'));
 
         $this->get(route('faq'))
             ->assertOk()
@@ -69,12 +62,73 @@ class ExampleTest extends TestCase
         $this->assertSame('https://chat.whatsapp.com/zelvora', $settings->whatsapp_url);
         $this->assertSame('https://t.me/zelvora', $settings->telegram_url);
 
-        $this->get('/')
+        auth()->logout();
+
+        $this->get(route('contact'))
             ->assertOk()
             ->assertSee('Rejoindre WhatsApp', false)
             ->assertSee('https://chat.whatsapp.com/zelvora', false)
             ->assertSee('Rejoindre Telegram', false)
             ->assertSee('https://t.me/zelvora', false)
-            ->assertDontSee('Résidence Absente');
+            ->assertDontSee('id="welcome-community"', false);
+
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('id="welcome-community"', false)
+            ->assertSee('Bienvenue sur ZELVORA')
+            ->assertSee('Rejoignez notre communauté WhatsApp et Telegram')
+            ->assertSee('zelvora_welcome_seen', false);
+    }
+
+    public function test_the_welcome_modal_hides_a_missing_community_link(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee('id="welcome-community"', false);
+
+        PlatformSetting::current()->forceFill([
+            'whatsapp_url' => 'https://chat.whatsapp.com/seul',
+            'telegram_url' => null,
+        ])->save();
+
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('id="welcome-community"', false)
+            ->assertSee('https://chat.whatsapp.com/seul', false)
+            ->assertSee('Rejoindre WhatsApp', false)
+            ->assertDontSee('Rejoindre Telegram');
+
+        PlatformSetting::current()->forceFill([
+            'whatsapp_url' => null,
+            'telegram_url' => 'https://t.me/seul',
+        ])->save();
+
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('https://t.me/seul', false)
+            ->assertSee('Rejoindre Telegram', false)
+            ->assertDontSee('Rejoindre WhatsApp')
+            ->assertDontSee('https://chat.whatsapp.com/zelvora', false);
+
+        PlatformSetting::current()->forceFill([
+            'whatsapp_url' => null,
+            'telegram_url' => null,
+        ])->save();
+
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee('id="welcome-community"', false);
+    }
+
+    public function test_logout_returns_to_the_login_screen(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('logout'))
+            ->assertRedirect(route('login'));
     }
 }
