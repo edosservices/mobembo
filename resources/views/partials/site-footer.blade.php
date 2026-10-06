@@ -2,7 +2,8 @@
     <div class="wrap footer-grid">
         <div>
             <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA">
-            <p class="footer-tagline">Investir dans l'immobilier, simplement.</p>
+            <p class="footer-tagline">Votre argent travaille pour vous pendant que vous dormez.</p>
+            @include('partials.community-links')
         </div>
         <nav class="footer-links" aria-label="Navigation">
             <a href="{{ route('home') }}">Accueil</a>

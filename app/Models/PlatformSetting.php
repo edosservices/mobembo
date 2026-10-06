@@ -40,6 +40,8 @@ class PlatformSetting extends Model
             'otp_enabled' => false,
             'kyc_required_for_withdrawal' => false,
             'legal_disclaimer' => 'Les performances présentées sont indicatives et dépendent des conditions de chaque projet.',
+            'whatsapp_url' => null,
+            'telegram_url' => null,
             'mpesa_number' => null,
             'airtel_number' => null,
             'orange_number' => null,

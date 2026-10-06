@@ -71,6 +71,8 @@ class SettingsController extends Controller
             'airtel_holder',
             'orange_number',
             'orange_holder',
+            'whatsapp_url',
+            'telegram_url',
         ]);
 
         $levels = $this->levels($request);
@@ -80,6 +82,7 @@ class SettingsController extends Controller
             'otp_enabled' => $request->boolean('otp_enabled'),
             'kyc_required_for_withdrawal' => $request->boolean('kyc_required_for_withdrawal'),
             'referral_levels' => $levels ?? $settings->referral_levels,
+            ...$this->communityLinks($request),
         ])->save();
 
         $audit->record($request->user(), null, 'settings_updated', null, null, null, 'Mise à jour des paramètres de la plateforme', [
@@ -146,5 +149,30 @@ class SettingsController extends Controller
         }
 
         return $rules;
+    }
+
+    /**
+     * @return array<string, string|null>
+     */
+    private function communityLinks(Request $request): array
+    {
+        if (! $request->exists('whatsapp_url') && ! $request->exists('telegram_url')) {
+            return [];
+        }
+
+        foreach (['whatsapp_url', 'telegram_url'] as $field) {
+            $value = trim((string) $request->input($field));
+            $request->merge([$field => $value === '' ? null : $value]);
+        }
+
+        $data = $request->validate([
+            'whatsapp_url' => ['nullable', 'regex:/^https?:\/\/\S+$/i', 'max:255'],
+            'telegram_url' => ['nullable', 'regex:/^https?:\/\/\S+$/i', 'max:255'],
+        ]);
+
+        return [
+            'whatsapp_url' => $data['whatsapp_url'] ?? null,
+            'telegram_url' => $data['telegram_url'] ?? null,
+        ];
     }
 }

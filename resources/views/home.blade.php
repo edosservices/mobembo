@@ -8,8 +8,8 @@
     <div class="overlay"></div>
     <div class="hero-copy">
         <p class="kicker">ZELVORA</p>
-        <h1>Votre patrimoine commence ici.</h1>
-        <p class="lede">Résidences, hôtels et appartements sélectionnés. Vous choisissez un projet, vous investissez depuis votre téléphone et vous suivez votre portefeuille au même endroit.</p>
+        <h1>Votre argent travaille pour vous pendant que vous dormez.</h1>
+        <p class="lede">Votre patrimoine commence ici. Quelques adresses choisies, un suivi clair, et le temps de décider depuis votre téléphone.</p>
         <div class="actions hero-actions">
             <a class="btn-z gold" href="{{ route('register') }}">Commencer à investir</a>
             <a class="btn-z-ghost light" href="{{ route('projects.index') }}">Voir les projets</a>
@@ -91,24 +91,33 @@
         <p class="kicker">L’esprit des lieux</p>
         <h2 class="mx-auto">Des adresses que l’on a envie de retenir.</h2>
         <p class="lede mx-auto">Quelques images de l’univers ZELVORA. Le détail de chaque projet, son minimum et son rendement se consultent dans la sélection.</p>
-        <div class="row g-3 gallery-row">
+        <div class="row g-4">
             <div class="col-md-4">
-                <figure class="gallery-shot">
-                    <img src="{{ asset('images/projects/urban-stay.jpg') }}" alt="Suite urbaine avec terrasse et piscine">
-                    <figcaption>Suites urbaines</figcaption>
-                </figure>
+                <article class="card h-100 border-0 shadow-sm overflow-hidden text-start">
+                    <img class="card-img-top" src="{{ asset('images/projects/urban-stay.jpg') }}" alt="Suite urbaine avec terrasse et piscine">
+                    <div class="card-body">
+                        <h3 class="card-title h5">Des lieux que l’on retient</h3>
+                        <p class="card-text">Suites, résidences et appartements présentés par l’image, avant le détail.</p>
+                    </div>
+                </article>
             </div>
             <div class="col-md-4">
-                <figure class="gallery-shot">
-                    <img src="{{ asset('images/projects/kivu-pearl.jpg') }}" alt="Résidence contemporaine au bord d’une piscine">
-                    <figcaption>Résidences</figcaption>
-                </figure>
+                <article class="card h-100 border-0 shadow-sm overflow-hidden text-start">
+                    <img class="card-img-top" src="{{ asset('images/projects/kivu-pearl.jpg') }}" alt="Résidence contemporaine au bord d’une piscine">
+                    <div class="card-body">
+                        <h3 class="card-title h5">Votre argent reste au travail</h3>
+                        <p class="card-text">Le gain estimatif avance du lundi au vendredi. Le samedi, la plateforme est en maintenance.</p>
+                    </div>
+                </article>
             </div>
             <div class="col-md-4">
-                <figure class="gallery-shot">
-                    <img src="{{ asset('images/projects/congo-vista.jpg') }}" alt="Intérieur d’un appartement meublé">
-                    <figcaption>Appartements</figcaption>
-                </figure>
+                <article class="card h-100 border-0 shadow-sm overflow-hidden text-start">
+                    <img class="card-img-top" src="{{ asset('images/projects/congo-vista.jpg') }}" alt="Intérieur d’un appartement meublé">
+                    <div class="card-body">
+                        <h3 class="card-title h5">Un suivi pendant que vous dormez</h3>
+                        <p class="card-text">Le portefeuille, les échéances et les revenus crédités restent lisibles à tout moment.</p>
+                    </div>
+                </article>
             </div>
         </div>
         <a class="btn-z" href="{{ route('projects.index') }}">Voir les projets</a>
