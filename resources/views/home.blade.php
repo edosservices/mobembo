@@ -11,7 +11,7 @@
         <h1>Votre argent travaille pour vous pendant que vous dormez.</h1>
         <p class="lede">Votre patrimoine commence ici. Quelques adresses choisies, un suivi clair, et le temps de décider depuis votre téléphone.</p>
         <div class="actions hero-actions">
-            <a class="btn-z gold" href="{{ route('register') }}">Commencer à investir</a>
+            <a class="btn-z gold" href="{{ route('register') }}">Créer ton compte</a>
             <a class="btn-z-ghost light" href="{{ route('projects.index') }}">Voir les projets</a>
         </div>
     </div>
@@ -87,40 +87,36 @@
 </section>
 
 <section class="section section-muted reveal">
-    <div class="wrap text-center">
+    <div class="container text-center">
         <p class="kicker">L’esprit des lieux</p>
         <h2 class="mx-auto">Des adresses que l’on a envie de retenir.</h2>
-        <p class="lede mx-auto">Quelques images de l’univers ZELVORA. Le détail de chaque projet, son minimum et son rendement se consultent dans la sélection.</p>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <article class="card h-100 border-0 shadow-sm overflow-hidden text-start">
-                    <img class="card-img-top" src="{{ asset('images/projects/urban-stay.jpg') }}" alt="Suite urbaine avec terrasse et piscine">
-                    <div class="card-body">
-                        <h3 class="card-title h5">Des lieux que l’on retient</h3>
-                        <p class="card-text">Suites, résidences et appartements présentés par l’image, avant le détail.</p>
+        <p class="lede mx-auto">Trois opportunités ouvertes. Le détail, le minimum et le rendement de chaque plan se consultent sur sa fiche.</p>
+        <div class="row g-4 text-start">
+            @forelse ($featured as $project)
+                <div class="col-md-6 col-lg-4">
+                    @include('partials.home-plan-card', ['project' => $project])
+                </div>
+            @empty
+                <div class="col-12">
+                    <p class="text-center mb-0">Les prochaines opportunités seront publiées ici.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<section class="section reveal">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm text-center home-cta">
+                    <div class="card-body p-4 p-md-5">
+                        <h2>Crée ton compte et commence à découvrir les opportunités immobilières ZELVORA.</h2>
+                        <a class="btn btn-dark btn-lg rounded-pill px-4" href="{{ route('register') }}">Créer ton compte</a>
                     </div>
-                </article>
-            </div>
-            <div class="col-md-4">
-                <article class="card h-100 border-0 shadow-sm overflow-hidden text-start">
-                    <img class="card-img-top" src="{{ asset('images/projects/kivu-pearl.jpg') }}" alt="Résidence contemporaine au bord d’une piscine">
-                    <div class="card-body">
-                        <h3 class="card-title h5">Votre argent reste au travail</h3>
-                        <p class="card-text">Le gain estimatif avance du lundi au vendredi. Le samedi, la plateforme est en maintenance.</p>
-                    </div>
-                </article>
-            </div>
-            <div class="col-md-4">
-                <article class="card h-100 border-0 shadow-sm overflow-hidden text-start">
-                    <img class="card-img-top" src="{{ asset('images/projects/congo-vista.jpg') }}" alt="Intérieur d’un appartement meublé">
-                    <div class="card-body">
-                        <h3 class="card-title h5">Un suivi pendant que vous dormez</h3>
-                        <p class="card-text">Le portefeuille, les échéances et les revenus crédités restent lisibles à tout moment.</p>
-                    </div>
-                </article>
+                </div>
             </div>
         </div>
-        <a class="btn-z" href="{{ route('projects.index') }}">Voir les projets</a>
     </div>
 </section>
 
@@ -170,6 +166,18 @@
         <a class="btn-z gold" href="{{ route('projects.index') }}">Voir les projets</a>
     </div>
 </section>
+
+@php($homeCommunity = \App\Models\PlatformSetting::current())
+@if (filled($homeCommunity->whatsapp_url) || filled($homeCommunity->telegram_url))
+<section class="section section-muted reveal">
+    <div class="container text-center">
+        <p class="kicker">Communauté</p>
+        <h2>Restez connecté avec la communauté ZELVORA.</h2>
+        <p class="lede mx-auto">Actualités, opportunités immobilières et annonces, sur WhatsApp et Telegram.</p>
+        @include('partials.community-links', ['variant' => 'buttons'])
+    </div>
+</section>
+@endif
 
 <section class="section reveal" id="faq">
     <div class="wrap faq-list">

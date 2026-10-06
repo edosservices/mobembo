@@ -42,6 +42,8 @@
         @yield('content')
     </main>
     @include('partials.site-footer')
+    @include('partials.welcome-community-modal')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.querySelector('[data-back]')?.addEventListener('click', () => {
             const fallback = document.querySelector('[data-back]').dataset.fallback;
@@ -97,6 +99,18 @@
         });
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('{{ asset('sw.js') }}');
+        }
+        const welcome = document.getElementById('welcome-community');
+        if (welcome && window.bootstrap && !localStorage.getItem('zelvora_welcome_seen')) {
+            window.setTimeout(() => {
+                window.bootstrap.Modal.getOrCreateInstance(welcome).show();
+            }, 600);
+            welcome.addEventListener('hidden.bs.modal', () => {
+                localStorage.setItem('zelvora_welcome_seen', '1');
+            });
+            welcome.querySelectorAll('a[target="_blank"]').forEach((link) => {
+                link.addEventListener('click', () => localStorage.setItem('zelvora_welcome_seen', '1'));
+            });
         }
     </script>
 </body>
