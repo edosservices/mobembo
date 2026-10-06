@@ -2,6 +2,9 @@
 @section('title', 'Retirer')
 @section('content')
 <h1 style="font-size:2.4rem;">Retirer</h1>
+<p class="muted">Les retraits sont traités du lundi au samedi. Le traitement peut prendre de quelques minutes à quelques heures.</p>
+@include('partials.operating-notice')
+@include('partials.withdrawal-steps', ['withdrawal' => $recent->first()])
 <p class="muted">Frais : {{ number_format((float) $settings->withdrawal_fee_percent, 2, ',', ' ') }} % + {{ money($settings->withdrawal_fee_fixed) }}. Minimum {{ money($settings->withdrawal_min) }}, maximum {{ money($settings->withdrawal_max) }}.</p>
 @if ($settings->kyc_required_for_withdrawal)
     <p class="fine-print">Une vérification d’identité est demandée avant un retrait. <a href="{{ route('kyc.edit') }}">Envoyer un document</a>.</p>

@@ -4,7 +4,7 @@
 <h1 style="font-size:2.3rem;">Portefeuille</h1>
 <div class="table-wrap panel">
     <table>
-        <thead><tr><th>Projet</th><th>Montant</th><th>Revenus crédités</th><th>Revenu estimatif</th><th>Statut</th><th>Date de fin</th></tr></thead>
+        <thead><tr><th>Projet</th><th>Montant</th><th>Revenus crédités</th><th>Revenu estimatif</th><th>Accumulé estimatif</th><th>Statut</th><th>Date de fin</th></tr></thead>
         <tbody>
         @forelse ($investments as $investment)
             <tr>
@@ -12,11 +12,12 @@
                 <td>{{ money($investment->amount) }}</td>
                 <td>{{ money($investment->returns_credited) }}</td>
                 <td>{{ money($investment->estimatedReturn()) }}</td>
+                <td>{{ \App\Support\ReturnEstimator::amountLabel($investment->estimatedAccruedReturn()) }}</td>
                 <td>@include('partials.status', ['status' => $investment->status])</td>
                 <td>{{ $investment->ends_at->format('d/m/Y') }}</td>
             </tr>
         @empty
-            <tr><td colspan="6">Aucun investissement.</td></tr>
+            <tr><td colspan="7">Aucun investissement.</td></tr>
         @endforelse
         </tbody>
     </table>

@@ -8,7 +8,6 @@ use Tests\TestCase;
 class InstallPromptTest extends TestCase
 {
     use RefreshDatabase;
-
     public function test_registration_offers_an_android_home_screen_install(): void
     {
         $this->get(route('register'))

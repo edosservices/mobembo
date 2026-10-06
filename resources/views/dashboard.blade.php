@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Tableau de bord · ZELVORA')
 @section('content')
+@include('partials.operating-notice')
 <header class="dash-head">
     <h1>Bonjour {{ $firstName }}</h1>
     <p>Voici l'état de votre portefeuille.</p>
@@ -87,6 +88,7 @@
                 <strong>{{ $investment->project->name }}</strong>
                 <div class="money sm">{{ money($investment->amount) }}</div>
                 <p class="muted">{{ \App\Support\ReturnEstimator::percentLabel($investment->dailyReturnPercent()) }}</p>
+                <p class="muted">Gain estimatif accumulé {{ \App\Support\ReturnEstimator::amountLabel($investment->estimatedAccruedReturn()) }}</p>
                 <p class="muted">{{ $investment->remainingDays() }} jours restants</p>
             </div>
             <a class="btn-z-ghost small" href="{{ route('investments.show', $investment) }}">Voir</a>
