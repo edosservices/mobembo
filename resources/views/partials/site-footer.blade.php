@@ -3,6 +3,7 @@
         <div>
             <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="ZELVORA">
             <p class="footer-tagline">Investir dans l'immobilier, simplement.</p>
+            @include('partials.community-links', ['light' => 'light'])
         </div>
         <nav class="footer-links" aria-label="Navigation">
             <a href="{{ route('home') }}">Accueil</a>

@@ -48,6 +48,18 @@
     <label style="display:flex;gap:.5rem;align-items:center;"><input type="checkbox" name="kyc_required_for_withdrawal" value="1" style="width:auto;" @checked($settings->kyc_required_for_withdrawal)> Exiger un KYC vérifié avant tout retrait</label>
     <label style="display:flex;gap:.5rem;align-items:center;margin-top:.6rem;"><input type="checkbox" name="otp_enabled" value="1" style="width:auto;" @checked($settings->otp_enabled)> Exiger un code SMS à la connexion</label>
     <div class="field" style="margin-top:.8rem;"><label>Mention légale</label><textarea name="legal_disclaimer" required>{{ old('legal_disclaimer', $settings->legal_disclaimer) }}</textarea></div>
+    <h2>Groupes WhatsApp et Telegram</h2>
+    <p class="muted">Ces liens apparaissent dans le pied de page, sur la page contact et dans l’espace client. Laissez un champ vide pour masquer le bouton correspondant.</p>
+    <div class="grid-2">
+        <div class="field">
+            <label for="whatsapp_url">Lien du groupe WhatsApp</label>
+            <input id="whatsapp_url" name="whatsapp_url" type="url" inputmode="url" placeholder="https://" value="{{ old('whatsapp_url', $settings->whatsapp_url) }}">
+        </div>
+        <div class="field">
+            <label for="telegram_url">Lien du groupe Telegram</label>
+            <input id="telegram_url" name="telegram_url" type="url" inputmode="url" placeholder="https://" value="{{ old('telegram_url', $settings->telegram_url) }}">
+        </div>
+    </div>
     <button class="btn-z" type="submit">Enregistrer les modifications</button>
 </form>
 <section class="panel" style="margin-top:1rem;">

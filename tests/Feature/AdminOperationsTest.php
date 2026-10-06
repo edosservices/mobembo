@@ -161,6 +161,104 @@ class AdminOperationsTest extends TestCase
         $this->assertSame('30.00', Money::of($user->wallet()->first()->available_balance));
     }
 
+    public function test_admin_can_publish_whatsapp_and_telegram_links(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->get(route('home'))->assertOk()->assertDontSee('Rejoindre WhatsApp')->assertDontSee('Rejoindre Telegram');
+        $this->get(route('contact'))->assertOk()->assertDontSee('Rejoindre WhatsApp');
+
+        $this->actingAs($admin)->get(route('admin.settings.edit'))
+            ->assertOk()
+            ->assertSee('Groupes WhatsApp et Telegram')
+            ->assertSee('name="whatsapp_url"', false)
+            ->assertSee('name="telegram_url"', false);
+
+        $this->actingAs($admin)->put(route('admin.settings.update'), [
+            ...$this->settingsPayload(),
+            'whatsapp_url' => 'javascript:alert(1)',
+            'telegram_url' => 'https://t.me/zelvora',
+        ])->assertSessionHasErrors('whatsapp_url');
+
+        $this->assertNull(PlatformSetting::current()->fresh()->whatsapp_url);
+
+        $this->actingAs($admin)->put(route('admin.settings.update'), [
+            ...$this->settingsPayload(),
+            'whatsapp_url' => 'https://chat.whatsapp.com/zelvora',
+            'telegram_url' => 'https://t.me/zelvora',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $settings = PlatformSetting::current()->fresh();
+        $this->assertSame('https://chat.whatsapp.com/zelvora', $settings->whatsapp_url);
+        $this->assertSame('https://t.me/zelvora', $settings->telegram_url);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Rejoindre WhatsApp')
+            ->assertSee('https://chat.whatsapp.com/zelvora', false)
+            ->assertSee('Rejoindre Telegram')
+            ->assertSee('https://t.me/zelvora', false);
+
+        $this->get(route('contact'))->assertOk()->assertSee('Rejoindre WhatsApp')->assertSee('Rejoindre Telegram');
+
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Rejoindre WhatsApp')
+            ->assertSee('Rejoindre Telegram');
+    }
+
+    public function test_admin_can_update_referral_parameters_without_touching_the_ledger(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $user = User::factory()->create();
+        $this->credit($user, '25.00');
+        $before = LedgerEntry::query()->count();
+
+        $this->actingAs($admin)->get(route('admin.referrals.index'))
+            ->assertOk()
+            ->assertSee('Paramètres de parrainage')
+            ->assertSee('Enregistrer les paramètres')
+            ->assertSee('name="referral_rate_percent"', false)
+            ->assertSee('name="level_name_pro"', false);
+
+        $this->actingAs($user)->put(route('admin.referrals.update'), [
+            'referral_rate_percent' => '1',
+            'referral_trigger' => 'approved_deposit',
+            'level_starter' => '0',
+            'level_pro' => '2',
+            'level_elite' => '3',
+            'level_vip' => '4',
+        ])->assertForbidden();
+
+        $this->actingAs($admin)->put(route('admin.referrals.update'), [
+            'referral_enabled' => '1',
+            'referral_trigger' => 'investment',
+            'referral_rate_percent' => '7,5',
+            'level_starter' => '0',
+            'level_pro' => '4',
+            'level_elite' => '12',
+            'level_vip' => '30',
+            'level_name_starter' => 'STARTER',
+            'level_name_pro' => 'PRO PLUS',
+            'level_name_elite' => 'ELITE',
+            'level_name_vip' => 'VIP',
+            'benefit_pro' => "Suivi prioritaire\nRapport mensuel",
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $settings = PlatformSetting::current()->fresh();
+        $this->assertTrue($settings->referral_enabled);
+        $this->assertSame('investment', $settings->referral_trigger->value);
+        $this->assertSame('7.5000', number_format((float) $settings->referral_rate_percent, 4, '.', ''));
+        $pro = collect($settings->referral_levels)->firstWhere('key', 'pro');
+        $this->assertSame('PRO PLUS', $pro['name']);
+        $this->assertSame(4, $pro['min_active']);
+        $this->assertSame(['Suivi prioritaire', 'Rapport mensuel'], $pro['benefits']);
+        $this->assertSame($before, LedgerEntry::query()->count());
+        $this->assertSame('25.00', Money::of($user->wallet()->first()->available_balance));
+        $this->assertSame([], app(WalletService::class)->findDrift());
+    }
+
     public function test_a_client_cannot_open_another_account(): void
     {
         $user = User::factory()->create();
@@ -169,6 +267,23 @@ class AdminOperationsTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.users.impersonate', $other))
             ->assertForbidden();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function settingsPayload(): array
+    {
+        return [
+            'withdrawal_fee_percent' => '5',
+            'withdrawal_fee_fixed' => '0.00',
+            'withdrawal_min' => '5.00',
+            'withdrawal_max' => '10000.00',
+            'referral_enabled' => '1',
+            'referral_trigger' => 'approved_deposit',
+            'referral_rate_percent' => '10',
+            'legal_disclaimer' => 'Les rendements affichés sont des estimations.',
+        ];
     }
 
     private function credit(User $user, string $amount): void

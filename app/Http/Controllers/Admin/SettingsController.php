@@ -23,7 +23,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function update(Request $request, AuditService $audit)
+    public function update(Request $request, AuditService $audit, ReferralProgressService $progress)
     {
         $request->merge([
             'withdrawal_fee_percent' => str_replace(',', '.', (string) $request->input('withdrawal_fee_percent')),
@@ -71,15 +71,17 @@ class SettingsController extends Controller
             'airtel_holder',
             'orange_number',
             'orange_holder',
+            'whatsapp_url',
+            'telegram_url',
         ]);
 
-        $levels = $this->levels($request);
         $settings->fill([
             ...$data,
             'referral_enabled' => $request->boolean('referral_enabled'),
             'otp_enabled' => $request->boolean('otp_enabled'),
             'kyc_required_for_withdrawal' => $request->boolean('kyc_required_for_withdrawal'),
-            'referral_levels' => $levels ?? $settings->referral_levels,
+            'referral_levels' => $progress->rulesFromRequest($request) ?? $settings->referral_levels,
+            ...$this->communityLinks($request),
         ])->save();
 
         $audit->record($request->user(), null, 'settings_updated', null, null, null, 'Mise à jour des paramètres de la plateforme', [
@@ -91,60 +93,29 @@ class SettingsController extends Controller
     }
 
     /**
-     * @return list<array{key: string, name: string, min_active: int}>|null
+     * @return array<string, string|null>
      */
-    private function levels(Request $request): ?array
+    private function communityLinks(Request $request): array
     {
-        if (! $request->exists('level_pro')) {
-            return null;
+        if (! $request->exists('whatsapp_url') && ! $request->exists('telegram_url')) {
+            return [];
+        }
+
+        $links = [];
+        foreach (['whatsapp_url', 'telegram_url'] as $field) {
+            $value = trim((string) $request->input($field));
+            $request->merge([$field => $value === '' ? null : $value]);
         }
 
         $data = $request->validate([
-            'level_starter' => ['required', 'integer', 'min:0', 'max:100000'],
-            'level_pro' => ['required', 'integer', 'min:1', 'max:100000'],
-            'level_elite' => ['required', 'integer', 'min:1', 'max:100000'],
-            'level_vip' => ['required', 'integer', 'min:1', 'max:100000'],
+            'whatsapp_url' => ['nullable', 'regex:/^https?:\/\/\S+$/i', 'max:255'],
+            'telegram_url' => ['nullable', 'regex:/^https?:\/\/\S+$/i', 'max:255'],
         ]);
 
-        $names = $request->validate([
-            'level_name_starter' => ['nullable', 'string', 'max:40'],
-            'level_name_pro' => ['nullable', 'string', 'max:40'],
-            'level_name_elite' => ['nullable', 'string', 'max:40'],
-            'level_name_vip' => ['nullable', 'string', 'max:40'],
-            'benefit_starter' => ['nullable', 'string', 'max:1000'],
-            'benefit_pro' => ['nullable', 'string', 'max:1000'],
-            'benefit_elite' => ['nullable', 'string', 'max:1000'],
-            'benefit_vip' => ['nullable', 'string', 'max:1000'],
-        ]);
-        $stored = collect(PlatformSetting::current()->referral_levels ?? [])->keyBy('key');
-        $rules = [];
-        foreach ([
-            'starter' => [(int) $data['level_starter'], 'STARTER'],
-            'pro' => [(int) $data['level_pro'], 'PRO'],
-            'elite' => [(int) $data['level_elite'], 'ELITE'],
-            'vip' => [(int) $data['level_vip'], 'VIP'],
-        ] as $key => [$minimum, $fallback]) {
-            $lines = preg_split('/\r\n|\r|\n/', (string) ($names['benefit_'.$key] ?? ''));
-            $benefits = array_values(array_filter(array_map('trim', $lines ?: [])));
-            if ($benefits === []) {
-                $benefits = $stored->get($key)['benefits'] ?? config('zelvora.level_benefits.'.$key, []);
-            }
-            $rules[] = [
-                'key' => $key,
-                'name' => trim((string) ($names['level_name_'.$key] ?? '')) ?: $fallback,
-                'min_active' => $minimum,
-                'benefits' => array_values($benefits),
-            ];
+        foreach (['whatsapp_url', 'telegram_url'] as $field) {
+            $links[$field] = $data[$field] ?? null;
         }
 
-        if ($rules[1]['min_active'] <= $rules[0]['min_active']
-            || $rules[2]['min_active'] <= $rules[1]['min_active']
-            || $rules[3]['min_active'] <= $rules[2]['min_active']) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'level_vip' => 'Chaque niveau doit demander plus de membres actifs que le précédent.',
-            ]);
-        }
-
-        return $rules;
+        return $links;
     }
 }
