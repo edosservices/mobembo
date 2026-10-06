@@ -59,9 +59,10 @@ class ClientInvestmentExperienceTest extends TestCase
         $available = Money::of($user->wallet()->first()->available_balance);
 
         $this->assertSame(32, $investment->elapsedDays());
+        $this->assertSame(25, $investment->accrualDays());
         $this->assertSame(333, $investment->remainingDays());
         $this->assertSame('0.1235', $investment->estimatedDailyAmount());
-        $this->assertSame('3.9520', $investment->estimatedAccruedReturn());
+        $this->assertSame('3.0875', $investment->estimatedAccruedReturn());
         $this->assertSame($ledgerBefore, LedgerEntry::query()->count());
         $this->assertSame('0.00', Money::of($investment->returns_credited));
         $user->wallet->refresh();

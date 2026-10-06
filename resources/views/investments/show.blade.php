@@ -5,6 +5,7 @@
 <p class="kicker">Investissement</p>
 <h1 style="font-size:clamp(2rem, 6vw, 2.8rem);">{{ $investment->project->name }}</h1>
 @include('partials.status', ['status' => $investment->status])
+@include('partials.operating-notice')
 
 <section class="detail-block">
     <h2>Estimation</h2>
@@ -17,13 +18,15 @@
         <div class="stat"><span>Date de début</span><strong class="money sm">{{ $investment->starts_at->format('d/m/Y') }}</strong></div>
         <div class="stat"><span>Date de fin</span><strong class="money sm">{{ $investment->ends_at->format('d/m/Y') }}</strong></div>
         <div class="stat"><span>Jours écoulés</span><strong class="money sm">{{ $investment->elapsedDays() }}</strong></div>
+        <div class="stat"><span>Jours ouvrés comptés</span><strong class="money sm">{{ $investment->accrualDays() }}</strong></div>
+        <div class="stat"><span>Gain estimatif accumulé</span><strong class="money sm">{{ \App\Support\ReturnEstimator::amountLabel($investment->estimatedAccruedReturn()) }}</strong></div>
         <div class="stat"><span>Jours restants</span><strong class="money sm">{{ $investment->remainingDays() }}</strong></div>
     </div>
     <p style="margin-top:1rem;">Progression temporelle</p>
     <div class="progress" role="img" aria-label="{{ str_replace('.', ',', $investment->progressPercent()) }} % de la durée écoulée">
         <span style="width: {{ min(100, (float) $investment->progressPercent()) }}%"></span>
     </div>
-    <p class="fine-print">Ces montants permettent d'estimer le potentiel. Ils ne sont pas des revenus déjà gagnés.</p>
+    <p class="fine-print">Le gain estimatif accumulé augmente chaque jour du lundi au vendredi. Le samedi est le jour de maintenance. Ce montant n’est pas un revenu déjà crédité.</p>
 </section>
 
 <section class="panel credited-card">

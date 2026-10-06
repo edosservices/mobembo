@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\InvestmentStatus;
+use App\Support\BusinessCalendar;
 use App\Support\InvestmentQuote;
 use App\Support\ReturnEstimator;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -120,8 +121,20 @@ class Investment extends Model
         return bcadd($raw, '0', 2);
     }
 
+    public function accrualDays(): int
+    {
+        if ($this->starts_at === null) {
+            return 0;
+        }
+
+        $start = $this->starts_at->copy()->startOfDay();
+        $end = ($this->ends_at ?? $start->copy()->addDays(max(1, (int) $this->duration_days)))->copy()->startOfDay();
+
+        return BusinessCalendar::accrualDays($start, $end);
+    }
+
     public function estimatedAccruedReturn(): string
     {
-        return bcmul($this->estimatedDailyAmount(), (string) $this->elapsedDays(), 4);
+        return bcmul($this->estimatedDailyAmount(), (string) $this->accrualDays(), 4);
     }
 }

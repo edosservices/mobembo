@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PaymentMethod;
 use App\Models\PlatformSetting;
 use App\Services\WithdrawalService;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
 use App\Support\PhoneNumber;
 use Illuminate\Http\Request;
@@ -60,9 +61,13 @@ class WithdrawalController extends Controller
             $data['idempotency_key'],
         );
 
+        $timing = BusinessCalendar::withdrawalsOpen()
+            ? 'La vérification est en cours et peut prendre de quelques minutes à quelques heures.'
+            : 'Votre demande est enregistrée. La vérification reprend lundi.';
+
         return redirect()->route('withdrawals.create')->with(
             'success',
-            'Demande enregistrée. Montant '.money($withdrawal->amount).', frais '.money($withdrawal->fee).', net à recevoir '.money($withdrawal->net_amount).'. Statut : en attente.',
+            'Retrait effectué. Montant '.money($withdrawal->amount).', frais '.money($withdrawal->fee).', net à recevoir '.money($withdrawal->net_amount).'. '.$timing,
         );
     }
 }

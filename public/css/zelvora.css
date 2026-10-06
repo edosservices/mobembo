@@ -149,6 +149,26 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
     border-radius: 99px;
     overflow: hidden;
 }
+.withdrawal-step {
+    height: 100%;
+    border: 1px solid #ece7df;
+    border-radius: 1rem;
+    padding: 0.85rem 0.8rem;
+    background: #fff;
+}
+.withdrawal-step strong {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.withdrawal-step p { margin: 0.3rem 0 0; font-weight: 700; font-size: 0.95rem; }
+.withdrawal-step span { display: block; margin-top: 0.35rem; color: var(--muted); font-size: 0.82rem; }
+.withdrawal-step.is-done { border-color: #0f7a52; }
+.withdrawal-step.is-current { border-color: #111; box-shadow: inset 0 0 0 1px #111; }
+.withdrawal-step.is-refused { border-color: #9f2d2d; }
+.withdrawal-step.is-waiting { opacity: 0.72; }
 .progress > span { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), #dfc089); }
 .meta { display: flex; justify-content: space-between; gap: 0.5rem; color: var(--muted); font-size: 0.82rem; margin: 0.45rem 0; }
 

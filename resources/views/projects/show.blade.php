@@ -29,7 +29,7 @@
             <div class="stat"><span>Progression</span><strong class="money sm">{{ str_replace('.', ',', $project->progressPercent()) }} %</strong></div>
         </div>
         <div class="progress" style="margin:.9rem 0 .4rem;"><span style="width: {{ min(100, (float) $project->progressPercent()) }}%"></span></div>
-        <p class="fine-print">Les performances présentées sont indicatives et dépendent des conditions de chaque projet.</p>
+        <p class="fine-print">Les performances présentées sont indicatives et dépendent des conditions de chaque projet. Le gain estimatif progresse du lundi au vendredi. Le samedi est le jour de maintenance.</p>
     </section>
 
     <section class="detail-block panel" id="investir">
