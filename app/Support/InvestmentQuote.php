@@ -17,18 +17,20 @@ class InvestmentQuote
         public string $maturity,
     ) {}
 
-    public static function for(mixed $capital, mixed $percent, int $days): self
+    public static function for(mixed $capital, mixed $percent, int $days, ?int $profitDays = null): self
     {
-        $total = ReturnEstimator::total($capital, $percent);
+        $total = PlanMath::totalGain($capital, $percent);
+        $profitDays = $profitDays ?? max(1, $days);
+        $daily = PlanMath::ordinaryDaily($total, $profitDays);
 
         return new self(
             Money::of($capital),
             max(1, $days),
             ReturnEstimator::durationPercent($percent),
-            ReturnEstimator::dailyPercent($percent, $days),
-            ReturnEstimator::dailyAmount($capital, $percent, $days),
+            ReturnEstimator::dailyPercent($percent, max(1, $profitDays)),
+            $daily,
             $total,
-            Money::add($capital, $total),
+            PlanMath::economicTotal($capital, $total),
         );
     }
 

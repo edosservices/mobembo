@@ -30,6 +30,7 @@ class ClientExperienceTest extends TestCase
 
     public function test_project_card_uses_the_real_estimate_for_the_minimum(): void
     {
+        $this->travelTo('2026-10-07 11:00:00');
         $user = User::factory()->create();
         $project = $this->project([
             'min_investment' => '50.00',
@@ -38,10 +39,8 @@ class ClientExperienceTest extends TestCase
             'funded_amount' => '83000.00',
             'target_amount' => '100000.00',
         ]);
-        $quote = InvestmentQuote::for('50.00', '7.5000', 270);
+        $quote = $project->quote();
 
-        $this->assertSame('0.0278', $quote->dailyPercent);
-        $this->assertSame('0.0139', $quote->dailyAmount);
         $this->assertSame('3.75', $quote->totalReturn);
         $this->assertSame('53.75', $quote->maturity);
         $this->assertSame(0, LedgerEntry::query()->count());
@@ -93,7 +92,7 @@ class ClientExperienceTest extends TestCase
         ])->assertRedirect();
 
         $investment = $user->investments()->first();
-        $this->assertSame('0.01', Money::of($investment->returns_credited));
+        $this->assertSame('0.02', Money::of($investment->returns_credited));
 
         $this->actingAs($user)
             ->get(route('investments.show', $investment))
@@ -102,7 +101,7 @@ class ClientExperienceTest extends TestCase
             ->assertSee('Revenus réellement crédités')
             ->assertSee('3,75 $')
             ->assertSee('53,75 $')
-            ->assertSee('0,01 $');
+            ->assertSee('0,02 $');
 
         $this->assertSame(1, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
     }

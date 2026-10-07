@@ -61,10 +61,10 @@ class ClientInvestmentExperienceTest extends TestCase
         $this->assertSame(32, $investment->elapsedDays());
         $this->assertSame(25, $investment->accrualDays());
         $this->assertSame(333, $investment->remainingDays());
-        $this->assertSame('0.1235', $investment->estimatedDailyAmount());
-        $this->assertSame('3.0875', $investment->estimatedAccruedReturn());
+        $this->assertSame('0.17', $investment->estimatedDailyAmount());
+        $this->assertSame('4.25', $investment->estimatedAccruedReturn());
         $this->assertSame($ledgerBefore, LedgerEntry::query()->count());
-        $this->assertSame('0.12', Money::of($investment->returns_credited));
+        $this->assertSame('0.17', Money::of($investment->returns_credited));
         $user->wallet->refresh();
         $this->assertSame($available, Money::of($user->wallet->available_balance));
         $this->assertSame([], app(WalletService::class)->findDrift());
@@ -72,6 +72,7 @@ class ClientInvestmentExperienceTest extends TestCase
 
     public function test_sufficient_balance_invests_and_insufficient_balance_is_refused(): void
     {
+        $this->travelTo('2026-10-10 11:00:00');
         $user = User::factory()->create();
         $this->credit($user, '40.00');
         $project = $this->project(['min_investment' => '10.00']);

@@ -10,7 +10,9 @@ use App\Exceptions\FinancialException;
 use App\Models\Investment;
 use App\Models\Project;
 use App\Models\User;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
+use App\Support\PlanMath;
 use Illuminate\Support\Str;
 
 class InvestmentService
@@ -46,12 +48,16 @@ class InvestmentService
 
             $project = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
 
-            if (! $project->status->acceptsInvestment()) {
+            if (! $project->acceptsNewPosition()) {
                 throw new FinancialException('Ce projet n’accepte pas de nouvel investissement.');
             }
 
             if (Money::cmp($amount, $project->min_investment) < 0) {
                 throw new FinancialException('L’investissement minimum est de '.Money::format($project->min_investment).'.');
+            }
+
+            if ($project->max_investment !== null && Money::cmp($amount, $project->max_investment) > 0) {
+                throw new FinancialException('L’investissement maximum est de '.Money::format($project->max_investment).'.');
             }
 
             $remaining = $project->remainingAmount();
@@ -72,6 +78,8 @@ class InvestmentService
             }
 
             [$starts, $ends] = $this->term($project);
+            $profitDays = BusinessCalendar::scheduledProfitDays($starts, $ends);
+            $planned = PlanMath::totalGain($amount, $project->expected_return_percent);
 
             $investment = Investment::query()->create([
                 'uuid' => (string) Str::uuid(),
@@ -81,6 +89,9 @@ class InvestmentService
                 'currency' => $project->currency,
                 'expected_return_percent' => $project->expected_return_percent,
                 'duration_days' => $project->duration_days,
+                'planned_return' => $planned,
+                'profit_days' => $profitDays,
+                'daily_return' => PlanMath::ordinaryDaily($planned, $profitDays),
                 'returns_credited' => '0.00',
                 'capital_returned' => '0.00',
                 'invested_at' => now(),

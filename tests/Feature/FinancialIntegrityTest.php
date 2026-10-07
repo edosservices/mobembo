@@ -115,7 +115,7 @@ class FinancialIntegrityTest extends TestCase
         ])->assertRedirect();
 
         $user->wallet->refresh();
-        $this->assertSame('75.01', Money::of($user->wallet->available_balance));
+        $this->assertSame('75.02', Money::of($user->wallet->available_balance));
         $this->assertSame('25.00', Money::of($user->wallet->invested_balance));
         $project->refresh();
         $this->assertSame('25.00', Money::of($project->funded_amount));
@@ -133,8 +133,8 @@ class FinancialIntegrityTest extends TestCase
 
         $user->wallet->refresh();
         $investment = Investment::query()->first();
-        $this->assertSame('10.01', Money::of($investment->returns_credited));
-        $this->assertSame('85.01', Money::of($user->wallet->available_balance));
+        $this->assertSame('10.02', Money::of($investment->returns_credited));
+        $this->assertSame('85.02', Money::of($user->wallet->available_balance));
         $this->assertSame('25.00', Money::of($user->wallet->invested_balance));
     }
 
@@ -228,6 +228,7 @@ class FinancialIntegrityTest extends TestCase
 
     public function test_guest_can_open_a_project_and_an_open_status_investment_stays_estimated(): void
     {
+        $this->travelTo('2026-10-10 11:00:00');
         $project = $this->project([
             'status' => ProjectStatus::Open,
             'slug' => 'projet-ouvert',

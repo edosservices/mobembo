@@ -12,6 +12,7 @@ use App\Services\DistributionService;
 use App\Services\InvestmentService;
 use App\Support\Money;
 use App\Support\ReturnEstimator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -167,14 +168,20 @@ class ProjectController extends Controller
 
     private function fill(Project $project, Request $request): void
     {
+        $maxInvestment = $request->exists('max_investment')
+            ? ($request->filled('max_investment') ? Money::normalizeInput($request->input('max_investment')) : null)
+            : $project->max_investment;
+
         $request->merge([
             'target_amount' => Money::normalizeInput($request->input('target_amount')),
             'min_investment' => Money::normalizeInput($request->input('min_investment')),
+            'max_investment' => $maxInvestment,
             'expected_return_percent' => str_replace(',', '.', (string) $request->input('expected_return_percent')),
         ]);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
+            'slogan' => ['nullable', 'string', 'max:180'],
             'slug' => ['nullable', 'string', 'max:160'],
             'currency' => ['required', 'string', 'max:8'],
             'description' => ['required', 'string', 'max:5000'],
@@ -182,6 +189,7 @@ class ProjectController extends Controller
             'category' => ['required', 'string', 'max:80'],
             'target_amount' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
             'min_investment' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'max_investment' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
             'duration_days' => ['required', 'integer', 'min:1', 'max:3650'],
             'expected_return_percent' => ['required', 'numeric', 'min:0', 'max:100'],
             'distribution_frequency' => ['required', Rule::enum(DistributionFrequency::class)],
@@ -191,7 +199,8 @@ class ProjectController extends Controller
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
             'next_distribution_on' => ['nullable', 'date'],
             'is_demo' => ['nullable', 'boolean'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'is_active' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 
         if (Money::cmp($data['min_investment'], $data['target_amount']) > 0) {
@@ -200,15 +209,28 @@ class ProjectController extends Controller
             ]);
         }
 
+        if ($data['max_investment'] !== null && Money::cmp($data['min_investment'], $data['max_investment']) > 0) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'max_investment' => 'Le maximum doit être supérieur ou égal au minimum.',
+            ]);
+        }
+
         $slug = $this->slugFor($project, $data['name'], $data['slug'] ?? null);
         $image = $project->image_path;
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image')->store('projects', 'public');
+            $stored = $request->file('image')->store('projects', 'public');
+
+            if ($image && ! str_starts_with($image, 'images/')) {
+                Storage::disk('public')->delete($image);
+            }
+
+            $image = $stored;
         }
 
         $project->fill([
             'name' => $data['name'],
+            'slogan' => $data['slogan'] ?? null,
             'slug' => $slug,
             'currency' => strtoupper($data['currency']),
             'image_path' => $image,
@@ -217,11 +239,13 @@ class ProjectController extends Controller
             'category' => $data['category'],
             'target_amount' => $data['target_amount'],
             'min_investment' => $data['min_investment'],
+            'max_investment' => $data['max_investment'],
             'duration_days' => $data['duration_days'],
             'expected_return_percent' => $data['expected_return_percent'],
             'distribution_frequency' => $data['distribution_frequency'],
             'economic_terms' => $data['economic_terms'],
             'status' => $data['status'],
+            'is_active' => $request->exists('is_active') ? $request->boolean('is_active') : ($project->exists ? $project->is_active : true),
             'starts_at' => $data['starts_at'] ?? null,
             'ends_at' => $data['ends_at'] ?? null,
             'next_distribution_on' => $data['next_distribution_on'] ?? null,

@@ -1,4 +1,5 @@
 @php($quote = $project->quote())
+@php($example = $project->quote($project->exampleCapital()))
 @php($cover = $project->imageUrl())
 <article class="opportunity plan-card h-100" data-plan-card="{{ $project->slug }}">
     <a class="cover" href="{{ route('projects.show', $project) }}#investir">
@@ -9,11 +10,14 @@
     <div class="body text-center">
         <span class="badge-z">{{ $project->category }}</span>
         <h2>{{ $project->name }}</h2>
+        @if ($project->slogan)
+            <p class="fine-print">{{ $project->slogan }}</p>
+        @endif
         <div class="row row-cols-2 g-2 plan-facts">
             <div class="col">
                 <div class="fact">
-                    <span>À partir de</span>
-                    <strong>{{ money($project->min_investment) }}</strong>
+                    <span>Investissement</span>
+                    <strong>{{ money($project->min_investment) }}@if ($project->max_investment) – {{ money($project->max_investment) }}@endif</strong>
                 </div>
             </div>
             <div class="col">
@@ -63,6 +67,7 @@
             <span style="width: {{ min(100, (float) $project->progressPercent()) }}%"></span>
         </div>
         <p class="funded-line">Progression {{ str_replace('.', ',', $project->progressPercent()) }} %</p>
+        <p class="fine-print">Pour {{ money($example->capital) }} : gain journalier estimé {{ money($example->dailyAmount) }}, gain total {{ money($example->totalReturn) }}. À l’échéance, le capital est restitué et les profits déjà crédités ne sont pas versés une seconde fois.</p>
         <p class="fine-print">Jusqu’à {{ \App\Services\InvestmentService::MAX_ACTIVE_PER_PLAN }} positions actives</p>
         <a class="btn-z full" href="{{ route('projects.show', $project) }}#investir">Investir</a>
     </div>

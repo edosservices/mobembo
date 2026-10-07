@@ -11,6 +11,27 @@
     body.site-app .balance-total { background: linear-gradient(160deg, #141414, #6e2430) !important; --bs-card-bg: #141414; }
     body.site-app .balance-pending { background: #2a211c !important; --bs-card-bg: #2a211c; }
     body.site-app .balance-paid { background: #3d2424 !important; --bs-card-bg: #3d2424; }
+    body.site-app .position-terms dl { margin: 0; }
+    body.site-app .position-terms dl > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #ece7df;
+    }
+    body.site-app .position-terms dt {
+        margin: 0;
+        color: #6d675f;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    body.site-app .position-terms dd {
+        margin: 0;
+        font-weight: 800;
+        text-align: right;
+    }
+    body.site-app .plan-facts strong { overflow-wrap: anywhere; }
     body.site-app .balance-daily {
         background: #4e2430 !important;
         color: #f7f5f2 !important;

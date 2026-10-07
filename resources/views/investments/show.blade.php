@@ -7,6 +7,25 @@
 @include('partials.status', ['status' => $investment->status])
 @include('partials.operating-notice')
 
+<section class="detail-block panel position-terms">
+    <h2>Votre position</h2>
+    <dl>
+        <div><dt>Montant investi</dt><dd>{{ money($investment->amount) }}</dd></div>
+        <div><dt>Durée</dt><dd>{{ $investment->duration_days }} jours</dd></div>
+        <div><dt>Rendement</dt><dd>{{ str_replace('.', ',', $quote->totalPercent) }} %</dd></div>
+        <div><dt>Gain total prévu</dt><dd>{{ money($investment->plannedReturn()) }}</dd></div>
+        <div><dt>Gain journalier</dt><dd>{{ money($investment->ordinaryDailyReturn()) }}</dd></div>
+        <div><dt>Profits déjà crédités</dt><dd>{{ money($investment->returns_credited) }}</dd></div>
+        <div><dt>Profits restants</dt><dd>{{ money($investment->remainingProfit()) }}</dd></div>
+        <div><dt>Capital à récupérer à l’échéance</dt><dd>{{ money($investment->capitalAtMaturity()) }}</dd></div>
+        <div><dt>Montant total généré</dt><dd>{{ money($investment->economicTotal()) }}</dd></div>
+        <div><dt>Date de début</dt><dd>{{ $investment->starts_at->format('d/m/Y') }}</dd></div>
+        <div><dt>Date d’échéance</dt><dd>{{ $investment->ends_at->format('d/m/Y') }}</dd></div>
+        <div><dt>Statut</dt><dd>{{ $investment->status->label() }}</dd></div>
+    </dl>
+    <p class="fine-print">Les profits sont crédités du lundi au vendredi dans le solde retirable. À l’échéance, seul le capital est restitué : les profits déjà versés ne sont pas crédités une seconde fois. Ces conditions restent celles du jour de l’investissement.</p>
+</section>
+
 <section class="detail-block">
     <h2>Estimation</h2>
     <div class="dash-stats">

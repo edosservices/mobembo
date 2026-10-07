@@ -12,7 +12,10 @@ use App\Models\PlatformSetting;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\WalletService;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
+use App\Support\PlanMath;
+use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -70,7 +73,9 @@ class DailyProfitAndWithdrawalTest extends TestCase
             $investment = Investment::query()->where('user_id', $user->id)->firstOrFail();
             $profit = InvestmentProfit::query()->where('investment_id', $investment->id)->firstOrFail();
             $this->assertSame($date, $profit->profit_date->toDateString());
-            $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+            $opened = Carbon::parse($date)->startOfDay();
+            $openDays = BusinessCalendar::scheduledProfitDays($opened, $opened->copy()->addDays(10));
+            $this->assertSame(PlanMath::ordinaryDaily('10.00', $openDays), Money::of($user->wallet->refresh()->available_balance));
             $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
             $this->assertDatabaseHas('notifications', [
                 'notifiable_id' => $user->id,
@@ -80,7 +85,9 @@ class DailyProfitAndWithdrawalTest extends TestCase
             $this->artisan('investments:process-daily-profits', ['--date' => $date])->assertSuccessful();
             $this->artisan('investments:process-daily-profits', ['--date' => $date])->assertSuccessful();
             $this->assertSame(1, InvestmentProfit::query()->where('investment_id', $investment->id)->count());
-            $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+            $opened = Carbon::parse($date)->startOfDay();
+            $openDays = BusinessCalendar::scheduledProfitDays($opened, $opened->copy()->addDays(10));
+            $this->assertSame(PlanMath::ordinaryDaily('10.00', $openDays), Money::of($user->wallet->refresh()->available_balance));
         }
 
         foreach (['2026-10-10', '2026-10-11'] as $date) {
@@ -134,7 +141,9 @@ class DailyProfitAndWithdrawalTest extends TestCase
                 ['2026-10-12'],
                 InvestmentProfit::query()->where('investment_id', $investment->id)->orderBy('profit_date')->pluck('profit_date')->map->toDateString()->all(),
             );
-            $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+            $opened = Carbon::parse($date)->startOfDay();
+            $openDays = BusinessCalendar::scheduledProfitDays($opened, $opened->copy()->addDays(10));
+            $this->assertSame(PlanMath::ordinaryDaily('10.00', $openDays), Money::of($user->wallet->refresh()->available_balance));
             $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
         }
 
@@ -175,8 +184,11 @@ class DailyProfitAndWithdrawalTest extends TestCase
             ['2026-10-12'],
             InvestmentProfit::query()->orderBy('profit_date')->pluck('profit_date')->map->toDateString()->all(),
         );
-        $this->assertSame('1.00', Money::of(Investment::query()->value('returns_credited')));
-        $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+        $legacy = Investment::query()->firstOrFail();
+        $index = BusinessCalendar::profitDayIndex($legacy->starts_at, Carbon::parse('2026-10-12'));
+        $expected = PlanMath::amountForIndex($legacy->planned_return, (int) $legacy->profit_days, (int) $index);
+        $this->assertSame($expected, Money::of($legacy->returns_credited));
+        $this->assertSame($expected, Money::of($user->wallet->refresh()->available_balance));
         $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
         $this->assertSame([], app(WalletService::class)->findDrift());
     }
@@ -196,7 +208,7 @@ class DailyProfitAndWithdrawalTest extends TestCase
         $this->artisan('investments:process-daily-profits')->assertSuccessful();
 
         $this->assertSame(5, InvestmentProfit::query()->count());
-        $this->assertSame('5.00', Money::of(Investment::query()->value('returns_credited')));
+        $this->assertSame('6.25', Money::of(Investment::query()->value('returns_credited')));
 
         $this->travelTo('2026-10-10 08:00:00');
         $this->artisan('investments:process-daily-profits')->assertSuccessful();
@@ -206,7 +218,7 @@ class DailyProfitAndWithdrawalTest extends TestCase
         $this->artisan('investments:process-daily-profits')->assertSuccessful();
         $this->assertSame(6, InvestmentProfit::query()->count());
         $user->wallet->refresh();
-        $this->assertSame('6.00', Money::of($user->wallet->available_balance));
+        $this->assertSame('7.50', Money::of($user->wallet->available_balance));
         $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
         $this->assertSame([], app(WalletService::class)->findDrift());
     }

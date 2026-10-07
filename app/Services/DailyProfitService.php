@@ -9,7 +9,7 @@ use App\Models\InvestmentProfit;
 use App\Models\User;
 use App\Support\BusinessCalendar;
 use App\Support\Money;
-use App\Support\ReturnEstimator;
+use App\Support\PlanMath;
 use Carbon\CarbonInterface;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
@@ -32,11 +32,21 @@ class DailyProfitService
 
     public function dailyAmount(Investment $investment): string
     {
-        return Money::of(ReturnEstimator::daily(
-            $investment->amount,
-            $investment->expected_return_percent,
-            (int) $investment->duration_days,
-        ));
+        $this->hydrateSnapshot($investment);
+
+        return Money::of($investment->daily_return);
+    }
+
+    public function creditFor(Investment $investment, CarbonInterface $day): string
+    {
+        $this->hydrateSnapshot($investment);
+        $index = BusinessCalendar::profitDayIndex($investment->starts_at, $day);
+
+        if ($index === null) {
+            return '0.00';
+        }
+
+        return PlanMath::amountForIndex($investment->planned_return, (int) $investment->profit_days, $index);
     }
 
     /**
@@ -147,7 +157,8 @@ class DailyProfitService
                 return false;
             }
 
-            $amount = $this->dailyAmount($investment);
+            $this->hydrateSnapshot($investment);
+            $amount = $this->creditFor($investment, $day);
             $entryId = null;
 
             if (Money::cmp($amount, '0') > 0) {
@@ -261,6 +272,22 @@ class DailyProfitService
 
             return true;
         });
+    }
+
+    private function hydrateSnapshot(Investment $investment): void
+    {
+        if ($investment->planned_return !== null && $investment->profit_days !== null && $investment->daily_return !== null) {
+            return;
+        }
+
+        $days = BusinessCalendar::scheduledProfitDays($investment->starts_at, $investment->ends_at);
+        $planned = PlanMath::totalGain($investment->amount, $investment->expected_return_percent);
+
+        $investment->forceFill([
+            'planned_return' => $planned,
+            'profit_days' => $days,
+            'daily_return' => PlanMath::ordinaryDaily($planned, $days),
+        ])->save();
     }
 
     private function isPayable(string $date): bool

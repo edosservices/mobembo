@@ -7,7 +7,9 @@ use App\Models\InvestmentProfit;
 use App\Models\Project;
 use App\Services\InvestmentService;
 use App\Services\PortfolioService;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
+use App\Support\PlanMath;
 use App\Support\ReturnEstimator;
 use Illuminate\Http\Request;
 
@@ -57,7 +59,15 @@ class InvestmentController extends Controller
                 ->withErrors(['amount' => 'L’investissement minimum est de '.Money::format($project->min_investment).'.']);
         }
 
+        if ($project->max_investment !== null && Money::cmp($data['amount'], $project->max_investment) > 0) {
+            return back()
+                ->withInput()
+                ->withErrors(['amount' => 'L’investissement maximum est de '.Money::format($project->max_investment).'.']);
+        }
+
         [$starts, $ends] = $investments->term($project);
+        $profitDays = BusinessCalendar::scheduledProfitDays($starts, $ends);
+        $total = PlanMath::totalGain($data['amount'], $project->expected_return_percent);
 
         return redirect()
             ->route('projects.show', $project)
@@ -65,9 +75,9 @@ class InvestmentController extends Controller
             ->with('investment_preview', [
                 'project_id' => $project->id,
                 'amount' => Money::of($data['amount']),
-                'daily_percent' => ReturnEstimator::dailyPercent($project->expected_return_percent, (int) $project->duration_days),
-                'daily_amount' => ReturnEstimator::dailyAmount($data['amount'], $project->expected_return_percent, (int) $project->duration_days),
-                'total' => ReturnEstimator::total($data['amount'], $project->expected_return_percent),
+                'daily_percent' => ReturnEstimator::dailyPercent($project->expected_return_percent, max(1, $profitDays)),
+                'daily_amount' => PlanMath::ordinaryDaily($total, $profitDays),
+                'total' => $total,
                 'duration_days' => (int) $project->duration_days,
                 'starts_at' => $starts->toDateString(),
                 'ends_at' => $ends->toDateString(),

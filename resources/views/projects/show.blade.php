@@ -15,13 +15,16 @@
 
     <section class="detail-block">
         <h2>À propos du projet</h2>
+        @if ($project->slogan)
+            <p class="kicker">{{ $project->slogan }}</p>
+        @endif
         <p class="detail-copy">{{ $project->description }}</p>
     </section>
 
     <section class="detail-block">
         <h2>Informations</h2>
         <div class="grid-3">
-            <div class="stat"><span>Montant minimum</span><strong class="money sm">{{ money($project->min_investment) }}</strong></div>
+            <div class="stat"><span>Investissement</span><strong class="money sm">{{ money($project->min_investment) }}@if ($project->max_investment) – {{ money($project->max_investment) }}@endif</strong></div>
             <div class="stat"><span>Durée</span><strong class="money sm">{{ $project->duration_days }} jours</strong></div>
             <div class="stat"><span>Rendement prévu</span><strong class="money sm">{{ number_format((float) $project->expected_return_percent, 2, ',', ' ') }} %</strong></div>
             <div class="stat"><span>Rendement journalier estimatif</span><strong class="money sm">{{ \App\Support\ReturnEstimator::percentLabel($project->dailyReturnPercent()) }}</strong></div>

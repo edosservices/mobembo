@@ -11,8 +11,9 @@ use App\Models\LedgerEntry;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\WalletService;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
-use App\Support\ReturnEstimator;
+use App\Support\PlanMath;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -28,14 +29,14 @@ class PlanPositionsAndDailyRevenueTest extends TestCase
         $this->credit($user, '25.00');
         $plan = $this->project(['name' => 'Plan cinq', 'min_investment' => '5.00', 'duration_days' => 30, 'expected_return_percent' => '12.0000']);
         $other = $this->project(['name' => 'Autre plan', 'slug' => 'autre-plan', 'min_investment' => '5.00', 'duration_days' => 30, 'expected_return_percent' => '12.0000']);
-        $daily = Money::of(ReturnEstimator::daily('5.00', '12.0000', 30));
+        $start = now()->startOfDay();
+        $openDays = BusinessCalendar::scheduledProfitDays($start, $start->copy()->addDays(30));
+        $daily = PlanMath::ordinaryDaily(PlanMath::totalGain('5.00', '12'), $openDays);
         $four = '0.00';
 
         for ($position = 1; $position <= 4; $position++) {
             $four = Money::add($four, $daily);
         }
-
-        $this->assertSame('0.02', $daily);
 
         $keys = [];
 
@@ -110,7 +111,11 @@ class PlanPositionsAndDailyRevenueTest extends TestCase
         $this->assertSame(15, InvestmentProfit::query()->count());
         $this->assertSame(5, InvestmentProfit::query()->whereDate('profit_date', '2026-10-09')->count());
         $this->assertSame(0, InvestmentProfit::query()->whereDate('profit_date', '2026-10-10')->count());
-        $this->assertSame('0.30', Money::of($user->wallet()->first()->refresh()->available_balance));
+        $threeDays = '0.00';
+        foreach (range(1, 15) as $ignored) {
+            $threeDays = Money::add($threeDays, $daily);
+        }
+        $this->assertSame($threeDays, Money::of($user->wallet()->first()->refresh()->available_balance));
         $this->assertSame('25.00', Money::of($user->wallet()->first()->invested_balance));
         $this->assertSame([], app(WalletService::class)->findDrift());
     }

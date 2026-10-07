@@ -55,7 +55,7 @@ class OperatingCalendarTest extends TestCase
         $this->travelTo('2026-10-12 12:00:00');
         $investment->refresh();
         $this->assertSame(6, $investment->accrualDays());
-        $this->assertSame('0.04', Money::of($investment->returns_credited));
+        $this->assertSame('0.06', Money::of($investment->returns_credited));
         $this->assertSame(1, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
 
         $this->actingAs($user)->get(route('investments.show', $investment))

@@ -58,4 +58,67 @@ class BusinessCalendar
 
         return $count;
     }
+
+    /**
+     * Jours ouvrés de profit : du début inclus à l'échéance exclue.
+     */
+    public static function scheduledProfitDays(CarbonInterface $start, CarbonInterface $end): int
+    {
+        $start = $start->copy()->timezone(config('app.timezone'))->startOfDay();
+        $end = $end->copy()->timezone(config('app.timezone'))->startOfDay();
+
+        if ($end->lte($start)) {
+            return 0;
+        }
+
+        $count = 0;
+        $cursor = $start->copy();
+
+        while ($cursor->lt($end)) {
+            if (self::growsOn($cursor)) {
+                $count++;
+            }
+            $cursor->addDay();
+        }
+
+        return $count;
+    }
+
+    public static function profitDayIndex(CarbonInterface $start, CarbonInterface $day): ?int
+    {
+        $start = $start->copy()->timezone(config('app.timezone'))->startOfDay();
+        $day = $day->copy()->timezone(config('app.timezone'))->startOfDay();
+
+        if ($day->lt($start) || ! self::growsOn($day)) {
+            return null;
+        }
+
+        $index = 0;
+        $cursor = $start->copy();
+
+        while ($cursor->lt($day)) {
+            if (self::growsOn($cursor)) {
+                $index++;
+            }
+            $cursor->addDay();
+        }
+
+        return $index;
+    }
+
+    public static function lastProfitDate(CarbonInterface $start, CarbonInterface $end): ?Carbon
+    {
+        $start = $start->copy()->timezone(config('app.timezone'))->startOfDay();
+        $end = $end->copy()->timezone(config('app.timezone'))->startOfDay();
+        $cursor = $end->copy()->subDay();
+
+        while ($cursor->gte($start)) {
+            if (self::growsOn($cursor)) {
+                return $cursor;
+            }
+            $cursor->subDay();
+        }
+
+        return null;
+    }
 }
