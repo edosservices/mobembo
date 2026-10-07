@@ -48,7 +48,10 @@ class LivePortfolioExperienceTest extends TestCase
             ->assertSee(route('deposits.create'), false)
             ->assertSee(route('withdrawals.create'), false)
             ->assertSee(route('transfers.create'), false)
-            ->assertSee('Aucun investissement.');
+            ->assertSee('Aucun investissement.')
+            ->assertSee('Commencer à investir')
+            ->assertSee('Aucun profit crédité pour le moment.')
+            ->assertSee('page-portfolio', false);
     }
 
     public function test_live_feed_reports_only_movements_after_the_cursor(): void

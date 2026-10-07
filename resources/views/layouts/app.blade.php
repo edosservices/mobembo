@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{{ asset('css/zelvora.css') }}?v={{ filemtime(public_path('css/zelvora.css')) }}">
     @include('partials.client-design')
 </head>
-<body class="site-app">
+<body @class(['site-app', 'page-portfolio' => request()->routeIs('investments.index')])>
     @include('partials.support-banner')
     <header class="topbar">
         <button class="corner-btn" type="button" data-back data-fallback="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) hidden @endif>Retour</button>
