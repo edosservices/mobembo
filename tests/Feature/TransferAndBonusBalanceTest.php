@@ -129,7 +129,10 @@ class TransferAndBonusBalanceTest extends TestCase
         $this->assertSame(1, LedgerEntry::query()->where('reference', $reference)->where('type', LedgerType::TransferOut)->count());
         $this->assertSame(1, LedgerEntry::query()->where('reference', $reference)->where('type', LedgerType::TransferFee)->count());
         $this->assertSame(1, LedgerEntry::query()->where('reference', $reference)->where('type', LedgerType::TransferIn)->count());
-        $this->assertSame('-100.00', Money::of(LedgerEntry::query()->where('type', LedgerType::TransferOut)->value('amount')));
+        $out = LedgerEntry::query()->where('type', LedgerType::TransferOut)->firstOrFail();
+        $this->assertSame('-100.00', Money::of($out->amount));
+        $this->assertSame('48.00', Money::of($out->balance_after));
+        $this->assertSame(Money::of($sender->wallet()->first()->available_balance), Money::of($out->balance_after));
         $this->assertSame('-2.00', Money::of(LedgerEntry::query()->where('type', LedgerType::TransferFee)->value('amount')));
         $this->assertSame('100.00', Money::of(LedgerEntry::query()->where('type', LedgerType::TransferIn)->value('amount')));
 

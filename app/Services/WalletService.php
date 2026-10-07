@@ -206,6 +206,10 @@ class WalletService
                 'available_balance' => Money::sub($senderWallet->available_balance, $fee),
             ])->save();
 
+            $out->forceFill([
+                'balance_after' => $senderWallet->available_balance,
+            ])->save();
+
             $feeEntry = $this->write($senderWallet, $sender, Money::sub('0', $fee), LedgerType::TransferFee, LedgerStatus::Completed, [
                 'reference' => $reference,
                 'description' => $context['fee_description'] ?? 'Frais de transfert',
