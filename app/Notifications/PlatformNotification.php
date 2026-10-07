@@ -13,6 +13,7 @@ class PlatformNotification extends Notification
         public string $title,
         public string $body,
         public string $kind,
+        public ?string $url = null,
     ) {}
 
     public function via(object $notifiable): array
@@ -26,6 +27,7 @@ class PlatformNotification extends Notification
             'title' => $this->title,
             'body' => $this->body,
             'kind' => $this->kind,
+            'url' => $this->url,
         ];
     }
 }

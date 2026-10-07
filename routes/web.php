@@ -136,6 +136,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
 
     Route::get('/retraits', [AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::get('/retraits/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('withdrawals.show');
+    Route::post('/retraits/{withdrawal}/traitement', [AdminWithdrawalController::class, 'process'])->name('withdrawals.process');
     Route::post('/retraits/{withdrawal}/approuver', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
     Route::post('/retraits/{withdrawal}/refuser', [AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
 

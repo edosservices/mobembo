@@ -18,8 +18,8 @@ use Throwable;
 
 /**
  * Crédite le profit quotidien dans le solde retirable.
- * Le jour calendaire de l'activation est toujours payé, y compris le samedi et le dimanche.
- * Les jours suivants suivent le calendrier ouvré : lundi à vendredi.
+ * Un profit n'est dû que du lundi au vendredi, y compris le premier jour.
+ * Un investissement ouvert le samedi ou le dimanche attend le lundi suivant.
  * Un couple investissement + date ne peut être crédité qu'une fois.
  */
 class DailyProfitService
@@ -98,13 +98,11 @@ class DailyProfitService
 
         $count = 0;
         $cursor = $start->copy();
-        $first = $this->firstAccrualDate($investment);
 
         while ($cursor->lte($last)) {
             $key = $cursor->toDateString();
-            $payable = $key === $first || BusinessCalendar::growsOn($cursor);
 
-            if ($payable && ! isset($known[$key]) && $this->creditDay($investment, $cursor)) {
+            if (BusinessCalendar::growsOn($cursor) && ! isset($known[$key]) && $this->creditDay($investment, $cursor)) {
                 $count++;
                 $known[$key] = true;
             }
@@ -141,7 +139,7 @@ class DailyProfitService
                 return false;
             }
 
-            if (! $this->isPayable($investment, $date)) {
+            if (! $this->isPayable($date)) {
                 return false;
             }
 
@@ -176,6 +174,7 @@ class DailyProfitService
                     'daily_profit',
                     'Profit quotidien crédité',
                     Money::format($amount).' ont été ajoutés à votre solde retirable pour le '.$day->format('d/m/Y').'.',
+                    route('dashboard'),
                 );
             }
 
@@ -247,27 +246,26 @@ class DailyProfitService
                 'investment_completed',
                 'Investissement terminé',
                 'La durée est atteinte. Le capital a été rendu disponible dans votre solde retirable.',
+                route('investments.index'),
             );
+
+            if (Money::cmp($remaining, '0') > 0) {
+                $this->notifier->send(
+                    $user,
+                    'capital_returned',
+                    'Capital restitué',
+                    'Le capital de '.Money::format($remaining).' est de nouveau dans votre solde retirable.',
+                    route('dashboard'),
+                );
+            }
 
             return true;
         });
     }
 
-    private function isPayable(Investment $investment, string $date): bool
+    private function isPayable(string $date): bool
     {
-        if ($date === $this->firstAccrualDate($investment)) {
-            return true;
-        }
-
         return BusinessCalendar::growsOn(Carbon::parse($date, (string) config('app.timezone')));
-    }
-
-    private function firstAccrualDate(Investment $investment): string
-    {
-        $start = $investment->starts_at->toDateString();
-        $floor = $investment->profit_effective_from?->toDateString();
-
-        return $floor !== null && $floor > $start ? $floor : $start;
     }
 
     private function day(?CarbonInterface $moment): Carbon

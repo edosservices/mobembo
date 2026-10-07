@@ -89,11 +89,11 @@ class PortfolioService
     {
         $row = Withdrawal::query()
             ->where('user_id', $user->id)
-            ->whereIn('status', [ReviewStatus::Pending, ReviewStatus::Approved])
+            ->whereIn('status', [ReviewStatus::Pending, ReviewStatus::Processing, ReviewStatus::Approved])
             ->selectRaw(
-                'COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as pending,
+                'COALESCE(SUM(CASE WHEN status IN (?, ?) THEN amount ELSE 0 END), 0) as pending,
                  COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as paid',
-                [ReviewStatus::Pending->value, ReviewStatus::Approved->value],
+                [ReviewStatus::Pending->value, ReviewStatus::Processing->value, ReviewStatus::Approved->value],
             )
             ->first();
 

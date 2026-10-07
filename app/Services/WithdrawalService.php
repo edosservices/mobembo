@@ -99,6 +99,7 @@ class WithdrawalService
                 'withdrawal_requested',
                 'Retrait demandé',
                 'Demande de '.Money::format($quote['amount']).'. Frais '.Money::format($quote['fee']).', net '.Money::format($quote['net']).'.',
+                route('withdrawals.create'),
             );
 
             $this->wallets->holdWithdrawal($user, $quote['net'], $quote['fee'], [
@@ -115,12 +116,54 @@ class WithdrawalService
         });
     }
 
-    public function approve(Withdrawal $withdrawal, User $admin): Withdrawal
+    public function markProcessing(Withdrawal $withdrawal, User $admin): Withdrawal
     {
         return Finance::run(function () use ($withdrawal, $admin) {
             $withdrawal = Withdrawal::query()->whereKey($withdrawal->id)->lockForUpdate()->firstOrFail();
 
             if ($withdrawal->status !== ReviewStatus::Pending) {
+                throw new FinancialException('Seul un retrait demandé peut passer en traitement.');
+            }
+
+            if ($withdrawal->user_id === $admin->id) {
+                throw new FinancialException('Un administrateur ne peut pas traiter son propre retrait.');
+            }
+
+            $user = $withdrawal->user()->firstOrFail();
+            $withdrawal->forceFill([
+                'status' => ReviewStatus::Processing,
+                'processing_at' => now(),
+            ])->save();
+
+            $this->audit->record(
+                $admin,
+                $user,
+                'withdrawal_processing',
+                null,
+                null,
+                $withdrawal->amount,
+                'Retrait passé en traitement. Le montant reste réservé.',
+                ['withdrawal_id' => $withdrawal->id],
+            );
+
+            $this->notifier->send(
+                $user,
+                'withdrawal_processing',
+                'Retrait en traitement',
+                'Votre retrait de '.Money::format($withdrawal->amount).' est en cours de traitement. Net à recevoir '.Money::format($withdrawal->net_amount).'.',
+                route('withdrawals.create'),
+            );
+
+            return $withdrawal;
+        });
+    }
+
+    public function approve(Withdrawal $withdrawal, User $admin): Withdrawal
+    {
+        return Finance::run(function () use ($withdrawal, $admin) {
+            $withdrawal = Withdrawal::query()->whereKey($withdrawal->id)->lockForUpdate()->firstOrFail();
+
+            if (! in_array($withdrawal->status, [ReviewStatus::Pending, ReviewStatus::Processing], true)) {
                 throw new FinancialException('Cette demande de retrait a déjà été traitée.');
             }
 
@@ -142,6 +185,7 @@ class WithdrawalService
 
             $withdrawal->forceFill([
                 'status' => ReviewStatus::Approved,
+                'processing_at' => $withdrawal->processing_at ?? now(),
                 'reviewed_by' => $admin->id,
                 'reviewed_at' => now(),
             ])->save();
@@ -161,9 +205,10 @@ class WithdrawalService
 
             $this->notifier->send(
                 $user,
-                'withdrawal_approved',
-                'Retrait approuvé',
-                'Votre retrait est approuvé. Montant demandé '.Money::format($withdrawal->amount).', frais '.Money::format($withdrawal->fee).', net '.Money::format($withdrawal->net_amount).'.',
+                'withdrawal_paid',
+                'Retrait effectué',
+                'Votre retrait est payé. Montant demandé '.Money::format($withdrawal->amount).', frais '.Money::format($withdrawal->fee).', net '.Money::format($withdrawal->net_amount).'.',
+                route('withdrawals.create'),
             );
 
             return $withdrawal;
@@ -181,7 +226,7 @@ class WithdrawalService
         return Finance::run(function () use ($withdrawal, $admin, $reason) {
             $withdrawal = Withdrawal::query()->whereKey($withdrawal->id)->lockForUpdate()->firstOrFail();
 
-            if ($withdrawal->status !== ReviewStatus::Pending) {
+            if (! in_array($withdrawal->status, [ReviewStatus::Pending, ReviewStatus::Processing], true)) {
                 throw new FinancialException('Cette demande de retrait a déjà été traitée.');
             }
 
@@ -222,6 +267,7 @@ class WithdrawalService
                 'withdrawal_rejected',
                 'Retrait refusé',
                 'Votre demande de retrait de '.Money::format($withdrawal->amount).' a été refusée. Le montant a été rendu disponible. Motif : '.$reason,
+                route('withdrawals.create'),
             );
 
             return $withdrawal;

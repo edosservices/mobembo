@@ -34,18 +34,26 @@
 <h2>Demandes récentes</h2>
 <div class="table-wrap panel">
     <table>
-        <thead><tr><th>Date</th><th>Demandé</th><th>Frais</th><th>Net</th><th>Statut</th></tr></thead>
+        <thead><tr><th>Référence</th><th>Date</th><th>Demandé</th><th>Frais</th><th>Net</th><th>Méthode</th><th>Compte</th><th>Statut</th></tr></thead>
         <tbody>
         @forelse ($recent as $withdrawal)
             <tr>
-                <td>{{ $withdrawal->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i') }}</td>
+                <td class="text-nowrap">{{ $withdrawal->reference() }}</td>
+                <td class="text-nowrap">{{ $withdrawal->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i') }}</td>
                 <td>{{ money($withdrawal->amount) }}</td>
                 <td>{{ money($withdrawal->fee) }}</td>
                 <td>{{ money($withdrawal->net_amount) }}</td>
-                <td>@include('partials.status', ['status' => $withdrawal->status])</td>
+                <td>{{ $withdrawal->method->label() }}</td>
+                <td>{{ $withdrawal->maskedPhone() }}</td>
+                <td>
+                    @include('partials.status', ['status' => $withdrawal->status])
+                    @if ($withdrawal->rejection_reason)
+                        <div class="muted">{{ $withdrawal->rejection_reason }}</div>
+                    @endif
+                </td>
             </tr>
         @empty
-            <tr><td colspan="5">Aucune demande.</td></tr>
+            <tr><td colspan="8">Aucune demande.</td></tr>
         @endforelse
         </tbody>
     </table>

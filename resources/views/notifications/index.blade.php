@@ -4,16 +4,20 @@
 <div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;">
     <h1 style="font-size:2.2rem;">Notifications</h1>
     <div style="display:flex;gap:.5rem;">
+        <button class="btn-z-ghost small" type="button" id="toggle-sound">Activer le son</button>
         <button class="btn-z-ghost small" type="button" id="enable-push">Activer les notifications</button>
         <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="btn-z-ghost small" type="submit">Tout lire</button></form>
     </div>
 </div>
-<p class="fine-print" id="push-status">Le son se déclenche après un appui sur la page, lorsque le navigateur l’autorise. Une notification système n’est envoyée que si vous l’acceptez.</p>
+<p class="fine-print" id="push-status">Le son ne démarre qu’après avoir activé le bouton, lorsque le navigateur l’autorise. Une notification système n’est envoyée que si vous l’acceptez.</p>
 @forelse ($notifications as $notification)
     <article class="panel" style="margin-bottom:.6rem;{{ $notification->read_at ? 'opacity:.7;' : '' }}">
         <strong>{{ $notification->data['title'] ?? 'Notification' }}</strong>
         <p>{{ $notification->data['body'] ?? '' }}</p>
-        <div class="muted">{{ $notification->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i') }}</div>
+        <div class="muted">{{ $notification->created_at->timezone(config('app.timezone'))->format('d/m/Y H:i') }} · {{ $notification->data['kind'] ?? 'message' }}</div>
+        @if (is_string($notification->data['url'] ?? null) && (str_starts_with($notification->data['url'], '/') || str_starts_with($notification->data['url'], url('/'))))
+            <p><a href="{{ $notification->data['url'] }}">Voir le détail</a></p>
+        @endif
         @if (! $notification->read_at)
             <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf<button class="btn-z-ghost small" type="submit">Marquer lu</button></form>
         @endif
@@ -23,6 +27,21 @@
 @endforelse
 {{ $notifications->links() }}
 <script>
+    const soundKey = 'zelvora_notification_sound';
+    const soundButton = document.getElementById('toggle-sound');
+    const paintSound = () => {
+        if (!soundButton) {
+            return;
+        }
+        const on = window.localStorage.getItem(soundKey) === 'on';
+        soundButton.textContent = on ? 'Désactiver le son' : 'Activer le son';
+    };
+    paintSound();
+    soundButton?.addEventListener('click', () => {
+        const on = window.localStorage.getItem(soundKey) === 'on';
+        window.localStorage.setItem(soundKey, on ? 'off' : 'on');
+        paintSound();
+    });
     document.getElementById('enable-push')?.addEventListener('click', async () => {
         const status = document.getElementById('push-status');
         if (!('Notification' in window)) {

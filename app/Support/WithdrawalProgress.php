@@ -15,39 +15,49 @@ class WithdrawalProgress
         $status = $withdrawal?->status;
         $states = match ($status) {
             ReviewStatus::Approved => ['done', 'done', 'done'],
+            ReviewStatus::Processing => ['done', 'current', 'waiting'],
             ReviewStatus::Rejected => ['done', 'refused', 'waiting'],
-            ReviewStatus::Pending => ['done', 'current', 'waiting'],
+            ReviewStatus::Pending => ['done', 'waiting', 'waiting'],
             default => ['current', 'waiting', 'waiting'],
         };
 
-        $verification = match ($status) {
-            ReviewStatus::Approved => 'Vérification terminée.',
-            ReviewStatus::Rejected => 'Vérification refusée. Le montant reste disponible sur votre compte.',
+        $timezone = (string) config('app.timezone');
+        $requestedAt = $withdrawal?->created_at?->timezone($timezone)->format('d/m/Y H:i');
+        $processingAt = $withdrawal?->processing_at?->timezone($timezone)->format('d/m/Y H:i');
+        $paidAt = $status === ReviewStatus::Approved
+            ? $withdrawal?->reviewed_at?->timezone($timezone)->format('d/m/Y H:i')
+            : null;
+
+        $processing = match ($status) {
+            ReviewStatus::Rejected => 'Retrait refusé'.($withdrawal?->rejection_reason ? ' : '.$withdrawal->rejection_reason : '.'),
+            ReviewStatus::Processing, ReviewStatus::Approved => $processingAt
+                ? 'En traitement depuis le '.$processingAt.'.'
+                : 'Vérification en cours.',
             ReviewStatus::Pending => BusinessCalendar::withdrawalsOpen()
                 ? 'Vérification en cours. Cela peut prendre de quelques minutes à quelques heures.'
                 : 'La vérification reprend lundi.',
-            default => 'La vérification a lieu du lundi au samedi.',
+            default => 'Vérification du lundi au samedi.',
         };
 
         return [
             [
-                'title' => 'Retrait effectué',
+                'title' => 'Retrait demandé',
                 'state' => $states[0],
-                'detail' => $status === null
-                    ? 'Indiquez le montant, puis envoyez la demande.'
-                    : 'Votre demande est enregistrée.',
+                'detail' => $requestedAt
+                    ? 'Demandé le '.$requestedAt.'.'
+                    : 'Indiquez le montant, puis envoyez la demande.',
             ],
             [
-                'title' => 'Vérification',
+                'title' => 'En traitement',
                 'state' => $states[1],
-                'detail' => $verification,
+                'detail' => $processing,
             ],
             [
-                'title' => 'Les fonds sont versés dans votre compte',
+                'title' => 'Retrait effectué',
                 'state' => $states[2],
-                'detail' => $status === ReviewStatus::Approved
-                    ? 'Le versement est confirmé.'
-                    : 'Cette étape suit la vérification.',
+                'detail' => $paidAt
+                    ? 'Payé le '.$paidAt.'. Les fonds sont versés dans votre compte.'
+                    : 'Les fonds sont versés dans votre compte.',
             ],
         ];
     }

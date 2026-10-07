@@ -6,12 +6,11 @@
         if (!countUrl) {
             return;
         }
-        let audioReady = false;
+        const storageKey = 'zelvora_notification_sound';
         let lastCount = null;
-        const arm = () => { audioReady = true; };
-        window.addEventListener('pointerdown', arm, { once: true });
+        const enabled = () => window.localStorage.getItem(storageKey) === 'on';
         const beep = () => {
-            if (!audioReady) {
+            if (!enabled()) {
                 return;
             }
             const context = new (window.AudioContext || window.webkitAudioContext)();

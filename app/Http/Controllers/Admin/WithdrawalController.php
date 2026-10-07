@@ -31,6 +31,13 @@ class WithdrawalController extends Controller
         return view('admin.withdrawals.show', compact('withdrawal'));
     }
 
+    public function process(Request $request, Withdrawal $withdrawal, WithdrawalService $withdrawals)
+    {
+        $withdrawals->markProcessing($withdrawal, $request->user());
+
+        return back()->with('success', 'Retrait passé en traitement. Le montant reste réservé.');
+    }
+
     public function approve(Request $request, Withdrawal $withdrawal, WithdrawalService $withdrawals)
     {
         $withdrawals->approve($withdrawal, $request->user());

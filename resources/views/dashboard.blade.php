@@ -18,6 +18,9 @@
 <div class="dash-actions">
     <a class="btn-z" data-dashboard-deposit href="{{ route('deposits.create') }}">+ Faire un dépôt</a>
     <a class="btn-z-ghost" data-dashboard-invest href="{{ $investUrl }}">Investir</a>
+    @if (\App\Support\Money::cmp($summary['available'], '0') > 0)
+        <a class="btn-z" data-withdraw-gains href="{{ route('withdrawals.create') }}">Retirer mes gains</a>
+    @endif
 </div>
 
 <section class="panel chart-card">

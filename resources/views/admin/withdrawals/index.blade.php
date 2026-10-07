@@ -22,9 +22,12 @@
                         <button class="btn btn-sm btn-dark rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">Actions</button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a class="dropdown-item" href="{{ route('admin.withdrawals.show', $withdrawal) }}">Voir</a>
-                            @if ($withdrawal->status->value === 'pending')
-                                <form method="POST" action="{{ route('admin.withdrawals.approve', $withdrawal) }}">@csrf<button class="dropdown-item" type="submit">Approuver</button></form>
-                                <form method="POST" action="{{ route('admin.withdrawals.reject', $withdrawal) }}">@csrf<input name="reason" placeholder="Motif" required minlength="5"><button class="btn-z-ghost small" type="submit">Rejeter</button></form>
+                            @if (in_array($withdrawal->status->value, ['pending', 'processing'], true))
+                                @if ($withdrawal->status->value === 'pending')
+                                    <form method="POST" action="{{ route('admin.withdrawals.process', $withdrawal) }}">@csrf<button class="dropdown-item" type="submit">Passer en traitement</button></form>
+                                @endif
+                                <form method="POST" action="{{ route('admin.withdrawals.approve', $withdrawal) }}">@csrf<button class="dropdown-item" type="submit">Approuver le paiement</button></form>
+                                <form method="POST" action="{{ route('admin.withdrawals.reject', $withdrawal) }}">@csrf<input name="reason" placeholder="Motif" required minlength="5"><button class="btn-z-ghost small" type="submit">Refuser</button></form>
                             @endif
                         </div>
                     </div>

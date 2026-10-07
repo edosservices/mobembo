@@ -42,8 +42,8 @@ class AdminOverviewService
             ->selectRaw(
                 'COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as approved_amount,
                  COALESCE(SUM(CASE WHEN status = ? THEN fee ELSE 0 END), 0) as approved_fees,
-                 COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as pending_count',
-                [ReviewStatus::Approved->value, ReviewStatus::Approved->value, ReviewStatus::Pending->value],
+                 COALESCE(SUM(CASE WHEN status IN (?, ?) THEN 1 ELSE 0 END), 0) as pending_count',
+                [ReviewStatus::Approved->value, ReviewStatus::Approved->value, ReviewStatus::Pending->value, ReviewStatus::Processing->value],
             )
             ->first();
         $projects = Project::query()
@@ -98,7 +98,7 @@ class AdminOverviewService
     public function attention(): array
     {
         $deposits = Deposit::query()->where('status', ReviewStatus::Pending)->count();
-        $withdrawals = Withdrawal::query()->where('status', ReviewStatus::Pending)->count();
+        $withdrawals = Withdrawal::query()->whereIn('status', [ReviewStatus::Pending, ReviewStatus::Processing])->count();
         $investments = Investment::query()->where('status', InvestmentStatus::Suspended)->count();
         $kyc = User::query()->where('role', UserRole::User)->where('kyc_status', KycStatus::Pending)->count();
 
@@ -193,8 +193,13 @@ class AdminOverviewService
 
     private function profitBacklog(): int
     {
+        if (! BusinessCalendar::growsOn(now())) {
+            return 0;
+        }
+
         $today = now()->toDateString();
-        $query = Investment::query()
+
+        return Investment::query()
             ->where('status', InvestmentStatus::Active)
             ->whereDate('starts_at', '<=', $today)
             ->whereDate('ends_at', '>', $today)
@@ -202,16 +207,8 @@ class AdminOverviewService
                 $query->whereNull('profit_effective_from')
                     ->orWhereDate('profit_effective_from', '<=', $today);
             })
-            ->whereDoesntHave('profits', fn ($query) => $query->whereDate('profit_date', $today));
-
-        if (! BusinessCalendar::growsOn(now())) {
-            $query->where(function ($query) use ($today) {
-                $query->whereDate('starts_at', $today)
-                    ->orWhereDate('profit_effective_from', $today);
-            });
-        }
-
-        return $query->count();
+            ->whereDoesntHave('profits', fn ($query) => $query->whereDate('profit_date', $today))
+            ->count();
     }
 
     private function walletSums(): ?object

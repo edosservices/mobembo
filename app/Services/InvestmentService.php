@@ -123,7 +123,7 @@ class InvestmentService
                 $user,
                 'investment_activated',
                 'Investissement actif',
-                'Vous avez investi '.Money::format($amount).' dans '.$project->name.'. Le profit du jour est crédité immédiatement sur votre solde retirable.',
+                'Vous avez investi '.Money::format($amount).' dans '.$project->name.'. Les profits sont crédités du lundi au vendredi sur votre solde retirable.',
             );
 
             return $investment->load('project');
