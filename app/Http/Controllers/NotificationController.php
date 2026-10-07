@@ -116,6 +116,8 @@ class NotificationController extends Controller
             'total' => money($summary['portfolio_total']),
             'pending' => money($summary['withdrawals_pending']),
             'paid' => money($summary['withdrawals_paid']),
+            'daily' => money($summary['estimate_today']),
+            'daily_today' => money($summary['returns_today']),
         ];
     }
 }

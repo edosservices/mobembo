@@ -2,6 +2,14 @@
 @section('title', 'Portefeuille')
 @section('content')
 <h1 style="font-size:2.3rem;">Portefeuille</h1>
+<article class="card balance-card balance-daily border-0 daily-revenue-card" data-balance="daily">
+    <div class="card-body">
+        <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+        <span>Revenu journalier</span>
+        <strong>{{ money($summary['estimate_today']) }}</strong>
+        <small>Crédité aujourd’hui <span data-balance-extra="daily_today">{{ money($summary['returns_today']) }}</span>. Progression du lundi au vendredi, sur chaque position ouverte.</small>
+    </div>
+</article>
 <div class="row g-2 portfolio-services">
     <div class="col-4">
         <a class="card portfolio-service service-deposit h-100 border-0" href="{{ route('deposits.create') }}">

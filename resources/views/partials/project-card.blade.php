@@ -63,6 +63,7 @@
             <span style="width: {{ min(100, (float) $project->progressPercent()) }}%"></span>
         </div>
         <p class="funded-line">Progression {{ str_replace('.', ',', $project->progressPercent()) }} %</p>
+        <p class="fine-print">Jusqu’à {{ \App\Services\InvestmentService::MAX_ACTIVE_PER_PLAN }} positions actives</p>
         <a class="btn-z full" href="{{ route('projects.show', $project) }}#investir">Investir</a>
     </div>
 </article>

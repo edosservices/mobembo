@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InvestmentStatus;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Services\InvestmentService;
 use App\Support\Money;
 
 class ProjectController extends Controller
@@ -33,12 +35,14 @@ class ProjectController extends Controller
             ->get() ?? collect();
         $available = $user ? Money::of($user->wallet()->value('available_balance') ?? '0') : null;
         $canFundMinimum = $available !== null && Money::cmp($available, $project->min_investment) >= 0;
+        $activeSlots = $mine->where('status', InvestmentStatus::Active)->count();
+        $slotLimit = InvestmentService::MAX_ACTIVE_PER_PLAN;
         $preview = session('investment_preview');
 
         if (! is_array($preview) || (int) ($preview['project_id'] ?? 0) !== $project->id) {
             $preview = null;
         }
 
-        return view('projects.show', compact('project', 'mine', 'available', 'canFundMinimum', 'preview'));
+        return view('projects.show', compact('project', 'mine', 'available', 'canFundMinimum', 'preview', 'activeSlots', 'slotLimit'));
     }
 }

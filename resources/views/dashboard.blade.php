@@ -87,6 +87,16 @@
             </div>
         </article>
     </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="card balance-card balance-daily h-100 border-0" data-balance="daily">
+            <div class="card-body">
+                <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                <span>Revenu journalier</span>
+                <strong>{{ money($summary['estimate_today']) }}</strong>
+                <small>Aujourd’hui <span data-balance-extra="daily_today">{{ money($summary['returns_today']) }}</span></small>
+            </div>
+        </article>
+    </div>
 </div>
 <div class="dash-actions">
     <a class="btn-z" data-dashboard-deposit href="{{ route('deposits.create') }}">+ Faire un dépôt</a>

@@ -37,8 +37,11 @@
         @guest
             <a class="btn-z" href="{{ route('login', ['next' => '/projets/'.$project->slug.'#investir']) }}">Investir</a>
         @else
+            <p class="fine-print">Jusqu’à {{ $slotLimit }} positions actives sur ce plan. Positions ouvertes : {{ $activeSlots }} / {{ $slotLimit }}.</p>
             @if (! $project->isInvestable())
                 <p class="muted">Ce projet n’accepte plus de nouvel investissement.</p>
+            @elseif ($activeSlots >= $slotLimit)
+                <p>Vous avez déjà {{ $slotLimit }} investissements actifs sur ce plan. Une nouvelle position sera possible lorsqu’un d’eux sera terminé.</p>
             @elseif (! $canFundMinimum)
                 <h3>Solde insuffisant</h3>
                 <p>Votre solde : {{ money($available) }}</p>

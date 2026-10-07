@@ -6,13 +6,14 @@ use App\Models\Investment;
 use App\Models\InvestmentProfit;
 use App\Models\Project;
 use App\Services\InvestmentService;
+use App\Services\PortfolioService;
 use App\Support\Money;
 use App\Support\ReturnEstimator;
 use Illuminate\Http\Request;
 
 class InvestmentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, PortfolioService $portfolio)
     {
         $investments = $request->user()
             ->investments()
@@ -26,8 +27,9 @@ class InvestmentController extends Controller
             ->latest('profit_date')
             ->limit(20)
             ->get();
+        $summary = $portfolio->summary($request->user());
 
-        return view('investments.index', compact('investments', 'profits'));
+        return view('investments.index', compact('investments', 'profits', 'summary'));
     }
 
     public function show(Request $request, Investment $investment)

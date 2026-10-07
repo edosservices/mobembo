@@ -91,6 +91,12 @@
                     amount.textContent = value;
                 }
             });
+            document.querySelectorAll('[data-balance-extra]').forEach((node) => {
+                const value = balances[node.dataset.balanceExtra];
+                if (value) {
+                    node.textContent = value;
+                }
+            });
         };
         const announce = (movement) => {
             chime();

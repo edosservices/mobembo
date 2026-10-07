@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 
 class InvestmentService
 {
+    public const MAX_ACTIVE_PER_PLAN = 4;
+
     public function __construct(
         private WalletService $wallets,
         private ReferralService $referrals,
@@ -65,8 +67,8 @@ class InvestmentService
                 ->lockForUpdate()
                 ->count();
 
-            if ($activeOnPlan >= 4) {
-                throw new FinancialException('Vous avez déjà 4 investissements actifs sur ce plan. Une nouvelle position sera possible lorsqu’un d’eux sera terminé.');
+            if ($activeOnPlan >= self::MAX_ACTIVE_PER_PLAN) {
+                throw new FinancialException('Vous avez déjà '.self::MAX_ACTIVE_PER_PLAN.' investissements actifs sur ce plan. Une nouvelle position sera possible lorsqu’un d’eux sera terminé.');
             }
 
             [$starts, $ends] = $this->term($project);
