@@ -203,14 +203,69 @@ class AdminOperationsTest extends TestCase
             ->assertOk()
             ->assertDontSee('Rejoindre WhatsApp')
             ->assertDontSee('Rejoindre Telegram');
-
-        $this->get(route('contact'))->assertOk()->assertSee('Rejoindre WhatsApp')->assertSee('Rejoindre Telegram');
+        $this->get(route('contact'))
+            ->assertOk()
+            ->assertSee('Rejoindre WhatsApp')
+            ->assertSee('https://chat.whatsapp.com/zelvora', false)
+            ->assertSee('Rejoindre Telegram')
+            ->assertSee('https://t.me/zelvora', false);
 
         $user = User::factory()->create();
         $this->actingAs($user)->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Rejoindre WhatsApp')
             ->assertSee('Rejoindre Telegram');
+    }
+
+    public function test_admin_can_update_referral_parameters_without_touching_the_ledger(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $user = User::factory()->create();
+        $this->credit($user, '25.00');
+        $before = LedgerEntry::query()->count();
+
+        $this->actingAs($admin)->get(route('admin.referrals.index'))
+            ->assertOk()
+            ->assertSee('Paramètres de parrainage')
+            ->assertSee('Enregistrer les paramètres')
+            ->assertSee('name="referral_rate_percent"', false)
+            ->assertSee('name="level_name_pro"', false);
+
+        $this->actingAs($user)->put(route('admin.referrals.update'), [
+            'referral_rate_percent' => '1',
+            'referral_trigger' => 'approved_deposit',
+            'level_starter' => '0',
+            'level_pro' => '2',
+            'level_elite' => '3',
+            'level_vip' => '4',
+        ])->assertForbidden();
+
+        $this->actingAs($admin)->put(route('admin.referrals.update'), [
+            'referral_enabled' => '1',
+            'referral_trigger' => 'investment',
+            'referral_rate_percent' => '7,5',
+            'level_starter' => '0',
+            'level_pro' => '4',
+            'level_elite' => '12',
+            'level_vip' => '30',
+            'level_name_starter' => 'STARTER',
+            'level_name_pro' => 'PRO PLUS',
+            'level_name_elite' => 'ELITE',
+            'level_name_vip' => 'VIP',
+            'benefit_pro' => "Suivi prioritaire\nRapport mensuel",
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $settings = PlatformSetting::current()->fresh();
+        $this->assertTrue($settings->referral_enabled);
+        $this->assertSame('investment', $settings->referral_trigger->value);
+        $this->assertSame('7.5000', number_format((float) $settings->referral_rate_percent, 4, '.', ''));
+        $pro = collect($settings->referral_levels)->firstWhere('key', 'pro');
+        $this->assertSame('PRO PLUS', $pro['name']);
+        $this->assertSame(4, $pro['min_active']);
+        $this->assertSame(['Suivi prioritaire', 'Rapport mensuel'], $pro['benefits']);
+        $this->assertSame($before, LedgerEntry::query()->count());
+        $this->assertSame('25.00', Money::of($user->wallet()->first()->available_balance));
+        $this->assertSame([], app(WalletService::class)->findDrift());
     }
 
     public function test_a_client_cannot_open_another_account(): void

@@ -141,6 +141,7 @@ Route::middleware(['auth', 'active', 'password.fresh', 'admin'])->prefix('admin'
     Route::post('/retraits/{withdrawal}/refuser', [AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
 
     Route::get('/parrainage', [AdminReferralController::class, 'index'])->name('referrals.index');
+    Route::put('/parrainage', [AdminReferralController::class, 'update'])->name('referrals.update');
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/ajustements', [AdminTransactionController::class, 'adjustments'])->name('adjustments.index');
     Route::get('/notifications', [AdminNotificationController::class, 'create'])->name('notifications.create');

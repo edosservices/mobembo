@@ -37,6 +37,7 @@
     <main class="wrap page">
         @include('partials.alerts')
         @yield('content')
+        @include('partials.community-links')
     </main>
     <nav class="bottom-nav">
         <a href="{{ route('dashboard') }}" @class(['active' => request()->routeIs('dashboard')])><strong>⌂</strong>Accueil</a>
