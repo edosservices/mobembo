@@ -32,6 +32,17 @@
 <section class="panel credited-card">
     <h2>Revenus réellement crédités</h2>
     <p class="money">{{ money($investment->returns_credited) }}</p>
-    <p class="fine-print">Les revenus crédités apparaissent dans votre portefeuille après leur distribution.</p>
+    <p class="fine-print">Le profit quotidien est crédité automatiquement les jours ouvrés, dès le jour de l’investissement, dans le solde retirable. Le capital investi reste séparé.</p>
+    @if ($investment->profits->isNotEmpty())
+        <div class="txn-list">
+            @foreach ($investment->profits as $profit)
+                <article class="txn">
+                    <strong class="pos">+{{ money($profit->amount) }}</strong>
+                    <time>{{ $profit->profit_date->format('d/m/Y') }}</time>
+                    <em>Profit quotidien</em>
+                </article>
+            @endforeach
+        </div>
+    @endif
 </section>
 @endsection

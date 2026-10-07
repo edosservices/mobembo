@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Investment;
+use App\Models\InvestmentProfit;
 use App\Models\Project;
 use App\Services\InvestmentService;
 use App\Support\Money;
@@ -19,13 +20,20 @@ class InvestmentController extends Controller
             ->latest('invested_at')
             ->paginate(15);
 
-        return view('investments.index', compact('investments'));
+        $profits = InvestmentProfit::query()
+            ->where('user_id', $request->user()->id)
+            ->with('project:id,name')
+            ->latest('profit_date')
+            ->limit(20)
+            ->get();
+
+        return view('investments.index', compact('investments', 'profits'));
     }
 
     public function show(Request $request, Investment $investment)
     {
         abort_unless($investment->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
-        $investment->load('project');
+        $investment->load(['project', 'profits' => fn ($query) => $query->latest('profit_date')->limit(40)]);
 
         return view('investments.show', compact('investment'));
     }

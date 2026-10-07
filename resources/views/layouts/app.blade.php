@@ -75,6 +75,9 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('{{ asset('sw.js') }}');
         }
+    </script>
+    @include('partials.notification-sound')
+    <script>
         const welcome = document.getElementById('welcome-community');
         if (welcome && window.bootstrap && !localStorage.getItem('zelvora_welcome_seen')) {
             window.setTimeout(() => {

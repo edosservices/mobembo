@@ -10,7 +10,9 @@
     <div class="stat"><span>Membres inactifs</span><strong>{{ $team['inactive'] }}</strong></div>
     <div class="stat"><span>Dépôts de l'équipe</span><strong class="money sm">{{ money($team['deposits']) }}</strong></div>
     <div class="stat"><span>Investissements de l'équipe</span><strong class="money sm">{{ money($team['investments']) }}</strong></div>
-    <div class="stat"><span>Commissions générées</span><strong class="money sm">{{ money($team['commissions']) }}</strong></div>
+    <div class="stat"><span>Commission gagnée</span><strong class="money sm">{{ money($commissionEarned) }}</strong></div>
+    <div class="stat"><span>Commission disponible</span><strong class="money sm">{{ money($commissionAvailable) }}</strong></div>
+    <div class="stat"><span>Commission déjà retirée</span><strong class="money sm">{{ money($commissionWithdrawn) }}</strong></div>
 </div>
 <section class="panel" style="margin-top:1rem;">
     <p class="kicker">Invitation</p>

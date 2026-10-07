@@ -20,6 +20,7 @@ use App\Http\Controllers\InvestmentController;
 use App\Http\Controllers\KycController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\SupportController;
@@ -86,6 +87,9 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/parrainage', ReferralController::class)->name('referral');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/compteur', [NotificationController::class, 'count'])->name('notifications.count');
+    Route::post('/notifications/push', [PushSubscriptionController::class, 'store'])->name('notifications.push');
+    Route::delete('/notifications/push', [PushSubscriptionController::class, 'destroy'])->name('notifications.push.destroy');
     Route::post('/notifications/{id}/lire', [NotificationController::class, 'read'])->name('notifications.read');
     Route::post('/notifications/lire-tout', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -82,6 +82,7 @@ class ClientExperienceTest extends TestCase
 
     public function test_investment_detail_keeps_estimates_apart_from_credited_income(): void
     {
+        $this->travelTo('2026-10-07 11:00:00');
         $user = User::factory()->create();
         $this->credit($user, '100.00');
         $project = $this->project(['min_investment' => '50.00', 'duration_days' => 270, 'expected_return_percent' => '7.5000']);
@@ -92,7 +93,7 @@ class ClientExperienceTest extends TestCase
         ])->assertRedirect();
 
         $investment = $user->investments()->first();
-        $this->assertSame('0.00', Money::of($investment->returns_credited));
+        $this->assertSame('0.01', Money::of($investment->returns_credited));
 
         $this->actingAs($user)
             ->get(route('investments.show', $investment))
@@ -101,9 +102,9 @@ class ClientExperienceTest extends TestCase
             ->assertSee('Revenus réellement crédités')
             ->assertSee('3,75 $')
             ->assertSee('53,75 $')
-            ->assertSee('0,00 $');
+            ->assertSee('0,01 $');
 
-        $this->assertSame(0, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
+        $this->assertSame(1, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
     }
 
     public function test_approved_deposit_pays_one_audited_commission_and_rejection_pays_none(): void

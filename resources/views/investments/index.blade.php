@@ -23,4 +23,17 @@
     </table>
 </div>
 {{ $investments->links() }}
+<h2>Historique des profits</h2>
+<div class="txn-list">
+    @forelse ($profits as $profit)
+        <article class="txn">
+            <strong class="pos">+{{ money($profit->amount) }}</strong>
+            <span>{{ $profit->project->name ?? 'Plan' }}</span>
+            <time>{{ $profit->profit_date->format('d/m/Y') }}</time>
+            <em>Profit quotidien</em>
+        </article>
+    @empty
+        <p class="muted">Aucun profit crédité pour le moment.</p>
+    @endforelse
+</div>
 @endsection

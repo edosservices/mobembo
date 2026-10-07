@@ -12,11 +12,13 @@ use App\Enums\ReviewStatus;
 use App\Enums\UserRole;
 use App\Models\Deposit;
 use App\Models\Investment;
+use App\Models\InvestmentProfit;
 use App\Models\LedgerEntry;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
 use Illuminate\Support\Carbon;
 
@@ -42,6 +44,11 @@ class AdminOverviewService
             'projects_active' => Project::query()->where('status', ProjectStatus::Active)->count(),
             'projects_finished' => Project::query()->whereIn('status', [ProjectStatus::Finished, ProjectStatus::Closed, ProjectStatus::Complete, ProjectStatus::Funded])->count(),
             'investments_active' => Investment::query()->where('status', InvestmentStatus::Active)->count(),
+            'investments_completed' => Investment::query()->where('status', InvestmentStatus::Completed)->count(),
+            'profits_today' => Money::of(InvestmentProfit::query()->whereDate('profit_date', today())->sum('amount')),
+            'withdrawal_fees' => Money::of(Withdrawal::query()->where('status', ReviewStatus::Approved)->sum('fee')),
+            'withdrawable' => Money::of(Wallet::query()->sum('available_balance')),
+            'profit_backlog' => $this->profitBacklog(),
             'commissions' => $this->ledgerSum(LedgerType::ReferralCommission),
             'bonus' => $this->ledgerSum(LedgerType::Bonus),
         ];
@@ -143,6 +150,22 @@ class AdminOverviewService
         }
 
         return ['empty' => $empty, 'rows' => $rows];
+    }
+
+    private function profitBacklog(): int
+    {
+        if (! BusinessCalendar::growsOn(now())) {
+            return 0;
+        }
+
+        $today = now()->toDateString();
+
+        return Investment::query()
+            ->where('status', InvestmentStatus::Active)
+            ->whereDate('starts_at', '<=', $today)
+            ->whereDate('ends_at', '>', $today)
+            ->whereDoesntHave('profits', fn ($query) => $query->whereDate('profit_date', $today))
+            ->count();
     }
 
     private function ledgerSum(LedgerType $type): string

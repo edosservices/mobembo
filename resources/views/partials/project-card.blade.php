@@ -2,7 +2,7 @@
 <article class="opportunity plan-card h-100" data-plan-card="{{ $project->slug }}">
     <a class="cover" href="{{ route('projects.show', $project) }}#investir">
         @if ($project->imageUrl())
-            <img src="{{ $project->imageUrl() }}" alt="{{ $project->name }}">
+            <img src="{{ $project->imageUrl() }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
         @endif
     </a>
     <div class="body text-center">

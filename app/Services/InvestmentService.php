@@ -20,6 +20,7 @@ class InvestmentService
         private ReferralService $referrals,
         private Notifier $notifier,
         private AuditService $audit,
+        private DailyProfitService $profits,
     ) {}
 
     public function invest(User $user, Project $project, string $amount, string $idempotencyKey): Investment
@@ -57,6 +58,17 @@ class InvestmentService
                 throw new FinancialException('Il reste '.Money::format($remaining).' à financer sur ce projet.');
             }
 
+            $activeOnPlan = Investment::query()
+                ->where('user_id', $user->id)
+                ->where('project_id', $project->id)
+                ->where('status', InvestmentStatus::Active)
+                ->lockForUpdate()
+                ->count();
+
+            if ($activeOnPlan >= 4) {
+                throw new FinancialException('Vous avez déjà 4 investissements actifs sur ce plan. Une nouvelle position sera possible lorsqu’un d’eux sera terminé.');
+            }
+
             [$starts, $ends] = $this->term($project);
 
             $investment = Investment::query()->create([
@@ -72,6 +84,7 @@ class InvestmentService
                 'invested_at' => now(),
                 'starts_at' => $starts->toDateString(),
                 'ends_at' => $ends->toDateString(),
+                'profit_effective_from' => $starts->toDateString(),
                 'status' => InvestmentStatus::Active,
                 'idempotency_key' => $idempotencyKey,
             ]);
@@ -104,11 +117,13 @@ class InvestmentService
 
             $this->referrals->reward(ReferralTrigger::Investment, $user, $amount, Investment::class, $investment->id);
 
+            $this->profits->creditDay($investment, now());
+
             $this->notifier->send(
                 $user,
-                'investment_created',
-                'Investissement enregistré',
-                'Vous avez investi '.Money::format($amount).' dans '.$project->name.'. Le rendement affiché est une estimation, il n’est pas encore crédité.',
+                'investment_activated',
+                'Investissement actif',
+                'Vous avez investi '.Money::format($amount).' dans '.$project->name.'. Le profit du premier jour ouvré est crédité immédiatement sur votre solde retirable.',
             );
 
             return $investment->load('project');

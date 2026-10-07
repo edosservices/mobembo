@@ -7,12 +7,13 @@
     <p>Voici l'état de votre portefeuille.</p>
 </header>
 <div class="dash-stats">
-    <div class="stat"><span>Solde disponible</span><strong>{{ money($summary['available']) }}</strong></div>
-    <div class="stat"><span>Montant investi</span><strong>{{ money($summary['invested']) }}</strong></div>
-    <div class="stat"><span>Revenus réellement distribués</span><strong>{{ money($summary['returns_total']) }}</strong></div>
+    <div class="stat"><span>Capital investi</span><strong>{{ money($summary['invested']) }}</strong></div>
+    <div class="stat"><span>Profit total</span><strong>{{ money($summary['returns_total']) }}</strong></div>
     <div class="stat"><span>Bonus</span><strong>{{ money($summary['bonus']) }}</strong></div>
-    <div class="stat"><span>Commissions de parrainage</span><strong>{{ money($summary['commissions']) }}</strong></div>
-    <div class="stat"><span>Investissements actifs</span><strong>{{ $summary['active_count'] }}</strong></div>
+    <div class="stat"><span>Commissions</span><strong>{{ money($summary['commissions']) }}</strong></div>
+    <div class="stat"><span>Solde retirable</span><strong>{{ money($summary['available']) }}</strong></div>
+    <div class="stat"><span>Retraits en attente</span><strong>{{ money($summary['withdrawals_pending']) }}</strong></div>
+    <div class="stat"><span>Retraits effectués</span><strong>{{ money($summary['withdrawals_paid']) }}</strong></div>
 </div>
 <div class="dash-actions">
     <a class="btn-z" data-dashboard-deposit href="{{ route('deposits.create') }}">+ Faire un dépôt</a>

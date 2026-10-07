@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Enums\InvestmentStatus;
 use App\Enums\LedgerStatus;
 use App\Enums\LedgerType;
+use App\Enums\ReviewStatus;
 use App\Models\LedgerEntry;
 use App\Models\User;
+use App\Models\Withdrawal;
 use App\Support\Money;
 use App\Support\ReturnEstimator;
 
@@ -34,6 +36,8 @@ class PortfolioService
             'estimate_today' => $estimate,
             'bonus' => $this->sum($user, LedgerType::Bonus),
             'commissions' => $this->sum($user, LedgerType::ReferralCommission),
+            'withdrawals_pending' => Money::of(Withdrawal::query()->where('user_id', $user->id)->where('status', ReviewStatus::Pending)->sum('amount')),
+            'withdrawals_paid' => Money::of(Withdrawal::query()->where('user_id', $user->id)->where('status', ReviewStatus::Approved)->sum('amount')),
             'active_count' => $active->count(),
         ];
     }
@@ -49,11 +53,6 @@ class PortfolioService
             $query->whereDate('created_at', today());
         }
 
-        $total = '0.00';
-        $query->orderBy('id')->each(function (LedgerEntry $entry) use (&$total) {
-            $total = Money::add($total, $entry->amount);
-        });
-
-        return $total;
+        return Money::of($query->sum('amount') ?: 0);
     }
 }
