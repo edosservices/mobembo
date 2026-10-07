@@ -9,6 +9,7 @@ use App\Support\ReturnEstimator;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'uuid',
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'invested_at',
     'starts_at',
     'ends_at',
+    'profit_effective_from',
     'status',
     'idempotency_key',
 ])]
@@ -39,6 +41,7 @@ class Investment extends Model
             'invested_at' => 'datetime',
             'starts_at' => 'date',
             'ends_at' => 'date',
+            'profit_effective_from' => 'date',
         ];
     }
 
@@ -50,6 +53,11 @@ class Investment extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function profits(): HasMany
+    {
+        return $this->hasMany(InvestmentProfit::class);
     }
 
     public function estimatedReturn(): string

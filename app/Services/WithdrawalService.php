@@ -94,6 +94,13 @@ class WithdrawalService
                 'idempotency_key' => $idempotencyKey,
             ]);
 
+            $this->notifier->send(
+                $user,
+                'withdrawal_requested',
+                'Retrait demandé',
+                'Demande de '.Money::format($quote['amount']).'. Frais '.Money::format($quote['fee']).', net '.Money::format($quote['net']).'.',
+            );
+
             $this->wallets->holdWithdrawal($user, $quote['net'], $quote['fee'], [
                 'reference' => 'WD-'.$withdrawal->id,
                 'description' => 'Demande de retrait '.$method->label(),

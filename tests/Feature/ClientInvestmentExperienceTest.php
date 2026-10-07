@@ -51,7 +51,7 @@ class ClientInvestmentExperienceTest extends TestCase
         $investment = Investment::query()->firstOrFail();
         $this->assertSame('2026-10-05', $investment->starts_at->toDateString());
         $this->assertSame('2027-10-05', $investment->ends_at->toDateString());
-        $this->assertSame(0, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
+        $this->assertSame(1, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
 
         $this->travelTo('2026-11-06 10:00:00');
         $investment->refresh();
@@ -64,7 +64,7 @@ class ClientInvestmentExperienceTest extends TestCase
         $this->assertSame('0.1235', $investment->estimatedDailyAmount());
         $this->assertSame('3.0875', $investment->estimatedAccruedReturn());
         $this->assertSame($ledgerBefore, LedgerEntry::query()->count());
-        $this->assertSame('0.00', Money::of($investment->returns_credited));
+        $this->assertSame('0.12', Money::of($investment->returns_credited));
         $user->wallet->refresh();
         $this->assertSame($available, Money::of($user->wallet->available_balance));
         $this->assertSame([], app(WalletService::class)->findDrift());

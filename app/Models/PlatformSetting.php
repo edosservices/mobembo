@@ -30,9 +30,9 @@ class PlatformSetting extends Model
         return [
             'currency' => 'USD',
             'currency_symbol' => '$',
-            'withdrawal_fee_percent' => '5.0000',
+            'withdrawal_fee_percent' => '12.0000',
             'withdrawal_fee_fixed' => '0.00',
-            'withdrawal_min' => '5.00',
+            'withdrawal_min' => '3.50',
             'withdrawal_max' => '10000.00',
             'referral_enabled' => true,
             'referral_trigger' => ReferralTrigger::ApprovedDeposit->value,
@@ -48,8 +48,27 @@ class PlatformSetting extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            if (app()->resolved('platform.settings')) {
+                app()->forgetInstance('platform.settings');
+            }
+        });
+    }
+
     public static function current(): self
     {
-        return static::query()->first() ?? static::query()->create(static::defaults());
+        if (app()->resolved('platform.settings')) {
+            /** @var self $settings */
+            $settings = app('platform.settings');
+
+            return $settings;
+        }
+
+        $settings = static::query()->first() ?? static::query()->create(static::defaults());
+        app()->instance('platform.settings', $settings);
+
+        return $settings;
     }
 }

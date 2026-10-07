@@ -27,4 +27,11 @@ class NotificationController extends Controller
 
         return back()->with('success', 'Notifications marquées comme lues.');
     }
+
+    public function count(Request $request)
+    {
+        return response()->json([
+            'unread' => $request->user()->unreadNotifications()->count(),
+        ]);
+    }
 }

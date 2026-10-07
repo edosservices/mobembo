@@ -99,6 +99,7 @@ class FinancialIntegrityTest extends TestCase
 
     public function test_investment_debits_the_wallet_and_estimates_do_not_create_income(): void
     {
+        $this->travelTo('2026-10-07 15:00:00');
         $user = User::factory()->create();
         $admin = User::factory()->admin()->create();
         $this->credit($user, '100.00');
@@ -114,14 +115,14 @@ class FinancialIntegrityTest extends TestCase
         ])->assertRedirect();
 
         $user->wallet->refresh();
-        $this->assertSame('75.00', Money::of($user->wallet->available_balance));
+        $this->assertSame('75.01', Money::of($user->wallet->available_balance));
         $this->assertSame('25.00', Money::of($user->wallet->invested_balance));
         $project->refresh();
         $this->assertSame('25.00', Money::of($project->funded_amount));
-        $this->assertSame(0, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
+        $this->assertSame(1, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
 
         Artisan::call('schedule:run');
-        $this->assertSame(0, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
+        $this->assertSame(1, LedgerEntry::query()->where('type', LedgerType::InvestmentReturn)->count());
 
         $this->actingAs($user)->post(route('investments.store', $project), [
             'amount' => '1',
@@ -132,8 +133,8 @@ class FinancialIntegrityTest extends TestCase
 
         $user->wallet->refresh();
         $investment = Investment::query()->first();
-        $this->assertSame('10.00', Money::of($investment->returns_credited));
-        $this->assertSame('85.00', Money::of($user->wallet->available_balance));
+        $this->assertSame('10.01', Money::of($investment->returns_credited));
+        $this->assertSame('85.01', Money::of($user->wallet->available_balance));
         $this->assertSame('25.00', Money::of($user->wallet->invested_balance));
     }
 

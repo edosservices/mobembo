@@ -25,6 +25,11 @@
         'Projets actifs' => $stats['projects_active'],
         'Projets terminés' => $stats['projects_finished'],
         'Investissements actifs' => $stats['investments_active'],
+        'Investissements terminés' => $stats['investments_completed'],
+        'Profits du jour' => money($stats['profits_today']),
+        'Frais de retrait' => money($stats['withdrawal_fees']),
+        'Soldes retirables' => money($stats['withdrawable']),
+        'Rendements en retard' => $stats['profit_backlog'],
         'Commissions distribuées' => money($stats['commissions']),
         'Bonus distribués' => money($stats['bonus']),
     ] as $label => $value)

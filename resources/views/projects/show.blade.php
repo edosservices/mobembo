@@ -9,7 +9,7 @@
     </div>
     <figure class="detail-hero">
         @if ($project->imageUrl())
-            <img src="{{ $project->imageUrl() }}" alt="{{ $project->name }}">
+            <img src="{{ $project->imageUrl() }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
         @endif
     </figure>
 

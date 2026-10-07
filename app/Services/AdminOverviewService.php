@@ -12,11 +12,13 @@ use App\Enums\ReviewStatus;
 use App\Enums\UserRole;
 use App\Models\Deposit;
 use App\Models\Investment;
+use App\Models\InvestmentProfit;
 use App\Models\LedgerEntry;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Support\BusinessCalendar;
 use App\Support\Money;
 use Illuminate\Support\Carbon;
 
@@ -27,23 +29,66 @@ class AdminOverviewService
      */
     public function stats(): array
     {
-        $clients = User::query()->where('role', UserRole::User);
+        $clients = User::query()
+            ->where('role', UserRole::User)
+            ->selectRaw(
+                'COUNT(*) as total, COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as active',
+                [AccountStatus::Active->value],
+            )
+            ->first();
+        $wallets = $this->walletSums();
+        $ledger = $this->ledgerSums();
+        $withdrawals = Withdrawal::query()
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as approved_amount,
+                 COALESCE(SUM(CASE WHEN status = ? THEN fee ELSE 0 END), 0) as approved_fees,
+                 COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as pending_count',
+                [ReviewStatus::Approved->value, ReviewStatus::Approved->value, ReviewStatus::Pending->value],
+            )
+            ->first();
+        $projects = Project::query()
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as open_count,
+                 COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as active_count,
+                 COALESCE(SUM(CASE WHEN status IN (?, ?, ?, ?) THEN 1 ELSE 0 END), 0) as finished_count',
+                [
+                    ProjectStatus::Open->value,
+                    ProjectStatus::Active->value,
+                    ProjectStatus::Finished->value,
+                    ProjectStatus::Closed->value,
+                    ProjectStatus::Complete->value,
+                    ProjectStatus::Funded->value,
+                ],
+            )
+            ->first();
+        $investments = Investment::query()
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as active_count,
+                 COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as completed_count',
+                [InvestmentStatus::Active->value, InvestmentStatus::Completed->value],
+            )
+            ->first();
 
         return [
-            'users_total' => (clone $clients)->count(),
-            'users_active' => (clone $clients)->where('status', AccountStatus::Active)->count(),
+            'users_total' => (int) $clients->total,
+            'users_active' => (int) $clients->active,
             'deposits_total' => Money::of(Deposit::query()->where('status', ReviewStatus::Approved)->sum('amount')),
             'deposits_pending' => Deposit::query()->where('status', ReviewStatus::Pending)->count(),
-            'withdrawals_total' => Money::of(Withdrawal::query()->where('status', ReviewStatus::Approved)->sum('amount')),
-            'withdrawals_pending' => Withdrawal::query()->where('status', ReviewStatus::Pending)->count(),
-            'invested' => Money::of(Wallet::query()->sum('invested_balance')),
-            'returns' => $this->ledgerSum(LedgerType::InvestmentReturn),
-            'projects_open' => Project::query()->where('status', ProjectStatus::Open)->count(),
-            'projects_active' => Project::query()->where('status', ProjectStatus::Active)->count(),
-            'projects_finished' => Project::query()->whereIn('status', [ProjectStatus::Finished, ProjectStatus::Closed, ProjectStatus::Complete, ProjectStatus::Funded])->count(),
-            'investments_active' => Investment::query()->where('status', InvestmentStatus::Active)->count(),
-            'commissions' => $this->ledgerSum(LedgerType::ReferralCommission),
-            'bonus' => $this->ledgerSum(LedgerType::Bonus),
+            'withdrawals_total' => Money::of($withdrawals->approved_amount ?? 0),
+            'withdrawals_pending' => (int) $withdrawals->pending_count,
+            'invested' => Money::of($wallets->invested ?? 0),
+            'returns' => Money::of($ledger->returns ?? 0),
+            'projects_open' => (int) $projects->open_count,
+            'projects_active' => (int) $projects->active_count,
+            'projects_finished' => (int) $projects->finished_count,
+            'investments_active' => (int) $investments->active_count,
+            'investments_completed' => (int) $investments->completed_count,
+            'profits_today' => Money::of(InvestmentProfit::query()->whereDate('profit_date', today())->sum('amount')),
+            'withdrawal_fees' => Money::of($withdrawals->approved_fees ?? 0),
+            'withdrawable' => Money::of($wallets->available ?? 0),
+            'profit_backlog' => $this->profitBacklog(),
+            'commissions' => Money::of($ledger->commissions ?? 0),
+            'bonus' => Money::of($ledger->bonus ?? 0),
         ];
     }
 
@@ -125,10 +170,11 @@ class AdminOverviewService
      */
     public function funds(): array
     {
+        $wallets = $this->walletSums();
         $rows = [
-            ['label' => 'Disponible', 'amount' => Money::of(Wallet::query()->sum('available_balance'))],
-            ['label' => 'Investi', 'amount' => Money::of(Wallet::query()->sum('invested_balance'))],
-            ['label' => 'Revenus distribués', 'amount' => $this->ledgerSum(LedgerType::InvestmentReturn)],
+            ['label' => 'Disponible', 'amount' => Money::of($wallets->available ?? 0)],
+            ['label' => 'Investi', 'amount' => Money::of($wallets->invested ?? 0)],
+            ['label' => 'Revenus distribués', 'amount' => Money::of($this->ledgerSums()->returns ?? 0)],
             ['label' => 'Retraits versés', 'amount' => Money::of(Withdrawal::query()->where('status', ReviewStatus::Approved)->sum('net_amount'))],
         ];
         $max = '0.00';
@@ -145,9 +191,51 @@ class AdminOverviewService
         return ['empty' => $empty, 'rows' => $rows];
     }
 
-    private function ledgerSum(LedgerType $type): string
+    private function profitBacklog(): int
     {
-        return Money::of(LedgerEntry::query()->where('type', $type)->where('status', LedgerStatus::Completed)->sum('amount'));
+        $today = now()->toDateString();
+        $query = Investment::query()
+            ->where('status', InvestmentStatus::Active)
+            ->whereDate('starts_at', '<=', $today)
+            ->whereDate('ends_at', '>', $today)
+            ->where(function ($query) use ($today) {
+                $query->whereNull('profit_effective_from')
+                    ->orWhereDate('profit_effective_from', '<=', $today);
+            })
+            ->whereDoesntHave('profits', fn ($query) => $query->whereDate('profit_date', $today));
+
+        if (! BusinessCalendar::growsOn(now())) {
+            $query->where(function ($query) use ($today) {
+                $query->whereDate('starts_at', $today)
+                    ->orWhereDate('profit_effective_from', $today);
+            });
+        }
+
+        return $query->count();
+    }
+
+    private function walletSums(): ?object
+    {
+        return Wallet::query()
+            ->selectRaw('COALESCE(SUM(available_balance), 0) as available, COALESCE(SUM(invested_balance), 0) as invested')
+            ->first();
+    }
+
+    private function ledgerSums(): ?object
+    {
+        return LedgerEntry::query()
+            ->where('status', LedgerStatus::Completed)
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) as returns,
+                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) as commissions,
+                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) as bonus',
+                [
+                    LedgerType::InvestmentReturn->value,
+                    LedgerType::ReferralCommission->value,
+                    LedgerType::Bonus->value,
+                ],
+            )
+            ->first();
     }
 
     /**

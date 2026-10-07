@@ -15,7 +15,12 @@ class DashboardController extends Controller
     public function __invoke(Request $request, PortfolioService $portfolio, PortfolioAnalyticsService $analytics, ReferralProgressService $progress, BadgeService $badges)
     {
         $user = $request->user();
-        $summary = $portfolio->summary($user);
+        $investments = $user->investments()
+            ->with('project')
+            ->where('status', InvestmentStatus::Active)
+            ->latest('invested_at')
+            ->get();
+        $summary = $portfolio->summary($user, $investments);
         $name = trim((string) $user->name);
         $first = strtok($name, ' ') ?: $name;
         $range = $request->string('range')->toString();
@@ -27,11 +32,7 @@ class DashboardController extends Controller
             'investUrl' => Money::cmp($summary['available'], '0') > 0
                 ? route('projects.index')
                 : route('deposits.create'),
-            'investments' => $user->investments()
-                ->with('project')
-                ->where('status', InvestmentStatus::Active)
-                ->latest('invested_at')
-                ->get(),
+            'investments' => $investments,
             'activity' => $user->ledgerEntries()->latest()->limit(6)->get(),
             'chart' => $analytics->series($user, $range),
             'team' => $team,

@@ -49,7 +49,7 @@ class DepositService
                 throw new FinancialException('Cette référence de paiement a déjà été soumise.');
             }
 
-            return Deposit::query()->create([
+            $deposit = Deposit::query()->create([
                 'uuid' => (string) Str::uuid(),
                 'user_id' => $user->id,
                 'amount' => $amount,
@@ -61,6 +61,15 @@ class DepositService
                 'status' => ReviewStatus::Pending,
                 'idempotency_key' => $idempotencyKey,
             ]);
+
+            $this->notifier->send(
+                $user,
+                'deposit_received',
+                'Dépôt reçu',
+                'Votre dépôt de '.Money::format($amount).' est enregistré et en attente de vérification.',
+            );
+
+            return $deposit;
         });
     }
 
