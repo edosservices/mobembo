@@ -43,6 +43,8 @@ class LivePortfolioExperienceTest extends TestCase
             ->assertSee('portfolio-service service-deposit', false)
             ->assertSee('portfolio-service service-withdraw', false)
             ->assertSee('portfolio-service service-transfer', false)
+            ->assertSee('a.portfolio-service.service-deposit { background: #9f2d2d !important;', false)
+            ->assertSee('white-space: nowrap !important;', false)
             ->assertSee(route('deposits.create'), false)
             ->assertSee(route('withdrawals.create'), false)
             ->assertSee(route('transfers.create'), false)
