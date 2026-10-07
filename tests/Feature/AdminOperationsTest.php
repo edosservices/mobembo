@@ -165,7 +165,7 @@ class AdminOperationsTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
 
-        $this->get(route('home'))->assertOk()->assertDontSee('Rejoindre WhatsApp')->assertDontSee('Rejoindre Telegram');
+        $this->get(route('home'))->assertRedirect(route('login'));
         $this->get(route('contact'))->assertOk()->assertDontSee('Rejoindre WhatsApp');
 
         $this->actingAs($admin)->get(route('admin.settings.edit'))
@@ -187,17 +187,24 @@ class AdminOperationsTest extends TestCase
             'whatsapp_url' => 'https://chat.whatsapp.com/zelvora',
             'telegram_url' => 'https://t.me/zelvora',
         ])->assertRedirect()->assertSessionHas('success');
+ 
 
-        $settings = PlatformSetting::current()->fresh();
-        $this->assertSame('https://chat.whatsapp.com/zelvora', $settings->whatsapp_url);
-        $this->assertSame('https://t.me/zelvora', $settings->telegram_url);
+$settings = PlatformSetting::current()->fresh();
 
-        $this->get(route('home'))
-            ->assertOk()
-            ->assertSee('Rejoindre WhatsApp')
-            ->assertSee('https://chat.whatsapp.com/zelvora', false)
-            ->assertSee('Rejoindre Telegram')
-            ->assertSee('https://t.me/zelvora', false);
+$this->assertSame('https://chat.whatsapp.com/zelvora', $settings->whatsapp_url);
+$this->assertSame('https://t.me/zelvora', $settings->telegram_url);
+
+$this->actingAsGuest();
+
+$this->get(route('home'))
+    ->assertRedirect(route('login'));
+
+$this->get(route('contact'))
+    ->assertOk()
+    ->assertSee('Rejoindre WhatsApp')
+    ->assertSee('https://chat.whatsapp.com/zelvora', false)
+    ->assertSee('Rejoindre Telegram')
+    ->assertSee('https://t.me/zelvora', false);
 
         $this->get(route('contact'))->assertOk()->assertSee('Rejoindre WhatsApp')->assertSee('Rejoindre Telegram');
 
