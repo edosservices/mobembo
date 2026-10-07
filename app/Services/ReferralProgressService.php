@@ -23,11 +23,11 @@ class ReferralProgressService
         $rules = $this->rules($settings);
         $ids = $user->referrals()->pluck('id');
         $referred = $ids->count();
-        $active = $this->activeCount($user);
-        $deposits = $ids->isEmpty()
+        $active = $referred === 0 ? 0 : $this->activeCount($user);
+        $deposits = $referred === 0
             ? '0.00'
             : Money::of(Deposit::query()->whereIn('user_id', $ids)->where('status', ReviewStatus::Approved)->sum('amount'));
-        $investments = $ids->isEmpty()
+        $investments = $referred === 0
             ? '0.00'
             : Money::of(Investment::query()->whereIn('user_id', $ids)->sum('amount'));
         $commissions = Money::of(ReferralCommission::query()->where('referrer_id', $user->id)->sum('amount'));

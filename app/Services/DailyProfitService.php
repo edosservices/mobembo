@@ -11,14 +11,16 @@ use App\Support\BusinessCalendar;
 use App\Support\Money;
 use App\Support\ReturnEstimator;
 use Carbon\CarbonInterface;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
  * Crédite le profit quotidien dans le solde retirable.
+ * Le jour calendaire de l'activation est toujours payé, y compris le samedi et le dimanche.
+ * Les jours suivants suivent le calendrier ouvré : lundi à vendredi.
  * Un couple investissement + date ne peut être crédité qu'une fois.
- * Le samedi et le dimanche ne produisent pas de profit, comme le calendrier déjà en place.
  */
 class DailyProfitService
 {
@@ -96,11 +98,13 @@ class DailyProfitService
 
         $count = 0;
         $cursor = $start->copy();
+        $first = $this->firstAccrualDate($investment);
 
         while ($cursor->lte($last)) {
             $key = $cursor->toDateString();
+            $payable = $key === $first || BusinessCalendar::growsOn($cursor);
 
-            if (BusinessCalendar::growsOn($cursor) && ! isset($known[$key]) && $this->creditDay($investment, $cursor)) {
+            if ($payable && ! isset($known[$key]) && $this->creditDay($investment, $cursor)) {
                 $count++;
                 $known[$key] = true;
             }
@@ -115,10 +119,15 @@ class DailyProfitService
     {
         $day = $this->day($day);
 
-        if (! BusinessCalendar::growsOn($day)) {
+        try {
+            return $this->storeDay($investment, $day);
+        } catch (UniqueConstraintViolationException) {
             return false;
         }
+    }
 
+    private function storeDay(Investment $investment, Carbon $day): bool
+    {
         return (bool) Finance::run(function () use ($investment, $day) {
             $investment = Investment::query()->whereKey($investment->id)->lockForUpdate()->firstOrFail();
 
@@ -129,6 +138,10 @@ class DailyProfitService
             $date = $day->toDateString();
 
             if ($date < $investment->starts_at->toDateString() || $date >= $investment->ends_at->toDateString()) {
+                return false;
+            }
+
+            if (! $this->isPayable($investment, $date)) {
                 return false;
             }
 
@@ -185,6 +198,15 @@ class DailyProfitService
     {
         $today = $this->day($today);
 
+        try {
+            return $this->storeMaturity($investment, $today);
+        } catch (UniqueConstraintViolationException) {
+            return false;
+        }
+    }
+
+    private function storeMaturity(Investment $investment, Carbon $today): bool
+    {
         return (bool) Finance::run(function () use ($investment, $today) {
             $investment = Investment::query()->whereKey($investment->id)->lockForUpdate()->firstOrFail();
 
@@ -229,6 +251,23 @@ class DailyProfitService
 
             return true;
         });
+    }
+
+    private function isPayable(Investment $investment, string $date): bool
+    {
+        if ($date === $this->firstAccrualDate($investment)) {
+            return true;
+        }
+
+        return BusinessCalendar::growsOn(Carbon::parse($date, (string) config('app.timezone')));
+    }
+
+    private function firstAccrualDate(Investment $investment): string
+    {
+        $start = $investment->starts_at->toDateString();
+        $floor = $investment->profit_effective_from?->toDateString();
+
+        return $floor !== null && $floor > $start ? $floor : $start;
     }
 
     private function day(?CarbonInterface $moment): Carbon

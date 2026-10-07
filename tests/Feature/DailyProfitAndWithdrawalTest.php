@@ -52,6 +52,116 @@ class DailyProfitAndWithdrawalTest extends TestCase
         $this->assertSame([], app(WalletService::class)->findDrift());
     }
 
+    public function test_day_one_is_the_calendar_day_including_saturday_and_sunday(): void
+    {
+        foreach (['2026-10-05', '2026-10-10', '2026-10-11'] as $date) {
+            $this->travelTo($date.' 10:00:00');
+            [$user, $project] = $this->investor('100.00', [
+                'duration_days' => 10,
+                'expected_return_percent' => '10.0000',
+                'slug' => 'plan-'.$date,
+            ]);
+
+            $this->actingAs($user)->post(route('investments.store', $project), [
+                'amount' => '100',
+                'idempotency_key' => (string) Str::uuid(),
+            ])->assertRedirect();
+
+            $investment = Investment::query()->where('user_id', $user->id)->firstOrFail();
+            $profit = InvestmentProfit::query()->where('investment_id', $investment->id)->firstOrFail();
+            $this->assertSame($date, $profit->profit_date->toDateString());
+            $this->assertSame('1.00', Money::of($profit->amount));
+            $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+            $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
+            $this->assertDatabaseHas('ledger_entries', [
+                'idempotency_key' => 'daily-profit-'.$investment->id.'-'.$date,
+                'type' => LedgerType::InvestmentReturn->value,
+            ]);
+            $this->assertDatabaseHas('notifications', [
+                'notifiable_id' => $user->id,
+                'data->kind' => 'investment_activated',
+            ]);
+            $this->assertDatabaseHas('notifications', [
+                'notifiable_id' => $user->id,
+                'data->kind' => 'daily_profit',
+            ]);
+
+            $this->artisan('investments:process-daily-profits')->assertSuccessful();
+            $this->artisan('investments:process-daily-profits')->assertSuccessful();
+            $this->assertSame(1, InvestmentProfit::query()->where('investment_id', $investment->id)->count());
+            $this->assertSame(1, LedgerEntry::query()->where('idempotency_key', 'daily-profit-'.$investment->id.'-'.$date)->count());
+            $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+        }
+
+        $this->assertSame([], app(WalletService::class)->findDrift());
+    }
+
+    public function test_days_after_a_weekend_start_follow_the_business_calendar(): void
+    {
+        $this->travelTo('2026-10-10 10:00:00');
+        [$user, $project] = $this->investor('100.00', ['duration_days' => 10, 'expected_return_percent' => '10.0000']);
+
+        $this->actingAs($user)->post(route('investments.store', $project), [
+            'amount' => '100',
+            'idempotency_key' => (string) Str::uuid(),
+        ])->assertRedirect();
+
+        $this->travelTo('2026-10-11 00:10:00');
+        $this->artisan('investments:process-daily-profits')->assertSuccessful();
+        $this->assertSame(['2026-10-10'], InvestmentProfit::query()->orderBy('profit_date')->pluck('profit_date')->map->toDateString()->all());
+
+        $this->travelTo('2026-10-12 00:10:00');
+        $this->artisan('investments:process-daily-profits')->assertSuccessful();
+        $this->artisan('investments:process-daily-profits')->assertSuccessful();
+        $this->assertSame(
+            ['2026-10-10', '2026-10-12'],
+            InvestmentProfit::query()->orderBy('profit_date')->pluck('profit_date')->map->toDateString()->all(),
+        );
+        $this->assertSame('2.00', Money::of($user->wallet->refresh()->available_balance));
+        $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
+        $this->assertSame([], app(WalletService::class)->findDrift());
+    }
+
+    public function test_investments_opened_before_daily_profits_are_not_backfilled(): void
+    {
+        $this->travelTo('2026-10-12 08:00:00');
+        [$user, $project] = $this->investor('100.00');
+        app(WalletService::class)->invest($user, '100.00', [
+            'description' => 'Capital déjà placé',
+            'idempotency_key' => 'legacy-invest-'.$user->id,
+        ]);
+
+        Investment::query()->create([
+            'uuid' => (string) Str::uuid(),
+            'user_id' => $user->id,
+            'project_id' => $project->id,
+            'amount' => '100.00',
+            'currency' => 'USD',
+            'expected_return_percent' => '10.0000',
+            'duration_days' => 10,
+            'returns_credited' => '0.00',
+            'capital_returned' => '0.00',
+            'invested_at' => '2026-09-01 10:00:00',
+            'starts_at' => '2026-09-01',
+            'ends_at' => '2026-11-01',
+            'profit_effective_from' => '2026-10-12',
+            'status' => InvestmentStatus::Active,
+            'idempotency_key' => (string) Str::uuid(),
+        ]);
+
+        $this->artisan('investments:process-daily-profits')->assertSuccessful();
+        $this->artisan('investments:process-daily-profits')->assertSuccessful();
+
+        $this->assertSame(
+            ['2026-10-12'],
+            InvestmentProfit::query()->orderBy('profit_date')->pluck('profit_date')->map->toDateString()->all(),
+        );
+        $this->assertSame('1.00', Money::of(Investment::query()->value('returns_credited')));
+        $this->assertSame('1.00', Money::of($user->wallet->refresh()->available_balance));
+        $this->assertSame('100.00', Money::of($user->wallet->invested_balance));
+        $this->assertSame([], app(WalletService::class)->findDrift());
+    }
+
     public function test_the_daily_command_catches_up_without_paying_twice_or_on_the_weekend(): void
     {
         $this->travelTo('2026-10-05 09:00:00');
@@ -104,6 +214,7 @@ class DailyProfitAndWithdrawalTest extends TestCase
         $this->artisan('investments:process-daily-profits')->assertSuccessful();
         $this->artisan('investments:process-daily-profits')->assertSuccessful();
 
+        $this->assertSame(4, $user->notifications()->where('data->kind', 'investment_completed')->count());
         $this->assertSame(0, Investment::query()->where('status', InvestmentStatus::Active)->count());
         $this->assertSame(4, Investment::query()->where('status', InvestmentStatus::Completed)->count());
         $user->wallet->refresh();
@@ -131,7 +242,11 @@ class DailyProfitAndWithdrawalTest extends TestCase
             ->assertSessionHas('error');
         $this->assertSame('20.00', Money::of($user->wallet->refresh()->available_balance));
 
-        $this->actingAs($user)->post(route('withdrawals.store'), $this->withdrawal('10'))
+        $replay = $this->withdrawal('10');
+        $this->actingAs($user)->post(route('withdrawals.store'), $replay)
+            ->assertRedirect()
+            ->assertSessionHas('success');
+        $this->actingAs($user)->post(route('withdrawals.store'), $replay)
             ->assertRedirect()
             ->assertSessionHas('success');
 
@@ -140,10 +255,8 @@ class DailyProfitAndWithdrawalTest extends TestCase
         $this->assertSame('8.80', Money::of($withdrawal->net_amount));
         $this->assertSame('10.00', Money::of($user->wallet->refresh()->available_balance));
         $this->assertSame('10.00', Money::of($user->wallet->locked_balance));
-        $this->assertDatabaseHas('notifications', [
-            'notifiable_id' => $user->id,
-            'data->kind' => 'withdrawal_requested',
-        ]);
+        $this->assertSame(1, $user->withdrawals()->count());
+        $this->assertSame(1, $user->notifications()->where('data->kind', 'withdrawal_requested')->count());
 
         $this->actingAs($user)->post(route('withdrawals.store'), $this->withdrawal('10.01'))
             ->assertSessionHas('error');
@@ -206,6 +319,10 @@ class DailyProfitAndWithdrawalTest extends TestCase
 
         $referrer->wallet->refresh();
         $this->assertSame('5.00', Money::of($referrer->wallet->available_balance));
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $referrer->id,
+            'data->kind' => 'commission_received',
+        ]);
         $this->actingAs($referrer)->get(route('referral'))
             ->assertOk()
             ->assertSee('Commission gagnée')
