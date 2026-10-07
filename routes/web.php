@@ -92,6 +92,7 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::get('/parrainage', ReferralController::class)->name('referral');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/compteur', [NotificationController::class, 'count'])->name('notifications.count');
+    Route::get('/notifications/flux', [NotificationController::class, 'feed'])->name('notifications.feed');
     Route::post('/notifications/push', [PushSubscriptionController::class, 'store'])->name('notifications.push');
     Route::delete('/notifications/push', [PushSubscriptionController::class, 'destroy'])->name('notifications.push.destroy');
     Route::post('/notifications/{id}/lire', [NotificationController::class, 'read'])->name('notifications.read');

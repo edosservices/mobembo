@@ -27,7 +27,7 @@
             <a href="{{ route('investments.index') }}" @class(['active' => request()->routeIs('investments.*')])>Portefeuille</a>
             <a href="{{ route('transactions.index') }}">Transactions</a>
             <a href="{{ route('referral') }}">Parrainage</a>
-            <a href="{{ route('notifications.index') }}">Notifications @if($navUnread)<span class="badge-z tone-warn">{{ $navUnread }}</span>@endif</a>
+            <a href="{{ route('notifications.index') }}" data-live-nav="notifications">Notifications <span class="badge-z tone-warn" data-unread-badge @unless($navUnread) hidden @endunless>{{ $navUnread ?: '' }}</span></a>
             <a href="{{ route('profile.edit') }}">Profil</a>
             @if (auth()->user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}">Admin</a>
@@ -36,6 +36,10 @@
         </nav>
     </header>
     <main class="wrap page">
+        <p class="live-status" data-live-status>
+            <span class="live-dot" aria-hidden="true"></span>
+            <span data-live-label>Connexion…</span>
+        </p>
         @include('partials.alerts')
         @yield('content')
         @include('partials.community-links')
@@ -47,6 +51,7 @@
         <a href="{{ route('transactions.index') }}" @class(['active' => request()->routeIs('transactions.*')])><strong>≡</strong>Transactions</a>
         <a href="{{ route('profile.edit') }}" @class(['active' => request()->routeIs('profile.*')])><strong>●</strong>Profil</a>
     </nav>
+    <div class="toast-container live-toasts" id="live-toasts" aria-live="polite" aria-atomic="true"></div>
     @include('partials.welcome-community-modal')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

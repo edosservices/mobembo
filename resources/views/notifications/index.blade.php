@@ -9,7 +9,7 @@
         <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="btn-z-ghost small" type="submit">Tout lire</button></form>
     </div>
 </div>
-<p class="fine-print" id="push-status">Le son ne démarre qu’après avoir activé le bouton, lorsque le navigateur l’autorise. Une notification système n’est envoyée que si vous l’acceptez.</p>
+<p class="fine-print" id="push-status">Le son des mouvements est activé. Le navigateur l’autorise après la première action sur la page. Une notification système n’est envoyée que si vous l’acceptez.</p>
 @forelse ($notifications as $notification)
     <article class="panel" style="margin-bottom:.6rem;{{ $notification->read_at ? 'opacity:.7;' : '' }}">
         <strong>{{ $notification->data['title'] ?? 'Notification' }}</strong>
@@ -33,12 +33,12 @@
         if (!soundButton) {
             return;
         }
-        const on = window.localStorage.getItem(soundKey) === 'on';
+        const on = window.localStorage.getItem(soundKey) !== 'off';
         soundButton.textContent = on ? 'Désactiver le son' : 'Activer le son';
     };
     paintSound();
     soundButton?.addEventListener('click', () => {
-        const on = window.localStorage.getItem(soundKey) === 'on';
+        const on = window.localStorage.getItem(soundKey) !== 'off';
         window.localStorage.setItem(soundKey, on ? 'off' : 'on');
         paintSound();
     });

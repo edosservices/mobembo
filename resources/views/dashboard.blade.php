@@ -8,67 +8,83 @@
 </header>
 <div class="row g-2 g-md-3 balance-grid">
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-invested" data-balance="invested">
-            <i class="bi bi-building" aria-hidden="true"></i>
-            <span>Capital investi</span>
-            <strong>{{ money($summary['invested']) }}</strong>
-            <small>Non retirable</small>
+        <article class="card balance-card balance-invested h-100 border-0" data-balance="invested">
+            <div class="card-body">
+                <i class="bi bi-building" aria-hidden="true"></i>
+                <span>Capital investi</span>
+                <strong>{{ money($summary['invested']) }}</strong>
+                <small>Non retirable</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-available" data-balance="available">
-            <i class="bi bi-wallet2" aria-hidden="true"></i>
-            <span>Solde retirable</span>
-            <strong>{{ money($summary['available']) }}</strong>
-            <small>Disponible maintenant</small>
+        <article class="card balance-card balance-available h-100 border-0" data-balance="available">
+            <div class="card-body">
+                <i class="bi bi-wallet2" aria-hidden="true"></i>
+                <span>Solde retirable</span>
+                <strong>{{ money($summary['available']) }}</strong>
+                <small>Disponible maintenant</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-profit" data-balance="profit">
-            <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
-            <span>Profit total</span>
-            <strong>{{ money($summary['profit_available']) }}</strong>
-            <small>Encore disponible</small>
+        <article class="card balance-card balance-profit h-100 border-0" data-balance="profit">
+            <div class="card-body">
+                <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+                <span>Profit total</span>
+                <strong>{{ money($summary['profit_available']) }}</strong>
+                <small>Encore disponible</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-bonus" data-balance="bonus">
-            <i class="bi bi-gift" aria-hidden="true"></i>
-            <span>Bonus</span>
-            <strong>{{ money($summary['bonus']) }}</strong>
-            <small>Encore disponible</small>
+        <article class="card balance-card balance-bonus h-100 border-0" data-balance="bonus">
+            <div class="card-body">
+                <i class="bi bi-gift" aria-hidden="true"></i>
+                <span>Bonus</span>
+                <strong>{{ money($summary['bonus']) }}</strong>
+                <small>Encore disponible</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-commission" data-balance="commission">
-            <i class="bi bi-people" aria-hidden="true"></i>
-            <span>Commissions</span>
-            <strong>{{ money($summary['commissions']) }}</strong>
-            <small>Encore disponibles</small>
+        <article class="card balance-card balance-commission h-100 border-0" data-balance="commission">
+            <div class="card-body">
+                <i class="bi bi-people" aria-hidden="true"></i>
+                <span>Commissions</span>
+                <strong>{{ money($summary['commissions']) }}</strong>
+                <small>Encore disponibles</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-total" data-balance="total">
-            <i class="bi bi-pie-chart" aria-hidden="true"></i>
-            <span>Total portefeuille</span>
-            <strong>{{ money($summary['portfolio_total']) }}</strong>
-            <small>Disponible, réservé et investi</small>
+        <article class="card balance-card balance-total h-100 border-0" data-balance="total">
+            <div class="card-body">
+                <i class="bi bi-pie-chart" aria-hidden="true"></i>
+                <span>Total portefeuille</span>
+                <strong>{{ money($summary['portfolio_total']) }}</strong>
+                <small>Disponible, réservé et investi</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-pending" data-balance="pending">
-            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
-            <span>Retraits en attente</span>
-            <strong>{{ money($summary['withdrawals_pending']) }}</strong>
-            <small>Demandés ou en traitement</small>
+        <article class="card balance-card balance-pending h-100 border-0" data-balance="pending">
+            <div class="card-body">
+                <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+                <span>Retraits en attente</span>
+                <strong>{{ money($summary['withdrawals_pending']) }}</strong>
+                <small>Demandés ou en traitement</small>
+            </div>
         </article>
     </div>
     <div class="col-6 col-lg-4 col-xxl-3">
-        <article class="balance-card balance-paid" data-balance="paid">
-            <i class="bi bi-check2-circle" aria-hidden="true"></i>
-            <span>Retraits effectués</span>
-            <strong>{{ money($summary['withdrawals_paid']) }}</strong>
-            <small>Déjà payés</small>
+        <article class="card balance-card balance-paid h-100 border-0" data-balance="paid">
+            <div class="card-body">
+                <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                <span>Retraits effectués</span>
+                <strong>{{ money($summary['withdrawals_paid']) }}</strong>
+                <small>Déjà payés</small>
+            </div>
         </article>
     </div>
 </div>

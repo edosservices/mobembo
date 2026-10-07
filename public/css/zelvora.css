@@ -189,10 +189,11 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
 .balance-card {
     height: 100%;
     border-radius: 1rem;
-    padding: 0.8rem 0.7rem;
     min-width: 0;
     color: #f7f5f2;
+    box-shadow: 0 12px 28px rgba(17, 17, 17, 0.14);
 }
+.balance-card .card-body { padding: 0.85rem 0.75rem; }
 .balance-card i { display: block; font-size: 1rem; color: #e7dcc4; margin-bottom: 0.35rem; }
 .balance-card span, .balance-card small { display: block; }
 .balance-card span { font-size: 0.72rem; letter-spacing: 0.03em; text-transform: uppercase; opacity: 0.86; }
@@ -206,6 +207,48 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
 .balance-total { background: linear-gradient(160deg, #141414, #6e2430); }
 .balance-pending { background: #2a211c; }
 .balance-paid { background: #3d2424; }
+.portfolio-services { margin: 0.2rem 0 1rem; }
+.portfolio-service {
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 12px 28px rgba(17, 17, 17, 0.14);
+}
+.portfolio-service .card-body { padding: 0.8rem 0.55rem; text-align: center; }
+.portfolio-service i { display: block; font-size: 1.25rem; margin-bottom: 0.35rem; color: #e7dcc4; }
+.portfolio-service strong, .portfolio-service span { display: block; }
+.portfolio-service strong { font-size: clamp(0.74rem, 3.1vw, 0.95rem); white-space: nowrap; letter-spacing: -0.01em; }
+.portfolio-service span { margin-top: 0.2rem; font-size: clamp(0.6rem, 2.5vw, 0.72rem); line-height: 1.25; color: rgba(247, 245, 242, 0.82); overflow-wrap: normal; word-break: keep-all; }
+.service-deposit { background: #9f2d2d; }
+.service-withdraw { background: #111111; }
+.service-transfer { background: #6e2430; }
+.live-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0 0 0.85rem;
+    color: #6e2430;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+.live-dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #b8956c; }
+.live-status.is-live { color: #0f7a52; }
+.live-status.is-live .live-dot { background: #0f7a52; box-shadow: 0 0 0 4px rgba(15, 122, 82, 0.15); }
+.live-toasts {
+    position: fixed;
+    z-index: 1080;
+    left: 50%;
+    bottom: 5.6rem;
+    transform: translateX(-50%);
+    width: min(22rem, calc(100vw - 1.5rem));
+}
+.live-toast { border-left: 4px solid #9f2d2d; background: #111; color: #f7f5f2; }
+.live-toast.show { opacity: 1; }
+.live-toast .toast-body a { color: #e7dcc4; }
+@media (min-width: 901px) {
+    .live-toasts { right: 1.2rem; bottom: 1.2rem; left: auto; transform: none; }
+}
 .op-actions { margin: 0.2rem 0 1rem; }
 .op-btn {
     display: flex;
@@ -842,7 +885,7 @@ body.home-page .topbar .btn-z.small { color: #111; background: #f3efe8; }
     .admin-main { padding: 0.75rem; }
 }
 @media (max-width: 360px) {
-    .balance-card { padding: 0.65rem 0.55rem; }
+    .balance-card .card-body, .portfolio-service .card-body { padding: 0.65rem 0.4rem; }
     .op-btn { font-size: 0.92rem; }
 }
 @media (prefers-reduced-motion: reduce) {
