@@ -188,17 +188,17 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
 .withdrawal-steps > [class*="col-"] { padding-left: 0.3rem; padding-right: 0.3rem; }
 .balance-card {
     height: 100%;
-    border-radius: 1rem;
+    border-radius: 0.8rem;
     min-width: 0;
     color: #f7f5f2;
-    box-shadow: 0 12px 28px rgba(17, 17, 17, 0.14);
+    box-shadow: 0 8px 18px rgba(17, 17, 17, 0.12);
 }
-.balance-card .card-body { padding: 0.85rem 0.75rem; }
-.balance-card i { display: block; font-size: 1rem; color: #e7dcc4; margin-bottom: 0.35rem; }
+.balance-card .card-body { padding: 0.55rem 0.55rem 0.5rem; }
+.balance-card i { display: block; font-size: 0.82rem; color: #e7dcc4; margin-bottom: 0.15rem; }
 .balance-card span, .balance-card small { display: block; }
-.balance-card span { font-size: 0.72rem; letter-spacing: 0.03em; text-transform: uppercase; opacity: 0.86; }
-.balance-card strong { display: block; font-size: clamp(0.95rem, 3.6vw, 1.35rem); line-height: 1.2; margin: 0.28rem 0; overflow-wrap: anywhere; }
-.balance-card small { font-size: 0.68rem; line-height: 1.3; opacity: 0.78; }
+.balance-card span { font-size: 0.62rem; letter-spacing: 0.02em; text-transform: uppercase; opacity: 0.86; line-height: 1.2; }
+.balance-card strong { display: block; font-size: clamp(0.82rem, 3vw, 1.05rem); line-height: 1.15; margin: 0.12rem 0; overflow-wrap: anywhere; }
+.balance-card small { font-size: 0.58rem; line-height: 1.2; opacity: 0.78; }
 .balance-invested { background: #111111; }
 .balance-available { background: #9f2d2d; }
 .balance-profit { background: #6e2430; }
@@ -212,14 +212,14 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
     display: block;
     text-decoration: none;
     color: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 12px 28px rgba(17, 17, 17, 0.14);
+    border-radius: 0.8rem;
+    box-shadow: 0 8px 18px rgba(17, 17, 17, 0.12);
 }
-.portfolio-service .card-body { padding: 0.8rem 0.55rem; text-align: center; }
-.portfolio-service i { display: block; font-size: 1.25rem; margin-bottom: 0.35rem; color: #e7dcc4; }
+.portfolio-service .card-body { padding: 0.5rem 0.4rem; text-align: center; }
+.portfolio-service i { display: block; font-size: 0.95rem; margin-bottom: 0.15rem; color: #e7dcc4; }
 .portfolio-service strong, .portfolio-service span { display: block; }
-.portfolio-service strong { font-size: clamp(0.74rem, 3.1vw, 0.95rem); white-space: nowrap; letter-spacing: -0.01em; }
-.portfolio-service span { margin-top: 0.2rem; font-size: clamp(0.6rem, 2.5vw, 0.72rem); line-height: 1.25; color: rgba(247, 245, 242, 0.82); overflow-wrap: normal; word-break: keep-all; }
+.portfolio-service strong { font-size: clamp(0.68rem, 2.8vw, 0.86rem); white-space: nowrap; letter-spacing: -0.01em; }
+.portfolio-service span { margin-top: 0.1rem; font-size: clamp(0.55rem, 2.2vw, 0.66rem); line-height: 1.2; color: rgba(247, 245, 242, 0.82); overflow-wrap: normal; word-break: keep-all; }
 .service-deposit { background: #9f2d2d; }
 .service-withdraw { background: #111111; }
 .service-transfer { background: #6e2430; }
@@ -885,7 +885,7 @@ body.home-page .topbar .btn-z.small { color: #111; background: #f3efe8; }
     .admin-main { padding: 0.75rem; }
 }
 @media (max-width: 360px) {
-    .balance-card .card-body, .portfolio-service .card-body { padding: 0.65rem 0.4rem; }
+    .balance-card .card-body, .portfolio-service .card-body { padding: 0.45rem 0.35rem; }
     .op-btn { font-size: 0.92rem; }
 }
 @media (prefers-reduced-motion: reduce) {
