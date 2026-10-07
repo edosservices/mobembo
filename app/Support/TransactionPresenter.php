@@ -32,7 +32,7 @@ class TransactionPresenter
 
         return match ($entry->type) {
             LedgerType::Deposit => 'Approuvé',
-            LedgerType::Withdrawal, LedgerType::Investment => 'Confirmé',
+            LedgerType::Withdrawal, LedgerType::Investment, LedgerType::TransferOut, LedgerType::TransferIn, LedgerType::TransferFee => 'Confirmé',
             default => 'Créditée',
         };
     }

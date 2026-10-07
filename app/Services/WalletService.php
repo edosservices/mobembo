@@ -118,6 +118,118 @@ class WalletService
         });
     }
 
+    /**
+     * Débite l'expéditeur du montant et des frais, crédite le bénéficiaire du montant.
+     * Le capital investi n'est pas touché. La même clé ne débite qu'une fois.
+     *
+     * @param  array<string, mixed>  $context
+     * @return array{out: LedgerEntry, fee: LedgerEntry, in: LedgerEntry, replayed: bool}
+     */
+    public function transfer(User $sender, User $recipient, string $amount, string $fee, array $context): array
+    {
+        $amount = Money::of($amount);
+        $fee = Money::of($fee);
+        $total = Money::add($amount, $fee);
+        $key = (string) ($context['idempotency_key'] ?? '');
+
+        if ($key === '') {
+            throw new FinancialException('La référence d\'idempotence du transfert est obligatoire.');
+        }
+
+        if (Money::cmp($amount, '0') <= 0) {
+            throw new FinancialException('Le montant à transférer doit être positif.');
+        }
+
+        if (Money::cmp($fee, '0') < 0) {
+            throw new FinancialException('Les frais de transfert sont invalides.');
+        }
+
+        if ($sender->id === $recipient->id) {
+            throw new FinancialException('Vous ne pouvez pas vous transférer de l\'argent.');
+        }
+
+        return Finance::run(function () use ($sender, $recipient, $amount, $fee, $total, $key, $context) {
+            $existing = LedgerEntry::query()->where('idempotency_key', $key.'-out')->first();
+
+            if ($existing) {
+                if ($existing->user_id !== $sender->id) {
+                    throw new FinancialException('Cette opération a déjà été enregistrée pour un autre compte.');
+                }
+
+                return [
+                    'out' => $existing,
+                    'fee' => LedgerEntry::query()->where('idempotency_key', $key.'-fee')->firstOrFail(),
+                    'in' => LedgerEntry::query()->where('idempotency_key', $key.'-in')->firstOrFail(),
+                    'replayed' => true,
+                ];
+            }
+
+            $this->ensure($sender);
+            $this->ensure($recipient);
+
+            $ids = [$sender->id, $recipient->id];
+            sort($ids);
+
+            $wallets = Wallet::query()
+                ->whereIn('user_id', $ids)
+                ->orderBy('user_id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('user_id');
+
+            $senderWallet = $wallets->get($sender->id);
+            $recipientWallet = $wallets->get($recipient->id);
+
+            if (! $senderWallet || ! $recipientWallet) {
+                throw new FinancialException('Le portefeuille est introuvable.');
+            }
+
+            if (Money::cmp($senderWallet->available_balance, $total) < 0) {
+                throw new FinancialException('Solde disponible insuffisant.');
+            }
+
+            $senderWallet->forceFill([
+                'available_balance' => Money::sub($senderWallet->available_balance, $amount),
+            ])->save();
+
+            $out = $this->write($senderWallet, $sender, Money::sub('0', $amount), LedgerType::TransferOut, LedgerStatus::Completed, [
+                'description' => $context['out_description'] ?? 'Transfert envoyé',
+                'idempotency_key' => $key.'-out',
+                'metadata' => $context['metadata'] ?? null,
+                'created_by' => $sender->id,
+            ]);
+
+            $reference = 'TRF-'.str_pad((string) $out->id, 6, '0', STR_PAD_LEFT);
+            $out->forceFill(['reference' => $reference])->save();
+
+            $senderWallet->forceFill([
+                'available_balance' => Money::sub($senderWallet->available_balance, $fee),
+            ])->save();
+
+            $feeEntry = $this->write($senderWallet, $sender, Money::sub('0', $fee), LedgerType::TransferFee, LedgerStatus::Completed, [
+                'reference' => $reference,
+                'description' => $context['fee_description'] ?? 'Frais de transfert',
+                'idempotency_key' => $key.'-fee',
+                'metadata' => $context['metadata'] ?? null,
+                'created_by' => $sender->id,
+            ]);
+
+            $recipientWallet->forceFill([
+                'available_balance' => Money::add($recipientWallet->available_balance, $amount),
+            ])->save();
+
+            $in = $this->write($recipientWallet, $recipient, $amount, LedgerType::TransferIn, LedgerStatus::Completed, [
+                'reference' => $reference,
+                'description' => $context['in_description'] ?? 'Transfert reçu',
+                'idempotency_key' => $key.'-in',
+                'metadata' => $context['metadata'] ?? null,
+                'created_by' => $sender->id,
+            ]);
+
+            return ['out' => $out, 'fee' => $feeEntry, 'in' => $in, 'replayed' => false];
+        });
+    }
+
     public function releaseWithdrawal(User $user, string $gross): void
     {
         $gross = Money::of($gross);

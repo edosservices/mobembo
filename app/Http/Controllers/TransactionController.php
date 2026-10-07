@@ -13,7 +13,12 @@ class TransactionController extends Controller
         $type = $request->string('type')->toString();
 
         $entries = $request->user()->ledgerEntries()
-            ->when($type !== '' && LedgerType::tryFrom($type), fn ($query) => $query->where('type', $type))
+            ->when($type === 'transfer', fn ($query) => $query->whereIn('type', [
+                LedgerType::TransferOut,
+                LedgerType::TransferIn,
+                LedgerType::TransferFee,
+            ]))
+            ->when($type !== '' && $type !== 'transfer' && LedgerType::tryFrom($type), fn ($query) => $query->where('type', $type))
             ->latest()
             ->paginate(20)
             ->withQueryString();

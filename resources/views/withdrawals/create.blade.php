@@ -24,9 +24,9 @@
     <div class="field"><label for="phone">Numéro de réception</label><input id="phone" name="phone" value="{{ old('phone', auth()->user()->phone) }}" required></div>
     <input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', (string) \Illuminate\Support\Str::uuid()) }}">
     <div class="grid-3">
-        <div class="stat"><span>Montant demandé</span><strong id="gross">—</strong></div>
-        <div class="stat"><span>Frais</span><strong id="fee">—</strong></div>
-        <div class="stat"><span>Montant net</span><strong id="net">—</strong></div>
+        <div class="stat"><span>Montant demandé</span><strong id="gross">{{ isset($quote) && $quote ? money($quote['amount']) : '—' }}</strong></div>
+        <div class="stat"><span>Frais</span><strong id="fee">{{ isset($quote) && $quote ? money($quote['fee']) : '—' }}</strong></div>
+        <div class="stat"><span>Montant net</span><strong id="net">{{ isset($quote) && $quote ? money($quote['net']) : '—' }}</strong></div>
     </div>
     <p class="fine-print">Les frais et le montant net sont confirmés au moment de votre demande.</p>
     <button class="btn-z" type="submit">Demander le retrait</button>

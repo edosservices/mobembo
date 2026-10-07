@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AvailableComposition;
 use App\Services\ReferralProgressService;
 use App\Support\Money;
 use Illuminate\Http\Request;
 
 class ReferralController extends Controller
 {
-    public function __invoke(Request $request, ReferralProgressService $progress)
+    public function __invoke(Request $request, ReferralProgressService $progress, AvailableComposition $composition)
     {
         $user = $request->user();
         $earned = Money::of($user->commissionsEarned()->sum('amount'));
-        $stillThere = Money::of($user->wallet->available_balance);
-        $available = Money::cmp($stillThere, $earned) >= 0 ? $earned : $stillThere;
+        $available = $composition->remaining($user)['commission'];
+
+        if (Money::cmp($available, $earned) > 0) {
+            $available = $earned;
+        }
 
         return view('referral.index', [
             'team' => $progress->snapshot($user),

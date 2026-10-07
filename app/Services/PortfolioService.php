@@ -15,6 +15,8 @@ use Illuminate\Support\Collection;
 
 class PortfolioService
 {
+    public function __construct(private AvailableComposition $composition) {}
+
     public function summary(User $user, ?Collection $active = null): array
     {
         $wallet = $user->wallet()->firstOrFail();
@@ -29,17 +31,23 @@ class PortfolioService
         }
 
         $ledger = $this->ledgerTotals($user);
+        $remaining = $this->composition->remaining($user);
         $withdrawals = $this->withdrawalTotals($user);
+        $available = Money::of($wallet->available_balance);
+        $locked = Money::of($wallet->locked_balance);
+        $invested = Money::of($wallet->invested_balance);
 
         return [
-            'available' => Money::of($wallet->available_balance),
-            'locked' => Money::of($wallet->locked_balance),
-            'invested' => Money::of($wallet->invested_balance),
+            'available' => $available,
+            'locked' => $locked,
+            'invested' => $invested,
+            'portfolio_total' => Money::add(Money::add($available, $locked), $invested),
             'returns_total' => $ledger['returns_total'],
             'returns_today' => $ledger['returns_today'],
+            'profit_available' => $remaining['profit'],
             'estimate_today' => $estimate,
-            'bonus' => $ledger['bonus'],
-            'commissions' => $ledger['commissions'],
+            'bonus' => $remaining['bonus'],
+            'commissions' => $remaining['commission'],
             'withdrawals_pending' => $withdrawals['pending'],
             'withdrawals_paid' => $withdrawals['paid'],
             'active_count' => $active->count(),
@@ -47,38 +55,24 @@ class PortfolioService
     }
 
     /**
-     * @return array{returns_total: string, returns_today: string, bonus: string, commissions: string}
+     * @return array{returns_total: string, returns_today: string}
      */
     private function ledgerTotals(User $user): array
     {
         $row = LedgerEntry::query()
             ->where('user_id', $user->id)
             ->where('status', LedgerStatus::Completed)
-            ->whereIn('type', [
-                LedgerType::InvestmentReturn,
-                LedgerType::Bonus,
-                LedgerType::ReferralCommission,
-            ])
+            ->where('type', LedgerType::InvestmentReturn)
             ->selectRaw(
-                'COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) as returns_total,
-                 COALESCE(SUM(CASE WHEN type = ? AND date(created_at) = ? THEN amount ELSE 0 END), 0) as returns_today,
-                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) as bonus,
-                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) as commissions',
-                [
-                    LedgerType::InvestmentReturn->value,
-                    LedgerType::InvestmentReturn->value,
-                    today()->toDateString(),
-                    LedgerType::Bonus->value,
-                    LedgerType::ReferralCommission->value,
-                ],
+                'COALESCE(SUM(amount), 0) as returns_total,
+                 COALESCE(SUM(CASE WHEN date(created_at) = ? THEN amount ELSE 0 END), 0) as returns_today',
+                [today()->toDateString()],
             )
             ->first();
 
         return [
             'returns_total' => Money::of($row->returns_total ?? 0),
             'returns_today' => Money::of($row->returns_today ?? 0),
-            'bonus' => Money::of($row->bonus ?? 0),
-            'commissions' => Money::of($row->commissions ?? 0),
         ];
     }
 

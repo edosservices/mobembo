@@ -25,6 +25,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransferController;
 use App\Http\Controllers\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +85,9 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::post('/deposer', [DepositController::class, 'store'])->name('deposits.store');
     Route::get('/retirer', [WithdrawalController::class, 'create'])->name('withdrawals.create');
     Route::post('/retirer', [WithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::get('/transferer', [TransferController::class, 'create'])->name('transfers.create');
+    Route::post('/transferer/apercu', [TransferController::class, 'preview'])->name('transfers.preview');
+    Route::post('/transferer', [TransferController::class, 'store'])->name('transfers.store');
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/parrainage', ReferralController::class)->name('referral');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

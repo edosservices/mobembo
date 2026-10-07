@@ -13,6 +13,9 @@ enum LedgerType: string
     case ReferralCommission = 'referral_commission';
     case WithdrawalFee = 'withdrawal_fee';
     case AdminAdjustment = 'admin_adjustment';
+    case TransferOut = 'transfer_out';
+    case TransferIn = 'transfer_in';
+    case TransferFee = 'transfer_fee';
 
     public function label(): string
     {
@@ -26,14 +29,17 @@ enum LedgerType: string
             self::ReferralCommission => 'Commission de parrainage',
             self::WithdrawalFee => 'Frais de retrait',
             self::AdminAdjustment => 'Ajustement administrateur',
+            self::TransferOut => 'Transfert envoyé',
+            self::TransferIn => 'Transfert reçu',
+            self::TransferFee => 'Frais de transfert',
         };
     }
 
     public function tone(): string
     {
         return match ($this) {
-            self::Deposit, self::InvestmentReturn, self::CapitalReturn, self::Bonus, self::ReferralCommission => 'ok',
-            self::Withdrawal, self::Investment, self::WithdrawalFee => 'info',
+            self::Deposit, self::InvestmentReturn, self::CapitalReturn, self::Bonus, self::ReferralCommission, self::TransferIn => 'ok',
+            self::Withdrawal, self::Investment, self::WithdrawalFee, self::TransferOut, self::TransferFee => 'info',
             self::AdminAdjustment => 'warn',
         };
     }

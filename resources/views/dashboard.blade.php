@@ -6,14 +6,71 @@
     <h1>Bonjour {{ $firstName }}</h1>
     <p>Voici l'état de votre portefeuille.</p>
 </header>
-<div class="dash-stats">
-    <div class="stat"><span>Capital investi</span><strong>{{ money($summary['invested']) }}</strong></div>
-    <div class="stat"><span>Profit total</span><strong>{{ money($summary['returns_total']) }}</strong></div>
-    <div class="stat"><span>Bonus</span><strong>{{ money($summary['bonus']) }}</strong></div>
-    <div class="stat"><span>Commissions</span><strong>{{ money($summary['commissions']) }}</strong></div>
-    <div class="stat"><span>Solde retirable</span><strong>{{ money($summary['available']) }}</strong></div>
-    <div class="stat"><span>Retraits en attente</span><strong>{{ money($summary['withdrawals_pending']) }}</strong></div>
-    <div class="stat"><span>Retraits effectués</span><strong>{{ money($summary['withdrawals_paid']) }}</strong></div>
+<div class="row g-2 g-md-3 balance-grid">
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-invested" data-balance="invested">
+            <i class="bi bi-building" aria-hidden="true"></i>
+            <span>Capital investi</span>
+            <strong>{{ money($summary['invested']) }}</strong>
+            <small>Non retirable</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-available" data-balance="available">
+            <i class="bi bi-wallet2" aria-hidden="true"></i>
+            <span>Solde retirable</span>
+            <strong>{{ money($summary['available']) }}</strong>
+            <small>Disponible maintenant</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-profit" data-balance="profit">
+            <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+            <span>Profit total</span>
+            <strong>{{ money($summary['profit_available']) }}</strong>
+            <small>Encore disponible</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-bonus" data-balance="bonus">
+            <i class="bi bi-gift" aria-hidden="true"></i>
+            <span>Bonus</span>
+            <strong>{{ money($summary['bonus']) }}</strong>
+            <small>Encore disponible</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-commission" data-balance="commission">
+            <i class="bi bi-people" aria-hidden="true"></i>
+            <span>Commissions</span>
+            <strong>{{ money($summary['commissions']) }}</strong>
+            <small>Encore disponibles</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-total" data-balance="total">
+            <i class="bi bi-pie-chart" aria-hidden="true"></i>
+            <span>Total portefeuille</span>
+            <strong>{{ money($summary['portfolio_total']) }}</strong>
+            <small>Disponible, réservé et investi</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-pending" data-balance="pending">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+            <span>Retraits en attente</span>
+            <strong>{{ money($summary['withdrawals_pending']) }}</strong>
+            <small>Demandés ou en traitement</small>
+        </article>
+    </div>
+    <div class="col-6 col-lg-4 col-xxl-3">
+        <article class="balance-card balance-paid" data-balance="paid">
+            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+            <span>Retraits effectués</span>
+            <strong>{{ money($summary['withdrawals_paid']) }}</strong>
+            <small>Déjà payés</small>
+        </article>
+    </div>
 </div>
 <div class="dash-actions">
     <a class="btn-z" data-dashboard-deposit href="{{ route('deposits.create') }}">+ Faire un dépôt</a>
