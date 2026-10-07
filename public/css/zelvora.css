@@ -208,8 +208,42 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
 .balance-pending { background: #2a211c; }
 .balance-paid { background: #3d2424; }
 .balance-daily { background: #4e2430; }
-.daily-revenue-card { margin: 0 0 0.85rem; }
-.portfolio-services { margin: 0.2rem 0 1rem; }
+.portfolio-page { font-size: 0.84rem; }
+.portfolio-title { font-size: clamp(1.45rem, 6.5vw, 2.15rem); line-height: 1.1; margin: 0 0 0.75rem; }
+.portfolio-subtitle { font-size: 1.15rem; margin: 1.1rem 0 0.55rem; }
+.daily-revenue-card {
+    margin: 0 0 0.75rem;
+    background: #4e2430;
+    color: #f7f5f2;
+    border-radius: 0.85rem;
+    box-shadow: 0 8px 18px rgba(17, 17, 17, 0.12);
+}
+.daily-revenue-card .card-body { padding: 0.7rem 0.8rem; }
+.daily-revenue-card i { font-size: 1.05rem; color: #e7dcc4; }
+.daily-revenue-card .daily-label {
+    display: block;
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.86;
+}
+.daily-revenue-card strong {
+    display: block;
+    margin-top: 0.05rem;
+    font-size: 1.05rem;
+    line-height: 1.15;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+.daily-revenue-card .daily-note {
+    margin-top: 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    opacity: 0.9;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+.portfolio-services { margin: 0 0 0.85rem; }
 .portfolio-service {
     display: block;
     text-decoration: none;
@@ -217,11 +251,17 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; margin: 0.4rem 0 
     border-radius: 0.8rem;
     box-shadow: 0 8px 18px rgba(17, 17, 17, 0.12);
 }
-.portfolio-service .card-body { padding: 0.5rem 0.4rem; text-align: center; }
-.portfolio-service i { display: block; font-size: 0.95rem; margin-bottom: 0.15rem; color: #e7dcc4; }
-.portfolio-service strong, .portfolio-service span { display: block; }
-.portfolio-service strong { font-size: clamp(0.68rem, 2.8vw, 0.86rem); white-space: nowrap; letter-spacing: -0.01em; }
-.portfolio-service span { margin-top: 0.1rem; font-size: clamp(0.55rem, 2.2vw, 0.66rem); line-height: 1.2; color: rgba(247, 245, 242, 0.82); overflow-wrap: normal; word-break: keep-all; }
+.portfolio-service .card-body { padding: 0.55rem 0.3rem; text-align: center; }
+.portfolio-service i { display: block; font-size: 0.95rem; margin-bottom: 0.2rem; color: #e7dcc4; }
+.portfolio-service strong, .portfolio-service span { display: block; overflow-wrap: normal; word-break: keep-all; hyphens: manual; }
+.portfolio-service strong { font-size: 0.72rem; line-height: 1.15; white-space: nowrap; letter-spacing: 0; }
+.portfolio-service span { margin-top: 0.12rem; font-size: 0.62rem; line-height: 1.25; color: rgba(247, 245, 242, 0.82); }
+.portfolio-holdings { display: grid; gap: 0.55rem; margin-bottom: 0.8rem; }
+.holding-card { border-radius: 0.85rem; }
+.holding-card .card-body { padding: 0.7rem 0.75rem; }
+.holding-name { font-weight: 800; text-decoration: none; }
+.holding-card dt { color: var(--muted); font-size: 0.66rem; font-weight: 700; }
+.holding-card dd { margin: 0; font-size: 0.78rem; font-weight: 800; }
 .service-deposit { background: #9f2d2d; }
 .service-withdraw { background: #111111; }
 .service-transfer { background: #6e2430; }
@@ -885,9 +925,12 @@ body.home-page .topbar .btn-z.small { color: #111; background: #f3efe8; }
 }
 @media (max-width: 420px) {
     .admin-main { padding: 0.75rem; }
+    .portfolio-service span { display: none; }
+    .portfolio-service .card-body { padding: 0.5rem 0.2rem; }
+    .portfolio-service strong { font-size: 0.68rem; }
 }
 @media (max-width: 360px) {
-    .balance-card .card-body, .portfolio-service .card-body { padding: 0.45rem 0.35rem; }
+    .balance-card .card-body { padding: 0.45rem 0.35rem; }
     .op-btn { font-size: 0.92rem; }
 }
 @media (prefers-reduced-motion: reduce) {
