@@ -161,6 +161,58 @@ class AdminOperationsTest extends TestCase
         $this->assertSame('30.00', Money::of($user->wallet()->first()->available_balance));
     }
 
+    public function test_admin_can_publish_whatsapp_and_telegram_links(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->get(route('home'))->assertRedirect(route('login'));
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertDontSee('Rejoindre WhatsApp')
+            ->assertDontSee('Rejoindre Telegram');
+        $this->get(route('contact'))->assertOk()->assertDontSee('Rejoindre WhatsApp');
+
+        $this->actingAs($admin)->get(route('admin.settings.edit'))
+            ->assertOk()
+            ->assertSee('Groupes WhatsApp et Telegram')
+            ->assertSee('name="whatsapp_url"', false)
+            ->assertSee('name="telegram_url"', false);
+
+        $this->actingAs($admin)->put(route('admin.settings.update'), [
+            ...$this->settingsPayload(),
+            'whatsapp_url' => 'javascript:alert(1)',
+            'telegram_url' => 'https://t.me/zelvora',
+        ])->assertSessionHasErrors('whatsapp_url');
+
+        $this->assertNull(PlatformSetting::current()->fresh()->whatsapp_url);
+
+        $this->actingAs($admin)->put(route('admin.settings.update'), [
+            ...$this->settingsPayload(),
+            'whatsapp_url' => 'https://chat.whatsapp.com/zelvora',
+            'telegram_url' => 'https://t.me/zelvora',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $settings = PlatformSetting::current()->fresh();
+        $this->assertSame('https://chat.whatsapp.com/zelvora', $settings->whatsapp_url);
+        $this->assertSame('https://t.me/zelvora', $settings->telegram_url);
+
+        auth()->logout();
+
+        $this->get(route('home'))->assertRedirect(route('login'));
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertDontSee('Rejoindre WhatsApp')
+            ->assertDontSee('Rejoindre Telegram');
+
+        $this->get(route('contact'))->assertOk()->assertSee('Rejoindre WhatsApp')->assertSee('Rejoindre Telegram');
+
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Rejoindre WhatsApp')
+            ->assertSee('Rejoindre Telegram');
+    }
+
     public function test_a_client_cannot_open_another_account(): void
     {
         $user = User::factory()->create();
@@ -169,6 +221,23 @@ class AdminOperationsTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.users.impersonate', $other))
             ->assertForbidden();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function settingsPayload(): array
+    {
+        return [
+            'withdrawal_fee_percent' => '5',
+            'withdrawal_fee_fixed' => '0.00',
+            'withdrawal_min' => '5.00',
+            'withdrawal_max' => '10000.00',
+            'referral_enabled' => '1',
+            'referral_trigger' => 'approved_deposit',
+            'referral_rate_percent' => '10',
+            'legal_disclaimer' => 'Les rendements affichés sont des estimations.',
+        ];
     }
 
     private function credit(User $user, string $amount): void
